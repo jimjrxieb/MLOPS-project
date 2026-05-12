@@ -1,0 +1,114 @@
+# MLOPS-project CI — runs on changes to the BERU agent or its tests.
+#
+# This is the standalone-repo variant: paths are relative to the GP-MODEL-OPS
+# root (= the MLOPS-project repo root). A near-identical workflow scoped to
+# `GP-MODEL-OPS/BERU-AI/**` also lives in the parent GP-Copilot monorepo.
+#
+# Jobs:
+#   test  — slim runtime deps + pytest on the BERU unit/regression suite (89 tests)
+#   build — validate docker-compose config, build the 287 MB API image,
+#           smoke-test that the container boots and serves /health, /docs, /tracking
+#
+# Note: the BERU agent reads NIST playbooks from a path given by BERU_NIST_DIR
+# (mounted in docker-compose). That content lives in the GP-Copilot repo, not
+# here — so the smoke test below verifies the API *boots* (health = degraded,
+# since no Ollama is wired and no playbooks mounted), not that grade-ssp runs
+# end-to-end. For deeper CI, vendor a small NIST-800-53 fixture or add it as a
+# submodule.
+
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'BERU-AI/**'
+      - '8-tests/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'BERU-AI/**'
+      - '8-tests/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # ============================================================
+  # test — agent guards, HITL router, tools, core mappers
+  # ============================================================
+  test:
+    name: Unit & regression tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies (slim runtime + pytest)
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-asyncio
+          # Inference-path deps only — no torch/transformers/unsloth.
+          pip install -r BERU-AI/requirements-api.txt
+
+      - name: Run BERU test suite
+        run: |
+          python -m pytest -v \
+            8-tests/test_evidence_guard.py \
+            8-tests/test_beru_tools.py \
+            8-tests/test_beru_core.py
+
+  # ============================================================
+  # build — container builds and boots
+  # ============================================================
+  build:
+    name: Build & smoke-test container
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Validate docker-compose config
+        working-directory: BERU-AI
+        run: docker compose config --quiet && echo "compose config OK"
+
+      - name: Build BERU API image
+        working-directory: BERU-AI
+        run: |
+          docker build -t beru-api:ci .
+          docker images beru-api:ci --format '{{.Repository}}:{{.Tag}}  {{.Size}}'
+
+      - name: Smoke-test the container (boots, serves /health, /docs, /tracking)
+        run: |
+          docker run -d --name beru-ci-smoke -p 8088:8088 beru-api:ci
+          for i in $(seq 1 15); do
+            if curl -sf -o /dev/null http://localhost:8088/api/beru/health; then break; fi
+            sleep 1
+          done
+          echo "--- /api/beru/health (expect 'degraded' — no Ollama wired in CI) ---"
+          curl -sf http://localhost:8088/api/beru/health
+          echo
+          echo "--- /docs status ---"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8088/docs)" = "200"
+          echo "/docs -> 200 OK"
+          echo "--- /api/beru/tracking ---"
+          curl -sf http://localhost:8088/api/beru/tracking
+          echo
+          echo "--- container logs ---"
+          docker logs beru-ci-smoke
+
+      - name: Tear down
+        if: always()
+        run: docker rm -f beru-ci-smoke || true
