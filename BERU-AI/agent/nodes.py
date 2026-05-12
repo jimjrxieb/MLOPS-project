@@ -126,21 +126,37 @@ def _extract_ssp_claims(text: str) -> List[Dict[str, Any]]:
     return out
 
 
+def _base_control(cid: str) -> str:
+    """AC-2(1) -> AC-2, AC-6(5)(a) -> AC-6. We only have base-control files;
+    the enhancement number is kept as context on the chunk, not used for lookup."""
+    return cid.split("(")[0].strip() if cid else cid
+
+
 def _merge_ssp_chunks(parser_chunks: List[Dict[str, Any]], raw_text: str,
                       candidate: List[str], evidence: List[Dict[str, Any]]) -> None:
     """Take whatever the parser found, then backfill from a regex pass over the
-    raw text so single-line pastes and odd formatting still produce controls."""
-    have_cid = set()
+    raw text so single-line pastes and odd formatting still produce controls.
+
+    Control IDs that carry an enhancement number (AC-2(1)) are normalized to
+    their base control (AC-2) for file lookup and candidate selection — real
+    SSPs cite enhancements, but we only have base-control files. The full
+    enhancement ref is stashed on the chunk so the model can still cite it.
+    """
+    have_base = set()
     for c in parser_chunks:
         cid = c.get("control_id")
-        if cid and control_exists(cid) and cid not in candidate:
-            candidate.append(cid)
         if cid:
-            have_cid.add(cid)
+            base = _base_control(cid)
+            if control_exists(base):
+                if base not in candidate:
+                    candidate.append(base)
+                have_base.add(base)
+                c = {**c, "control_id": base,
+                     "enhancement_ref": cid if "(" in cid else None}
         evidence.append({"ssp_chunk": c})
     for c in _extract_ssp_claims(raw_text):
-        cid = c["control_id"]
-        if cid in have_cid:
+        cid = c["control_id"]  # already a base id (split on "(") in _extract_ssp_claims
+        if cid in have_base:
             continue  # parser already covered it
         if control_exists(cid) and cid not in candidate:
             candidate.append(cid)
