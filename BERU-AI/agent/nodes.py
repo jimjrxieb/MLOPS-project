@@ -99,6 +99,54 @@ def _get_ssp_parser():
 # ---------------------------------------------------------------------------
 # Nodes
 # ---------------------------------------------------------------------------
+# Matches "**AC-2**: narrative", "AC-2: narrative", "AC-6(5) — narrative" — one per line.
+_SSP_CLAIM_RE = re.compile(
+    r"^\s*\**\s*([A-Z]{2}-\d+(?:\(\d+\))?)\s*\**\s*[:\-—]\s*(.+?)\s*$",
+    re.MULTILINE,
+)
+
+
+def _extract_ssp_claims(text: str) -> List[Dict[str, Any]]:
+    """Pull `<CONTROL>: <narrative>` lines straight out of pasted SSP text.
+
+    Backstop for the structured SSP parser, which only recognizes control
+    sections when they have a list-like shape (≥2 entries / a known header).
+    A user pasting one control line gets handled too.
+    """
+    out: List[Dict[str, Any]] = []
+    seen = set()
+    for m in _SSP_CLAIM_RE.finditer(text or ""):
+        cid = m.group(1).split("(")[0]
+        narrative = m.group(2).strip()
+        if cid in seen:
+            continue
+        seen.add(cid)
+        out.append({"chunk_type": "control_implementation", "control_id": cid,
+                    "text": narrative, "source_file": "pasted"})
+    return out
+
+
+def _merge_ssp_chunks(parser_chunks: List[Dict[str, Any]], raw_text: str,
+                      candidate: List[str], evidence: List[Dict[str, Any]]) -> None:
+    """Take whatever the parser found, then backfill from a regex pass over the
+    raw text so single-line pastes and odd formatting still produce controls."""
+    have_cid = set()
+    for c in parser_chunks:
+        cid = c.get("control_id")
+        if cid and control_exists(cid) and cid not in candidate:
+            candidate.append(cid)
+        if cid:
+            have_cid.add(cid)
+        evidence.append({"ssp_chunk": c})
+    for c in _extract_ssp_claims(raw_text):
+        cid = c["control_id"]
+        if cid in have_cid:
+            continue  # parser already covered it
+        if control_exists(cid) and cid not in candidate:
+            candidate.append(cid)
+        evidence.append({"ssp_chunk": c})
+
+
 def parse_input(state: BERUState) -> Dict[str, Any]:
     """Classify input + extract initial evidence items and candidate control IDs."""
     itype = state["input_type"]
@@ -135,12 +183,9 @@ def parse_input(state: BERUState) -> Dict[str, Any]:
         else:
             try:
                 parser = _get_ssp_parser()
+                raw_text = Path(path).read_text(errors="replace") if path else raw
                 chunks = parser.parse_file(path) if path else parser.parse_text(raw, "inline")
-                for c in chunks:
-                    cid = c.get("control_id")
-                    if cid and control_exists(cid) and cid not in candidate_controls:
-                        candidate_controls.append(cid)
-                    evidence.append({"ssp_chunk": c})
+                _merge_ssp_chunks(chunks, raw_text, candidate_controls, evidence)
             except Exception as e:
                 errors.append(f"ssp parse failed: {e}")
 
@@ -153,12 +198,9 @@ def parse_input(state: BERUState) -> Dict[str, Any]:
         else:
             try:
                 parser = _get_ssp_parser()
+                raw_text = Path(path).read_text(errors="replace") if path else raw
                 chunks = parser.parse_file(path) if path else parser.parse_text(raw, "inline")
-                for c in chunks:
-                    cid = c.get("control_id")
-                    if cid and control_exists(cid) and cid not in candidate_controls:
-                        candidate_controls.append(cid)
-                    evidence.append({"ssp_chunk": c})
+                _merge_ssp_chunks(chunks, raw_text, candidate_controls, evidence)
             except Exception as e:
                 errors.append(f"ssp parse failed: {e}")
 
@@ -202,6 +244,19 @@ def parse_input(state: BERUState) -> Dict[str, Any]:
             cid = m.group(0).split("(")[0]
             if cid not in candidate_controls and control_exists(cid):
                 candidate_controls.append(cid)
+        # If the text names no control IDs (e.g. a pasted scanner finding), infer
+        # candidate controls from its content via the deterministic mapper.
+        if not candidate_controls:
+            try:
+                mapped = _get_mapper().map_finding({
+                    "title": raw[:200], "description": raw[:4000],
+                    "ai_context": ai_context,
+                })
+                for cid in mapped.get("controls", []):
+                    if control_exists(cid) and cid not in candidate_controls:
+                        candidate_controls.append(cid)
+            except Exception as e:
+                errors.append(f"control inference failed: {e}")
         evidence.append({"freeform": raw})
 
     elif itype == "ciso_briefing":
