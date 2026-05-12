@@ -104,25 +104,63 @@ _SSP_CLAIM_RE = re.compile(
     r"^\s*\**\s*([A-Z]{2}-\d+(?:\(\d+\))?)\s*\**\s*[:\-—]\s*(.+?)\s*$",
     re.MULTILINE,
 )
+# Matches a markdown section header like "## PL-2 — System Security and Privacy Plans"
+# or "### AC-6(5) — Privileged Accounts" — the body is the rest of the section.
+_SSP_HEADER_RE = re.compile(
+    r"^(#{2,4})\s+([A-Z]{2}-\d+(?:\(\d+\))?)\b.*$",
+    re.MULTILINE,
+)
 
 
 def _extract_ssp_claims(text: str) -> List[Dict[str, Any]]:
-    """Pull `<CONTROL>: <narrative>` lines straight out of pasted SSP text.
+    """Pull control narratives straight out of SSP text — backstop for the
+    structured SSP parser, which only recognizes control sections when they
+    have a list-like shape (≥2 entries / a known header).
 
-    Backstop for the structured SSP parser, which only recognizes control
-    sections when they have a list-like shape (≥2 entries / a known header).
-    A user pasting one control line gets handled too.
+    Two passes:
+      1. inline lines — "**AC-2**: narrative" / "AC-2: narrative" / "AC-6(5) — narrative"
+      2. section headers — "## PL-2 — Title" / "### AC-6(5) — Title", with the
+         section body (down to the next ## / ### control header or a top-level
+         ## non-control header) used as the narrative. This is what makes a
+         single-control SSP like PL-ssp-*.md gradable.
     """
     out: List[Dict[str, Any]] = []
     seen = set()
+
+    # pass 1 — inline lines (most targeted; takes precedence)
     for m in _SSP_CLAIM_RE.finditer(text or ""):
         cid = m.group(1).split("(")[0]
-        narrative = m.group(2).strip()
         if cid in seen:
             continue
         seen.add(cid)
         out.append({"chunk_type": "control_implementation", "control_id": cid,
-                    "text": narrative, "source_file": "pasted"})
+                    "text": m.group(2).strip(), "source_file": "pasted",
+                    "enhancement_ref": m.group(1) if "(" in m.group(1) else None})
+
+    # pass 2 — section headers
+    headers = list(_SSP_HEADER_RE.finditer(text or ""))
+    for i, m in enumerate(headers):
+        full_id = m.group(2)
+        cid = full_id.split("(")[0]
+        if cid in seen:
+            continue
+        seen.add(cid)
+        body_start = m.end()
+        # body runs to the next control header, or the next top-level "## " header
+        # that is NOT a control (e.g. "## What Makes This GREAT"), or end of text.
+        body_end = len(text)
+        if i + 1 < len(headers):
+            body_end = headers[i + 1].start()
+        nonctl = re.search(r"^##\s+(?![A-Z]{2}-\d)", text[body_start:body_end], re.MULTILINE)
+        if nonctl:
+            body_end = body_start + nonctl.start()
+        body = text[body_start:body_end].strip()
+        # strip the immediate sub-heading scaffolding so the narrative reads cleanly
+        body = re.sub(r"^#{2,6}\s+", "", body, flags=re.MULTILINE).strip()
+        if body:
+            out.append({"chunk_type": "control_implementation", "control_id": cid,
+                        "text": body[:6000], "source_file": "pasted",
+                        "enhancement_ref": full_id if "(" in full_id else None})
     return out
 
 
