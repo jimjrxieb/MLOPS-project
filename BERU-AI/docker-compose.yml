@@ -11,8 +11,9 @@
 # Then: http://localhost:8088/docs  (Swagger UI)
 #       http://localhost:8088/api/beru/health
 #
-# Note: paths are relative to BERU-AI/ — `../../GP-CONSULTING` is the repo's
-# GP-CONSULTING dir, `../CAPSTONE-PROJECT` is the sibling capstone dir.
+# Self-contained: the agent reads its NIST 800-53 corpus + AI RMF frameworks
+# from the bundled knowledge/ dir (baked into the image) — no playbook mounts
+# needed. The only host path mounted is the GGUF for model-init.
 
 services:
 
@@ -61,14 +62,9 @@ services:
     environment:
       OLLAMA_HOST: http://ollama:11434
       BERU_MODEL: beru:v1.4
-      BERU_NIST_DIR: /nist
-      BERU_CROSSWALK_PATH: /crosswalk/800-53-to-ai-rmf.md
       MLFLOW_BERU_TRACKING_URI: file:///app/mlruns
+      # (no BERU_NIST_DIR / BERU_CROSSWALK_PATH — agent uses the bundled /app/knowledge/)
     volumes:
-      # Playbooks, controls, templates, ssp-examples — read-only, canonical source.
-      - ../../GP-CONSULTING/NIST-800-53:/nist:ro
-      # 800-53 ↔ AI RMF crosswalk.
-      - ../CAPSTONE-PROJECT/frameworks/crosswalk:/crosswalk:ro
       # MLflow tracking output — writable, persisted on the host.
       - ./mlruns:/app/mlruns
       # Evidence ZIPs land here.

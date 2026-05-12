@@ -13,40 +13,26 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 
-# Resolve GP-CONSULTING/NIST-800-53. Two ways:
-#   1. BERU_NIST_DIR env var (set this inside containers — the repo layout
-#      doesn't exist at the same relative path once BERU-AI is COPY'd alone)
-#   2. Fall back to the in-repo relative path:
-#      BERU-AI/agent/playbook_loader.py
-#        parents[1] = BERU-AI, parents[2] = GP-MODEL-OPS, parents[3] = GP-copilot (repo root)
-def _repo_root_or_none() -> Optional[Path]:
-    """The repo root if we're running inside the source tree; None if not deep enough."""
-    p = Path(__file__).resolve()
-    return p.parents[3] if len(p.parents) > 3 else None
+# Where the agent reads its NIST 800-53 corpus + AI RMF frameworks.
+#
+# Default: the bundled copy at BERU-AI/knowledge/ — this makes BERU self-contained
+# (clone the repo, the agent has everything it needs, no external dirs to mount).
+#   BERU-AI/agent/playbook_loader.py  →  parents[1] == BERU-AI
+#
+# Override via env: BERU_NIST_DIR / BERU_CROSSWALK_PATH. Useful if you want the
+# agent to read the canonical source in GP-CONSULTING/NIST-800-53 instead of the
+# bundled snapshot. (knowledge/ IS a snapshot — re-sync if the canonical source
+# changes; see knowledge/README.md.)
+_BERU_AI_ROOT = Path(__file__).resolve().parents[1]
+_BUNDLED_NIST = _BERU_AI_ROOT / "knowledge" / "nist-800-53"
+_BUNDLED_CROSSWALK = _BERU_AI_ROOT / "knowledge" / "frameworks" / "crosswalk" / "800-53-to-ai-rmf.md"
 
-
-_REPO_ROOT = _repo_root_or_none()
-
-
-def _default_nist_dir() -> str:
-    if _REPO_ROOT is not None:
-        return str(_REPO_ROOT / "GP-CONSULTING" / "NIST-800-53")
-    # No repo layout (e.g. container without BERU_NIST_DIR set) — last-resort path.
-    return "/nist"
-
-
-def _default_crosswalk_path() -> str:
-    if _REPO_ROOT is not None:
-        return str(_REPO_ROOT / "GP-MODEL-OPS" / "CAPSTONE-PROJECT" / "frameworks" / "crosswalk" / "800-53-to-ai-rmf.md")
-    return "/crosswalk/800-53-to-ai-rmf.md"
-
-
-NIST_DIR = Path(os.environ.get("BERU_NIST_DIR", _default_nist_dir()))
+NIST_DIR = Path(os.environ.get("BERU_NIST_DIR", str(_BUNDLED_NIST)))
 PLAYBOOK_DIR = NIST_DIR / "playbooks"
 CONTROL_DIR = NIST_DIR / "controls"
 TEMPLATE_DIR = NIST_DIR / "templates"
 SSP_EXAMPLE_DIR = NIST_DIR / "ssp-examples"
-CROSSWALK_PATH = Path(os.environ.get("BERU_CROSSWALK_PATH", _default_crosswalk_path()))
+CROSSWALK_PATH = Path(os.environ.get("BERU_CROSSWALK_PATH", str(_BUNDLED_CROSSWALK)))
 
 
 def _family_for(control_id: str) -> str:

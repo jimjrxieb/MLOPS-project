@@ -19,27 +19,23 @@ WORKDIR /app
 COPY requirements-api.txt .
 RUN pip install --no-cache-dir -r requirements-api.txt
 
-# App source — agent, api, core, tools, providers, mlops.
+# App source — agent, api, core, tools, providers, mlops, knowledge/.
 # .dockerignore strips training-data/, mlruns/, *.gguf, caches.
+# knowledge/ (the bundled NIST 800-53 corpus + AI RMF frameworks, ~2 MB) IS
+# included — that's what makes the agent self-contained, no mounts needed.
 COPY --chown=beru:beru . /app/
 
 # MLflow file-store dir. In compose this is a bind mount; create it here so
 # standalone `docker run` also gets working tracking instead of degrading.
 RUN mkdir -p /app/mlruns && chown -R beru:beru /app/mlruns
 
-# Where playbooks / crosswalk are mounted in the container (overrides the
-# in-repo relative-path resolution that doesn't apply once BERU-AI is alone).
-ENV BERU_NIST_DIR=/nist \
-    BERU_CROSSWALK_PATH=/crosswalk/800-53-to-ai-rmf.md \
-    BERU_MODEL=beru:v1.4 \
+# No BERU_NIST_DIR / BERU_CROSSWALK_PATH here — the agent's defaults point at
+# the bundled /app/knowledge/ copy. Override those env vars only if you want it
+# to read a different (e.g. canonical GP-CONSULTING) checkout.
+ENV BERU_MODEL=beru:v1.4 \
     OLLAMA_HOST=http://ollama:11434 \
     MLFLOW_BERU_TRACKING_URI=file:///app/mlruns \
     PYTHONUNBUFFERED=1
-
-# The OllamaProvider reads base_url from config; we also export OLLAMA_HOST.
-# Bridge it: providers/ollama.py uses config.get("base_url", "http://localhost:11434"),
-# so we set the env the entrypoint script translates. (Simpler: the provider
-# could read OLLAMA_HOST directly — see entrypoint.)
 
 USER beru
 EXPOSE 8088
