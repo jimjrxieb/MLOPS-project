@@ -1,0 +1,41 @@
+# Experiment: BERU v1 — CySA+/NIST Fine-Tune
+# Hypothesis: LLaMA 3.1-8B can learn scanner triage patterns and NIST mapping
+# from real seclab findings via LoRA fine-tuning
+
+experiment_id: "exp-004-beru-v1-cysa"
+model: "beru"
+base_model: "unsloth/Llama-3.1-8B-Instruct"
+
+lora:
+  r: 64
+  alpha: 128
+  dropout: 0
+  target_modules: ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+
+training:
+  epochs_per_chunk: 2
+  batch_size: 4
+  gradient_accumulation_steps: 8
+  learning_rate: 2e-5
+  warmup_ratio: 0.03
+  lr_scheduler: "cosine"
+  weight_decay: 0.01
+  max_seq_length: 2048
+  load_in_4bit: true
+
+domain_weights:
+  threat_vuln_management: 0.30
+  security_ops_monitoring: 0.25
+  nist_compliance_mapping: 0.20
+  incident_response_forensics: 0.15
+  risk_management_reporting: 0.10
+
+data:
+  source: "0-data-lab/seclab-findings/"
+  corpus_version: "TBD — pending seclab data collection"
+  quality_gate: "8-tests/test_beru_schemas.py"
+
+eval:
+  suite: "4-eval-clarify/beru_eval_suite_v1.jsonl"
+  promotion_threshold: 0.60
+  domain_minimum: 0.50

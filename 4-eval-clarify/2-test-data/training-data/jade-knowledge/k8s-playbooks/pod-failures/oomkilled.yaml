@@ -1,0 +1,240 @@
+# JADE Operational Playbook: OOMKilled
+# Container killed by kernel due to memory exhaustion
+
+name: OOMKilled
+category: pod-failures
+severity: HIGH
+frequency: COMMON
+
+trigger_patterns:
+  - "OOMKilled"
+  - "reason: OOMKilled"
+  - "Exit Code: 137"
+  - "Memory cgroup out of memory"
+  - "Killed process .* total-vm"
+
+description: |
+  Container exceeded its memory limit and was killed by the Linux OOM killer.
+  Exit code 137 = 128 + 9 (SIGKILL). The kernel kills the process to protect the node.
+
+gameplan:
+  step_1:
+    name: "Confirm OOMKilled and get memory details"
+    commands:
+      - "kubectl describe pod {pod} -n {ns} | grep -A3 'Last State'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.status.containerStatuses[0].lastState.terminated}'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.containers[0].resources}'"
+
+    extract:
+      - "Exit Code: 137"
+      - "Reason: OOMKilled"
+      - "Current memory limit"
+      - "Current memory request"
+
+    analysis:
+      no_limit_set:
+        condition: "resources.limits.memory is null"
+        meaning: "No memory limit - container uses node memory until killed"
+        fix_rank: "D"
+        fix: "Set appropriate memory limit"
+
+      limit_too_low:
+        condition: "OOMKilled within minutes of start"
+        meaning: "Memory limit insufficient for normal operation"
+        fix_rank: "D"
+        fix: "Increase memory limit"
+
+      gradual_increase:
+        condition: "OOMKilled after running for hours/days"
+        meaning: "Possible memory leak"
+        fix_rank: "C"
+        fix: "Investigate application memory usage pattern"
+
+  step_2_analyze_memory_usage:
+    name: "Analyze memory consumption pattern"
+    commands:
+      - "kubectl top pod {pod} -n {ns} --containers"
+      - "kubectl exec {pod} -n {ns} -- cat /sys/fs/cgroup/memory/memory.usage_in_bytes 2>/dev/null || kubectl exec {pod} -n {ns} -- cat /sys/fs/cgroup/memory.current"
+      - "kubectl exec {pod} -n {ns} -- cat /proc/meminfo | head -5"
+
+    if_metrics_available:
+      prometheus_query: |
+        container_memory_working_set_bytes{pod="{pod}", namespace="{ns}"}
+      grafana_dashboard: "kubernetes-pod-resources"
+
+    analysis_questions:
+      - "Is memory usage constant or growing over time?"
+      - "Does it spike during specific operations?"
+      - "What percentage of limit was being used before kill?"
+
+  step_3_determine_cause:
+    name: "Identify root cause"
+
+    causes:
+      startup_oom:
+        indicators:
+          - "OOMKilled within first 60 seconds"
+          - "Happens on every restart"
+        meaning: "Base memory requirement exceeds limit"
+        fix_rank: "D"
+        fixes:
+          - action: "Increase memory limit to at least 1.5x startup usage"
+          - action: "For JVM: ensure -Xmx is less than container limit"
+            template: |
+              env:
+              - name: JAVA_OPTS
+                value: "-Xmx{limit * 0.75}m -Xms{limit * 0.5}m"
+
+      request_spike_oom:
+        indicators:
+          - "OOMKilled during high traffic"
+          - "Correlates with load spikes"
+        meaning: "Memory usage scales with load"
+        fix_rank: "D"
+        fixes:
+          - action: "Increase limit with headroom"
+          - action: "Add HPA to scale horizontally instead"
+          - action: "Implement request queuing/backpressure"
+
+      memory_leak:
+        indicators:
+          - "Memory grows continuously"
+          - "OOMKilled after hours/days of running"
+          - "Restarts briefly fix it, then repeats"
+        meaning: "Application has memory leak"
+        fix_rank: "C"
+        fixes:
+          - action: "Profile application memory"
+          - action: "Check for unclosed connections/handlers"
+          - action: "Temporary: set up periodic restart"
+            template: |
+              # CronJob to restart deployment daily
+              apiVersion: batch/v1
+              kind: CronJob
+              metadata:
+                name: restart-{deployment}
+              spec:
+                schedule: "0 3 * * *"
+                jobTemplate:
+                  spec:
+                    template:
+                      spec:
+                        containers:
+                        - name: kubectl
+                          image: bitnami/kubectl
+                          command:
+                          - kubectl
+                          - rollout
+                          - restart
+                          - deployment/{deployment}
+                          - -n
+                          - {ns}
+                        restartPolicy: Never
+
+      data_processing_oom:
+        indicators:
+          - "OOMKilled during batch jobs"
+          - "Large file processing"
+        meaning: "Loading too much data into memory"
+        fix_rank: "C"
+        fixes:
+          - action: "Implement streaming/chunked processing"
+          - action: "Use external storage for large datasets"
+          - action: "Increase limit for batch jobs only"
+
+  step_4_calculate_right_limit:
+    name: "Determine appropriate memory settings"
+
+    guidelines:
+      request_vs_limit:
+        description: "Request = guaranteed, Limit = maximum"
+        recommendation: "Limit should be 1.5-2x request for most apps"
+
+      jvm_apps:
+        heap: "Set -Xmx to 75% of container limit"
+        metaspace: "Reserve 256MB-512MB for metaspace"
+        formula: "container_limit = (Xmx / 0.75) + 300MB buffer"
+        example: |
+          # For 1Gi container limit:
+          # Xmx = 768m (75% of 1024)
+          # Remaining 256m for metaspace, native memory, etc.
+
+      python_apps:
+        note: "Python doesn't have hard heap limit"
+        recommendation: "Monitor with prometheus and set limit with 20% buffer"
+
+      nodejs_apps:
+        heap: "Use --max-old-space-size"
+        formula: "container_limit = max_old_space_size + 300MB"
+
+      go_apps:
+        note: "Go has efficient memory management"
+        recommendation: "GOMEMLIMIT env var (Go 1.19+) to prevent OOM"
+        template: |
+          env:
+          - name: GOMEMLIMIT
+            value: "{limit * 0.9}"
+
+  step_5_apply_fix:
+    name: "Apply memory limit increase"
+
+    immediate_fix:
+      command: |
+        kubectl patch deployment {deployment} -n {ns} --type=json \
+          -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/resources/limits/memory", "value": "{new_limit}"}]'
+
+    verify:
+      - "kubectl rollout status deployment/{deployment} -n {ns}"
+      - "kubectl top pod -l app={app} -n {ns}"
+      - "Watch for 15 minutes to confirm stability"
+
+common_auto_fixes:
+  - id: "oom-increase-limit"
+    trigger: "OOMKilled AND limit < 4Gi"
+    rank: "D"
+    action: "increase_memory_limit"
+    params:
+      multiplier: 1.5
+      also_increase_request: true
+      request_ratio: 0.8
+    rollback_if: "OOMKilled again within 1 hour"
+    max_attempts: 3
+
+  - id: "oom-jvm-fix"
+    trigger: "OOMKilled AND image contains java"
+    rank: "D"
+    action: "add_jvm_memory_settings"
+    params:
+      xmx_ratio: 0.75
+
+  - id: "oom-go-limit"
+    trigger: "OOMKilled AND GOMEMLIMIT not set"
+    rank: "D"
+    action: "add_gomemlimit_env"
+    params:
+      ratio: 0.9
+
+escalation_triggers:
+  - condition: "OOMKilled 3+ times after limit increase"
+    escalate_to: "JADE"
+    reason: "Likely memory leak requiring application investigation"
+
+  - condition: "Limit already at 4Gi+ and still OOMKilled"
+    escalate_to: "JADE"
+    reason: "Unusual memory consumption needs investigation"
+
+  - condition: "Multiple pods OOMKilled simultaneously"
+    escalate_to: "JADE"
+    reason: "Possible cluster-wide memory pressure or coordinated issue"
+
+metrics_to_monitor:
+  - "container_memory_working_set_bytes"
+  - "container_memory_usage_bytes"
+  - "container_memory_rss"
+  - "kube_pod_container_resource_limits{resource='memory'}"
+  - "node_memory_MemAvailable_bytes"
+
+related_playbooks:
+  - crashloopbackoff
+  - evicted
+  - pending

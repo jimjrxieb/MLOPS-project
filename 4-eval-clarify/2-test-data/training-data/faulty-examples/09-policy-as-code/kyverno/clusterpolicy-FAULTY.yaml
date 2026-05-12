@@ -1,0 +1,68 @@
+# FAULTY KYVERNO POLICY EXAMPLE #1
+# Common Mistakes: Ineffective Policy Configuration
+# Issues:
+#   1. validationFailureAction: audit (not blocking)
+#   2. Missing exclude for system namespaces
+#   3. Incomplete pattern matching
+#   4. No background scan
+#   5. Missing message for violations
+#   6. Too broad match (all resources)
+#
+# Severity: MEDIUM (policy bypass, false sense of security)
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-resource-limits
+  # BUG: No annotations for compliance tracking
+spec:
+  # BUG #1: audit mode doesn't block violations
+  validationFailureAction: audit
+
+  # BUG #4: No background scan for existing resources
+  background: false
+
+  rules:
+    - name: check-cpu-limits
+      match:
+        resources:
+          # BUG #6: Matches everything including system pods
+          kinds:
+            - Pod
+
+      # BUG #2: No exclude for kube-system, etc.
+
+      validate:
+        # BUG #5: No message for users
+        pattern:
+          spec:
+            containers:
+              # BUG #3: Only checks first container, not all
+              - resources:
+                  limits:
+                    cpu: "*"
+                    # BUG: Missing memory check
+
+---
+# FAULTY KYVERNO POLICY EXAMPLE #2
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: deny-privileged
+spec:
+  validationFailureAction: audit  # BUG: Should be enforce for security
+  rules:
+    - name: deny-privileged-containers
+      match:
+        resources:
+          kinds:
+            - Pod
+      validate:
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  privileged: false
+                  # BUG: Missing allowPrivilegeEscalation check
+                  # BUG: Missing capabilities check
+                  # BUG: Missing runAsNonRoot check

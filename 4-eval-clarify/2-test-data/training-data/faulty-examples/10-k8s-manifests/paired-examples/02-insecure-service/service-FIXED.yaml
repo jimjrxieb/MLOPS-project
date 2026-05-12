@@ -1,0 +1,142 @@
+# FIXED VERSION OF EXAMPLE #2
+# Fixes Applied:
+#   ✅ 1. Changed to ClusterIP (internal) or LoadBalancer (external)
+#   ✅ 2. Added Network Policy to restrict access
+#   ✅ 3. Only expose necessary ports
+#   ✅ 4. Added session affinity for stateful apps
+#   ✅ 5. Removed external IPs (use Ingress instead)
+#   ✅ 6. Separate service for metrics (internal only)
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "app.fullname" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+  annotations:
+    # Internal metrics scraping only
+    {{- if .Values.metrics.enabled }}
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+    {{- end }}
+spec:
+  # ✅ FIXED: ClusterIP for internal services
+  # Use LoadBalancer only if external access needed
+  type: {{ .Values.service.type | default "ClusterIP" }}
+
+  # ✅ FIXED: Removed external IPs - use Ingress for external access
+
+  # ✅ FIXED: Only expose necessary application port
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+
+  selector:
+    {{- include "app.selectorLabels" . | nindent 4 }}
+
+  # ✅ FIXED: Session affinity for stateful applications
+  {{- if .Values.service.sessionAffinity }}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+  {{- end }}
+
+---
+# ✅ FIXED: Separate service for metrics (internal only)
+{{- if .Values.metrics.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "app.fullname" . }}-metrics
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: metrics
+spec:
+  type: ClusterIP
+  clusterIP: None  # Headless for service discovery
+  ports:
+    - port: 9090
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    {{- include "app.selectorLabels" . | nindent 4 }}
+{{- end }}
+
+---
+# ✅ FIXED: Network Policy to restrict access
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "app.fullname" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "app.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+
+  # ✅ Allow ingress only from ingress controller
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: {{ .Values.networkPolicy.ingressNamespace | default "ingress-nginx" }}
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8080
+
+    # ✅ Allow metrics scraping from monitoring namespace
+    {{- if .Values.metrics.enabled }}
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: monitoring
+        podSelector:
+          matchLabels:
+            app: prometheus
+      ports:
+        - protocol: TCP
+          port: 9090
+    {{- end }}
+
+  # ✅ Allow egress to specific destinations
+  egress:
+    # Allow DNS resolution
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+        podSelector:
+          matchLabels:
+            k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+
+    # Allow database connection
+    - to:
+      - podSelector:
+          matchLabels:
+            app: postgresql
+      ports:
+        - protocol: TCP
+          port: 5432
+
+    # Allow external HTTPS (for API calls)
+    - to:
+      - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
+{{- end }}

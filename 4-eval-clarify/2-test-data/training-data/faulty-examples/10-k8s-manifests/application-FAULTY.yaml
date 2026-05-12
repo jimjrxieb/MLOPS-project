@@ -1,0 +1,48 @@
+# FAULTY ARGOCD APPLICATION EXAMPLE #1
+# Common Mistakes: Insecure GitOps Configuration
+# Issues:
+#   1. Auto-sync with prune enabled (accidental deletion)
+#   2. Self-heal can override manual hotfixes
+#   3. No sync windows (changes during business hours)
+#   4. Allow empty resources (can wipe namespace)
+#   5. Plain HTTP git URL (MITM attack)
+#   6. No resource hooks or health checks
+#   7. Sync with replace (destructive)
+#
+# Severity: HIGH (data loss, privilege escalation)
+# Compliance: GitOps Security Best Practices
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: production-app
+  namespace: argocd
+spec:
+  project: default  # BUG: Using default project has no restrictions
+
+  source:
+    # BUG #5: Plain HTTP - MITM attack risk
+    repoURL: http://github.com/company/app-manifests
+    targetRevision: HEAD  # BUG: HEAD can change unexpectedly
+    path: kubernetes/
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+
+  syncPolicy:
+    automated:
+      # BUG #1: Prune deletes resources not in git
+      prune: true
+      # BUG #2: Self-heal overrides manual fixes
+      selfHeal: true
+      # BUG #4: Allow empty can wipe the namespace
+      allowEmpty: true
+
+    syncOptions:
+      # BUG #7: Replace is destructive
+      - Replace=true
+      - CreateNamespace=true
+
+    # BUG #3: No sync windows defined
+    # BUG #6: No retry or health checks

@@ -1,0 +1,74 @@
+---
+# Secure Pod - Minimal CKS Compliant Example
+# Tags: cks, security-context, minimal
+# Compliant with: CIS 5.2.x
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secure-nginx-pod
+  namespace: production
+  labels:
+    app: nginx
+    security-reviewed: "true"
+spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 2000
+    seccompProfile:
+      type: RuntimeDefault
+
+  serviceAccountName: minimal-sa
+  automountServiceAccountToken: false
+
+  containers:
+  - name: nginx
+    image: nginx:1.25.3-alpine
+    imagePullPolicy: Always
+
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1000
+      capabilities:
+        drop:
+        - ALL
+
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 8080
+      initialDelaySeconds: 10
+      periodSeconds: 10
+
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 5
+
+    ports:
+    - containerPort: 8080
+
+    volumeMounts:
+    - name: tmp
+      mountPath: /tmp
+    - name: cache
+      mountPath: /var/cache/nginx
+
+  volumes:
+  - name: tmp
+    emptyDir: {}
+  - name: cache
+    emptyDir: {}

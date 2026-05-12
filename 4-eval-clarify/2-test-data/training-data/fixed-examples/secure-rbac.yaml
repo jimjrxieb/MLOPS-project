@@ -1,0 +1,81 @@
+---
+# Secure RBAC - Least Privilege Principle
+# Tags: rbac, pac, secure, least-privilege
+# Compliant with: CIS 5.1.x
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: web-app-sa
+  namespace: production
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: web-app-role
+  namespace: production
+rules:
+# Specific permissions only
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+  # Optionally restrict to specific resources
+  resourceNames: ["app-config"]
+
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get"]
+  resourceNames: ["db-credentials", "api-keys"]
+
+# No wildcard permissions
+# No pods/exec access
+# No cluster-admin escalation
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: web-app-binding
+  namespace: production
+subjects:
+- kind: ServiceAccount
+  name: web-app-sa
+  namespace: production
+roleRef:
+  kind: Role
+  name: web-app-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Read-only ClusterRole for monitoring
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: monitoring-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "endpoints"]
+  verbs: ["get", "list", "watch"]
+
+- apiGroups: ["apps"]
+  resources: ["deployments", "statefulsets", "daemonsets"]
+  verbs: ["get", "list", "watch"]
+
+# No write permissions
+# No exec/attach permissions
+# No secret access
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: monitoring-reader-binding
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: monitoring
+roleRef:
+  kind: ClusterRole
+  name: monitoring-reader
+  apiGroup: rbac.authorization.k8s.io

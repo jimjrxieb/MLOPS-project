@@ -1,0 +1,61 @@
+# FAULTY GITHUB ACTIONS EXAMPLE #1
+# Common Mistakes: Insecure CI/CD Pipeline
+# Issues:
+#   1. Secrets exposed in logs (echo $SECRET)
+#   2. Unsafe checkout with persist-credentials
+#   3. Using 'latest' action versions (supply chain risk)
+#   4. Pull request trigger from forks (code injection)
+#   5. No pinned dependencies
+#   6. Running with admin permissions
+#   7. No timeout (infinite runner cost)
+#
+# Severity: CRITICAL (supply chain attack, secret leaks)
+# Compliance: CIS-GHA 2.3, SLSA Level 1
+
+name: CI Pipeline
+
+# BUG #4: pull_request_target from forks can inject malicious code
+on:
+  pull_request_target:
+    branches: [main]
+  push:
+    branches: [main]
+
+# BUG #6: Overprivileged - allows write to all repos
+permissions: write-all
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # BUG #7: No timeout - can run forever
+    steps:
+      # BUG #3: Using 'latest' or unpinned versions
+      - uses: actions/checkout@latest
+        with:
+          # BUG #2: persist-credentials allows token theft
+          persist-credentials: true
+
+      - name: Setup Node
+        # BUG #3: No SHA pinning - supply chain risk
+        uses: actions/setup-node@v4
+
+      # BUG #5: No lockfile check - unpinned dependencies
+      - run: npm install
+
+      # BUG #1: CRITICAL - Secret exposed in logs!
+      - name: Debug
+        run: |
+          echo "API_KEY is: ${{ secrets.API_KEY }}"
+          echo "Using AWS: ${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+
+      - name: Build
+        run: npm run build
+        env:
+          # BUG: Secrets in env are logged on error
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      # BUG: No artifact signing or attestation
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: dist/

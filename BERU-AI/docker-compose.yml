@@ -1,0 +1,83 @@
+# BERU stack — one command boots the whole thing:
+#
+#   cd GP-MODEL-OPS/BERU-AI
+#   docker compose up --build
+#
+# Services:
+#   ollama      — the inference server (LLaMA 3.2-3B fine-tune, served as beru:v1.4)
+#   model-init  — one-shot: registers beru:v1.4 from the mounted GGUF, then exits
+#   beru-api    — the FastAPI service (LangGraph agent + guards + HITL + MLflow tracking)
+#
+# Then: http://localhost:8088/docs  (Swagger UI)
+#       http://localhost:8088/api/beru/health
+#
+# Note: paths are relative to BERU-AI/ — `../../GP-CONSULTING` is the repo's
+# GP-CONSULTING dir, `../CAPSTONE-PROJECT` is the sibling capstone dir.
+
+services:
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: beru-ollama
+    ports:
+      - "11434:11434"          # exposed for debugging; beru-api uses the internal network
+    volumes:
+      - ollama-models:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+    restart: unless-stopped
+
+  model-init:
+    image: ollama/ollama:latest
+    container_name: beru-model-init
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    volumes:
+      - ../3-model-registry/beru-v1.4-3b/gguf:/gguf:ro
+      - ./docker:/docker:ro
+    # Register beru:v1.4 from the mounted GGUF, then exit. If it already exists
+    # this is a fast no-op.
+    entrypoint: ["sh", "-c", "ollama create beru:v1.4 -f /docker/Modelfile.container && ollama list"]
+    restart: "no"
+
+  beru-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: beru-api:1.4
+    container_name: beru-api
+    depends_on:
+      model-init:
+        condition: service_completed_successfully
+    ports:
+      - "8088:8088"
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      BERU_MODEL: beru:v1.4
+      BERU_NIST_DIR: /nist
+      BERU_CROSSWALK_PATH: /crosswalk/800-53-to-ai-rmf.md
+      MLFLOW_BERU_TRACKING_URI: file:///app/mlruns
+    volumes:
+      # Playbooks, controls, templates, ssp-examples — read-only, canonical source.
+      - ../../GP-CONSULTING/NIST-800-53:/nist:ro
+      # 800-53 ↔ AI RMF crosswalk.
+      - ../CAPSTONE-PROJECT/frameworks/crosswalk:/crosswalk:ro
+      # MLflow tracking output — writable, persisted on the host.
+      - ./mlruns:/app/mlruns
+      # Evidence ZIPs land here.
+      - beru-output:/tmp/beru-api
+      # HITL queue — persisted so pending findings survive a restart.
+      - beru-hitl:/tmp/beru-hitl-queue
+    restart: unless-stopped
+
+volumes:
+  ollama-models:
+  beru-output:
+  beru-hitl:

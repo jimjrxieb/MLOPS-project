@@ -1,0 +1,42 @@
+# Experiment 003 — JADE v1 8B
+# Date: 2026-01 through 2026-02
+# Hypothesis: 8B model handles complex C-rank reasoning better than 3B
+
+model:
+  base: "unsloth/Llama-3.1-8B-Instruct"
+  quantization: "4bit"
+
+lora:
+  r: 64
+  alpha: 128
+  dropout: 0
+  target_modules: ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+
+training:
+  epochs_per_chunk: 2
+  batch_size: 4
+  gradient_accumulation_steps: 8
+  learning_rate: 2e-5
+  warmup_ratio: 0.03
+  lr_scheduler: "cosine"
+  weight_decay: 0.01
+  max_seq_length: 2048
+  chunk_size: 10000
+
+data:
+  corpus: "1-data-pipeline/01-raw-data-lake/"
+  total_examples: 284844
+  format: "mixed"
+  curation: "none"
+  note: "Same uncurated corpus as exp-001 — same garbage problem applies"
+
+serving:
+  modelfile: "3-model-registry/Modelfile_llama3b"
+  gguf: "jade-llama3b-v1.1.gguf"
+  ollama_name: "jade:v1.0"
+
+artifacts:
+  checkpoint: "3-model-registry/v1.1/"
+  modelfile: "3-model-registry/Modelfile_llama3b"
+  eval_results: "4-eval-clarify/3-results/benchmark_20260316_234331/"
+  note: "No corpus SHA — v1 raw data lake had 100+ files, no single hash"

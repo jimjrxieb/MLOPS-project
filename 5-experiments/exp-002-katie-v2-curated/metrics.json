@@ -1,0 +1,12 @@
+{
+  "experiment": "exp-002-katie-v2-curated",
+  "model": "LLaMA-3.2-3B-Instruct + LoRA (fresh from base)",
+  "status": "in_progress",
+  "checkpoint": "3-model-registry/v2.0-3b/chunk_0001_10k/merged",
+  "chunks_completed": 1,
+  "chunks_total": 5,
+  "examples_trained": 10000,
+  "examples_total": 42276,
+  "eval_pending": true,
+  "notes": "First chunk trained. Full eval suite pending before continuing to chunk 2."
+}

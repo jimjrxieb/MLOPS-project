@@ -1,0 +1,257 @@
+# JADE Operational Playbook: ImagePullBackOff
+# Container image cannot be pulled from registry
+
+name: ImagePullBackOff
+category: pod-failures
+severity: HIGH
+frequency: VERY_COMMON
+
+trigger_patterns:
+  - "ImagePullBackOff"
+  - "ErrImagePull"
+  - "Failed to pull image"
+  - "rpc error: code = NotFound"
+  - "manifest unknown"
+
+description: |
+  Kubernetes cannot pull the container image. This blocks the pod from starting.
+  Usually caused by wrong image name, missing credentials, or network issues.
+
+gameplan:
+  step_1:
+    name: "Get the exact error message"
+    commands:
+      - "kubectl describe pod {pod} -n {ns} | grep -A5 'Events:' | grep -i 'pull\\|image'"
+      - "kubectl get events -n {ns} --field-selector involvedObject.name={pod} | grep -i image"
+    parse_error: true
+
+    branches:
+      manifest_unknown:
+        patterns:
+          - "manifest unknown"
+          - "not found"
+          - "manifest for .* not found"
+        meaning: "Image tag doesn't exist in registry"
+        fix_rank: "D"
+        fixes:
+          - action: "Verify image and tag exist"
+            commands:
+              - "docker manifest inspect {image}:{tag}"
+              - "crane manifest {image}:{tag}"
+          - action: "Check for typo in image name"
+            common_typos:
+              - "latest vs main"
+              - "v1.0 vs 1.0"
+              - "missing registry prefix"
+          - action: "List available tags"
+            command: "crane ls {image}"
+
+      unauthorized:
+        patterns:
+          - "unauthorized"
+          - "authentication required"
+          - "denied: access forbidden"
+          - "401"
+        meaning: "Missing or invalid registry credentials"
+        fix_rank: "D"
+        fixes:
+          - action: "Check if imagePullSecrets is set"
+            command: "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.imagePullSecrets}'"
+          - action: "Verify secret exists and has correct credentials"
+            commands:
+              - "kubectl get secret {secret} -n {ns}"
+              - "kubectl get secret {secret} -n {ns} -o jsonpath='{.data.\\.dockerconfigjson}' | base64 -d"
+          - action: "Create registry secret if missing"
+            template: |
+              kubectl create secret docker-registry {secret-name} \
+                --docker-server={registry} \
+                --docker-username={username} \
+                --docker-password={password} \
+                --docker-email={email} \
+                -n {ns}
+          - action: "Patch ServiceAccount with imagePullSecrets"
+            template: |
+              kubectl patch serviceaccount default -n {ns} \
+                -p '{"imagePullSecrets": [{"name": "{secret-name}"}]}'
+
+      forbidden:
+        patterns:
+          - "403"
+          - "forbidden"
+          - "access denied"
+        meaning: "Authenticated but not authorized for this image"
+        fix_rank: "C"
+        fixes:
+          - action: "Check IAM/RBAC permissions on registry"
+          - action: "For ECR: verify IAM role has ecr:GetAuthorizationToken and ecr:BatchGetImage"
+          - action: "For GCR: verify service account has storage.objectViewer"
+
+      timeout:
+        patterns:
+          - "timeout"
+          - "context deadline exceeded"
+          - "i/o timeout"
+        meaning: "Network connectivity issue to registry"
+        fix_rank: "C"
+        fixes:
+          - action: "Check if registry is reachable from cluster"
+            command: "kubectl run test --rm -it --image=busybox -- wget -q -O- https://{registry}/v2/"
+          - action: "Check egress NetworkPolicy"
+          - action: "Check proxy settings if using corporate proxy"
+          - action: "Check DNS resolution"
+            command: "kubectl run test --rm -it --image=busybox -- nslookup {registry}"
+
+      rate_limited:
+        patterns:
+          - "429"
+          - "rate limit"
+          - "too many requests"
+          - "toomanyrequests"
+        meaning: "Registry rate limiting (common with Docker Hub)"
+        fix_rank: "D"
+        fixes:
+          - action: "Wait and retry (rate limit usually resets in 6 hours)"
+          - action: "Authenticate to increase rate limit"
+            note: "Docker Hub: 100 pulls/6hr anonymous, 200 authenticated"
+          - action: "Use image pull-through cache"
+          - action: "Mirror images to private registry"
+
+      image_not_found:
+        patterns:
+          - "repository does not exist"
+          - "name unknown"
+          - "image not found"
+        meaning: "Repository doesn't exist (not just tag)"
+        fix_rank: "D"
+        fixes:
+          - action: "Check for typo in repository name"
+          - action: "Verify repository exists in registry"
+          - action: "Check if image was deleted"
+
+  step_2_verify_image:
+    name: "Verify image accessibility"
+    commands:
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.containers[*].image}'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.imagePullSecrets}'"
+
+    checks:
+      - name: "Image format is valid"
+        pattern: "^[a-z0-9]+([._-][a-z0-9]+)*(/[a-z0-9]+([._-][a-z0-9]+)*)*:[a-zA-Z0-9._-]+$"
+
+      - name: "Registry prefix present for private images"
+        fail_if: "private image but no registry prefix"
+        example: "myimage:v1 should be registry.example.com/myimage:v1"
+
+      - name: "Using digest instead of tag (more reliable)"
+        recommendation: "Consider using image@sha256:... for immutability"
+
+  step_3_check_secret:
+    name: "Validate registry credentials"
+    commands:
+      - "kubectl get secret -n {ns} -o name | grep -i docker\\|registry"
+      - "kubectl get sa default -n {ns} -o jsonpath='{.imagePullSecrets}'"
+
+    validations:
+      - name: "Secret exists"
+        command: "kubectl get secret {secret} -n {ns}"
+
+      - name: "Secret is type docker-registry"
+        command: "kubectl get secret {secret} -n {ns} -o jsonpath='{.type}'"
+        expected: "kubernetes.io/dockerconfigjson"
+
+      - name: "Credentials are valid"
+        command: |
+          # Extract and test credentials
+          kubectl get secret {secret} -n {ns} -o jsonpath='{.data.\.dockerconfigjson}' | \
+            base64 -d | jq -r '.auths | to_entries[0] | "\(.key) \(.value.auth)"'
+        note: "Don't log actual credentials"
+
+  step_4_registry_specific:
+    name: "Registry-specific troubleshooting"
+
+    ecr:
+      name: "Amazon ECR"
+      pattern: "*.dkr.ecr.*.amazonaws.com"
+      common_issues:
+        - "Token expired (ECR tokens last 12 hours)"
+        - "Cross-account access not configured"
+        - "IAM role missing ECR permissions"
+      fixes:
+        - action: "Refresh ECR token"
+          command: |
+            aws ecr get-login-password --region {region} | \
+              kubectl create secret docker-registry ecr-secret \
+              --docker-server={account}.dkr.ecr.{region}.amazonaws.com \
+              --docker-username=AWS \
+              --docker-password=$(aws ecr get-login-password --region {region}) \
+              -n {ns} --dry-run=client -o yaml | kubectl apply -f -
+        - action: "Use IRSA for automatic token refresh"
+          note: "Recommended for production"
+
+    gcr:
+      name: "Google Container Registry"
+      pattern: "gcr.io/*"
+      common_issues:
+        - "Service account key expired or revoked"
+        - "Missing storage.objectViewer permission"
+      fixes:
+        - action: "Use Workload Identity (GKE)"
+        - action: "Create secret from service account key"
+
+    dockerhub:
+      name: "Docker Hub"
+      pattern: "docker.io/* or no prefix"
+      common_issues:
+        - "Rate limiting (100 pulls/6hr anonymous)"
+        - "Private repo without auth"
+      fixes:
+        - action: "Add Docker Hub credentials"
+        - action: "Use authenticated pulls"
+        - action: "Set up mirror/cache"
+
+    ghcr:
+      name: "GitHub Container Registry"
+      pattern: "ghcr.io/*"
+      common_issues:
+        - "Package visibility is private"
+        - "PAT doesn't have read:packages scope"
+      fixes:
+        - action: "Create PAT with read:packages scope"
+        - action: "Create secret with GitHub PAT"
+
+common_auto_fixes:
+  - id: "ipb-create-pull-secret"
+    trigger: "unauthorized AND no imagePullSecrets"
+    rank: "D"
+    action: "create_pull_secret_from_env"
+    requires:
+      - "REGISTRY_USERNAME env var"
+      - "REGISTRY_PASSWORD env var"
+
+  - id: "ipb-refresh-ecr"
+    trigger: "ECR token expired"
+    rank: "E"
+    action: "refresh_ecr_token"
+    auto_schedule: "every 11 hours"
+
+  - id: "ipb-fix-tag"
+    trigger: "manifest unknown AND similar tag exists"
+    rank: "D"
+    action: "suggest_correct_tag"
+
+escalation_triggers:
+  - condition: "403 forbidden on private registry"
+    escalate_to: "JADE"
+    reason: "May require registry admin to grant access"
+
+  - condition: "Repeated rate limiting"
+    escalate_to: "JADE"
+    reason: "May need architectural solution (mirror, cache)"
+
+  - condition: "Network timeout from all nodes"
+    escalate_to: "JADE"
+    reason: "Cluster network configuration issue"
+
+related_playbooks:
+  - createcontainererror
+  - crashloopbackoff

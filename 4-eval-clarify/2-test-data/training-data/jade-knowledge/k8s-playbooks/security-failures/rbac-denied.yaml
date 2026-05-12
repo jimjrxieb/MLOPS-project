@@ -1,0 +1,201 @@
+# JADE Operational Playbook: RBAC Denied
+# Kubernetes RBAC authorization failure
+
+name: RBAC-Denied
+category: security-failures
+severity: MEDIUM
+frequency: COMMON
+
+trigger_patterns:
+  - "forbidden"
+  - "is forbidden"
+  - "cannot .* in the namespace"
+  - "User .* cannot"
+  - "authorization denied"
+  - "RBAC"
+
+description: |
+  A user, service account, or controller lacks RBAC permissions to perform
+  an action. Need to identify what permission is missing and grant it.
+
+gameplan:
+  step_1:
+    name: "Identify the denied action"
+    commands:
+      - "kubectl auth can-i {verb} {resource} -n {ns} --as={user}"
+      - "kubectl get events -n {ns} | grep -i forbidden"
+
+    extract:
+      - "Who (user or service account)"
+      - "What action (verb: get, list, create, update, delete, watch, patch)"
+      - "What resource (pods, deployments, secrets, etc.)"
+      - "What namespace"
+
+  step_2_check_current_permissions:
+    name: "Check what permissions the subject currently has"
+    commands:
+      - "kubectl auth can-i --list --as=system:serviceaccount:{ns}:{sa}"
+      - "kubectl get rolebinding,clusterrolebinding -A | grep {subject}"
+      - "kubectl describe rolebinding -n {ns}"
+      - "kubectl describe clusterrolebinding | grep -A5 {subject}"
+
+    identify:
+      - "Current Role/ClusterRole bindings"
+      - "Roles those bindings reference"
+      - "Gap between current and needed permissions"
+
+  step_3_determine_scope:
+    name: "Decide Role vs ClusterRole"
+
+    use_role:
+      when:
+        - "Permission needed in single namespace"
+        - "Following least privilege"
+      creates: "Role + RoleBinding"
+
+    use_clusterrole:
+      when:
+        - "Permission needed cluster-wide"
+        - "Permission for cluster-scoped resources (nodes, PVs)"
+        - "Same role needed in multiple namespaces"
+      creates: "ClusterRole + ClusterRoleBinding (or RoleBinding for ns-scoped)"
+
+  step_4_create_rbac:
+    name: "Create the necessary RBAC"
+
+    role_template: |
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: Role
+      metadata:
+        name: {role-name}
+        namespace: {ns}
+      rules:
+      - apiGroups: ["{api-group}"]  # "" for core, "apps" for deployments
+        resources: ["{resource}"]
+        verbs: ["{verb}"]
+
+    rolebinding_template: |
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: RoleBinding
+      metadata:
+        name: {binding-name}
+        namespace: {ns}
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: Role
+        name: {role-name}
+      subjects:
+      - kind: ServiceAccount
+        name: {sa-name}
+        namespace: {ns}
+
+    clusterrole_template: |
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRole
+      metadata:
+        name: {role-name}
+      rules:
+      - apiGroups: ["{api-group}"]
+        resources: ["{resource}"]
+        verbs: ["{verb}"]
+
+    common_api_groups:
+      core: '""'
+      apps: '"apps"'
+      batch: '"batch"'
+      networking: '"networking.k8s.io"'
+      rbac: '"rbac.authorization.k8s.io"'
+      policy: '"policy"'
+
+  step_5_common_scenarios:
+    name: "Common RBAC patterns"
+
+    pod_reader:
+      description: "Read pods in namespace"
+      template: |
+        rules:
+        - apiGroups: [""]
+          resources: ["pods", "pods/log"]
+          verbs: ["get", "list", "watch"]
+
+    deployment_manager:
+      description: "Manage deployments"
+      template: |
+        rules:
+        - apiGroups: ["apps"]
+          resources: ["deployments", "replicasets"]
+          verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+    secret_reader:
+      description: "Read secrets (be careful!)"
+      template: |
+        rules:
+        - apiGroups: [""]
+          resources: ["secrets"]
+          verbs: ["get", "list"]
+          # Consider using resourceNames to limit to specific secrets
+
+    configmap_manager:
+      description: "Manage configmaps"
+      template: |
+        rules:
+        - apiGroups: [""]
+          resources: ["configmaps"]
+          verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+    namespace_admin:
+      description: "Full admin in namespace"
+      note: "Use built-in 'admin' ClusterRole"
+      template: |
+        kind: RoleBinding
+        roleRef:
+          kind: ClusterRole
+          name: admin  # Built-in
+
+  step_6_verify_fix:
+    name: "Verify permissions are granted"
+    commands:
+      - "kubectl auth can-i {verb} {resource} -n {ns} --as=system:serviceaccount:{ns}:{sa}"
+      - "kubectl get rolebinding -n {ns} {binding-name} -o yaml"
+
+common_auto_fixes:
+  - id: "rbac-create-reader"
+    trigger: "cannot get/list {resource}"
+    rank: "D"
+    action: "create_role_with_read"
+    template: |
+      verbs: ["get", "list", "watch"]
+
+  - id: "rbac-add-to-existing"
+    trigger: "role exists but missing verb"
+    rank: "D"
+    action: "patch_role_add_verb"
+
+  - id: "rbac-bind-existing-role"
+    trigger: "role exists but not bound"
+    rank: "D"
+    action: "create_rolebinding"
+
+escalation_triggers:
+  - condition: "Requesting cluster-admin or very broad permissions"
+    escalate_to: "JADE"
+    reason: "Security review needed for broad permissions"
+
+  - condition: "Secret access requested"
+    escalate_to: "JADE"
+    reason: "Sensitive - needs approval"
+
+  - condition: "Unclear what minimum permissions are needed"
+    escalate_to: "JADE"
+    reason: "Need to investigate actual requirements"
+
+security_notes:
+  - "Always follow least privilege"
+  - "Use namespace-scoped Role instead of ClusterRole when possible"
+  - "Use resourceNames to limit access to specific resources"
+  - "Audit RBAC regularly"
+  - "Don't grant secrets access broadly"
+
+related_playbooks:
+  - pss-psa-violation
+  - admission-webhook-denied

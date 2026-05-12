@@ -1,0 +1,48 @@
+# CISO-ready summary templates
+# Used by risk_summary.py to structure output
+# Three tiers: executive (board/CISO), technical (security team), compliance (auditor)
+
+templates:
+  executive:
+    description: "For CISO, VP, board — business impact language, no technical jargon"
+    sections:
+      - name: "risk_headline"
+        prompt: "One sentence: what happened and why it matters to the business"
+      - name: "business_impact"
+        prompt: "What data, systems, or operations are at risk. Use dollar terms or regulatory terms, not CVE numbers"
+      - name: "current_status"
+        prompt: "What has been done so far — containment, isolation, notification"
+      - name: "recommended_action"
+        prompt: "What decision the executive needs to make and by when"
+      - name: "compliance_exposure"
+        prompt: "Which regulatory frameworks are affected (FedRAMP, HIPAA, PCI-DSS) and what the gap means"
+
+  technical:
+    description: "For security engineers — full detail, commands, IOCs"
+    sections:
+      - name: "finding_summary"
+        prompt: "Scanner, rule ID, severity, affected resource, detection timestamp"
+      - name: "root_cause"
+        prompt: "What misconfiguration or vulnerability was exploited and how"
+      - name: "blast_radius"
+        prompt: "All affected systems, lateral movement potential, data exposure"
+      - name: "remediation_steps"
+        prompt: "Exact commands, config changes, or policy updates needed"
+      - name: "nist_mapping"
+        prompt: "Mapped NIST 800-53 controls with justification"
+      - name: "evidence"
+        prompt: "Log entries, screenshots, scan output that proves the finding"
+
+  compliance:
+    description: "For auditors — control mapping, evidence, gap status"
+    sections:
+      - name: "control_mapping"
+        prompt: "NIST 800-53 control ID, control name, implementation status"
+      - name: "gap_description"
+        prompt: "What the control requires vs what was found"
+      - name: "evidence_artifacts"
+        prompt: "List of evidence files, scan reports, log excerpts"
+      - name: "poam_entry"
+        prompt: "POA&M format: weakness, milestone, scheduled completion, resource estimate"
+      - name: "risk_level"
+        prompt: "Residual risk after remediation: High/Moderate/Low with justification"

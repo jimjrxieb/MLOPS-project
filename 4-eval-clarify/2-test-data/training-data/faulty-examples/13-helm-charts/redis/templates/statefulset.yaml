@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "redis.fullname" . }}-master
+  labels:
+    {{- include "redis.labels" . | nindent 4 }}
+    app.kubernetes.io/component: master
+spec:
+  serviceName: {{ include "redis.fullname" . }}-headless
+  replicas: {{ .Values.master.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "redis.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: master
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+      labels:
+        {{- include "redis.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: master
+    spec:
+      serviceAccountName: {{ include "redis.serviceAccountName" . }}
+      securityContext:
+        fsGroup: {{ .Values.master.securityContext.fsGroup }}
+        runAsUser: {{ .Values.master.securityContext.runAsUser }}
+        runAsNonRoot: {{ .Values.master.securityContext.runAsNonRoot }}
+        seccompProfile:
+          type: {{ .Values.master.securityContext.seccompProfile.type }}
+      containers:
+      - name: redis
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        securityContext:
+          {{- toYaml .Values.master.securityContext | nindent 12 }}
+        command:
+          - /bin/sh
+          - -c
+          - |
+            redis-server /etc/redis/redis.conf \
+              --requirepass ${REDIS_PASSWORD}
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.auth.existingSecret }}
+              key: {{ .Values.auth.existingSecretPasswordKey }}
+        ports:
+        - name: redis
+          containerPort: 6379
+          protocol: TCP
+        {{- if .Values.livenessProbe.enabled }}
+        livenessProbe:
+          {{- toYaml .Values.livenessProbe | nindent 12 }}
+        {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
+        readinessProbe:
+          {{- toYaml .Values.readinessProbe | nindent 12 }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.master.resources | nindent 12 }}
+        volumeMounts:
+        - name: redis-config
+          mountPath: /etc/redis
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: redis-config
+        configMap:
+          name: {{ include "redis.fullname" . }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- if .Values.master.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      labels:
+        {{- include "redis.labels" . | nindent 8 }}
+    spec:
+      accessModes:
+        {{- range .Values.master.persistence.accessModes }}
+        - {{ . }}
+        {{- end }}
+      {{- if .Values.master.persistence.storageClass }}
+      storageClassName: {{ .Values.master.persistence.storageClass }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.master.persistence.size }}
+  {{- end }}

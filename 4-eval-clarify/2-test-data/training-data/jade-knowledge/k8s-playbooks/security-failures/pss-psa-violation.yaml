@@ -1,0 +1,215 @@
+# JADE Operational Playbook: PSS/PSA Violation
+# Pod Security Standards/Admission violation
+
+name: PSS-PSA-Violation
+category: security-failures
+severity: HIGH
+frequency: COMMON
+
+trigger_patterns:
+  - "violates PodSecurity"
+  - "pod-security.kubernetes.io"
+  - "baseline"
+  - "restricted"
+  - "privileged"
+  - "forbidden"
+  - "PodSecurity violation"
+
+description: |
+  Pod rejected by Pod Security Admission because it violates the namespace's
+  Pod Security Standard (baseline or restricted). Need to fix pod spec or
+  request exemption.
+
+gameplan:
+  step_1:
+    name: "Identify the violation"
+    commands:
+      - "kubectl describe pod {pod} -n {ns} | grep -i 'violates\\|forbidden\\|pod-security'"
+      - "kubectl get namespace {ns} -o yaml | grep pod-security"
+      - "kubectl get events -n {ns} --field-selector reason=FailedCreate"
+
+    extract:
+      - "Which PSS level is enforced (baseline/restricted)"
+      - "What specific violation occurred"
+      - "Which container/field is the problem"
+
+  step_2_identify_violation_type:
+    name: "Map violation to fix"
+
+    common_violations:
+      privileged_container:
+        message: "privileged"
+        meaning: "Container requests privileged mode"
+        fix_rank: "D"
+        fix: |
+          securityContext:
+            privileged: false  # Remove or set to false
+
+      host_namespaces:
+        message: "hostNetwork\\|hostPID\\|hostIPC"
+        meaning: "Pod uses host namespaces"
+        fix_rank: "C"
+        fix: |
+          spec:
+            hostNetwork: false
+            hostPID: false
+            hostIPC: false
+
+      host_ports:
+        message: "hostPort"
+        meaning: "Container uses host ports"
+        fix_rank: "D"
+        fix: "Remove hostPort or use NodePort service instead"
+
+      capabilities:
+        message: "capabilities"
+        meaning: "Container adds capabilities beyond allowed set"
+        fix_rank: "D"
+        baseline_allowed: ["AUDIT_WRITE", "CHOWN", "DAC_OVERRIDE", "FOWNER", "FSETID", "KILL", "MKNOD", "NET_BIND_SERVICE", "SETFCAP", "SETGID", "SETPCAP", "SETUID", "SYS_CHROOT"]
+        restricted_allowed: ["NET_BIND_SERVICE"]
+        fix: |
+          securityContext:
+            capabilities:
+              drop: ["ALL"]
+              add: ["NET_BIND_SERVICE"]  # Only if needed
+
+      run_as_root:
+        message: "runAsNonRoot"
+        meaning: "Container runs as root or runAsNonRoot not set"
+        fix_rank: "D"
+        fix: |
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+
+      privilege_escalation:
+        message: "allowPrivilegeEscalation"
+        meaning: "Privilege escalation not explicitly disabled"
+        fix_rank: "D"
+        fix: |
+          securityContext:
+            allowPrivilegeEscalation: false
+
+      seccomp_profile:
+        message: "seccompProfile"
+        meaning: "Seccomp profile not set (restricted level)"
+        fix_rank: "D"
+        fix: |
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+
+      proc_mount:
+        message: "procMount"
+        meaning: "Non-default /proc mount requested"
+        fix_rank: "C"
+        fix: "Remove procMount or set to Default"
+
+  step_3_determine_approach:
+    name: "Decide: fix pod or request exemption"
+
+    fix_pod:
+      when:
+        - "Violation is unnecessary for app function"
+        - "Security settings are missing/default"
+        - "Can add security context without breaking app"
+      rank: "D"
+      action: "Apply security context fixes"
+
+    request_exemption:
+      when:
+        - "App genuinely needs privileged access"
+        - "System component (CNI, storage driver, etc.)"
+        - "Temporary until app can be fixed"
+      rank: "C"
+      action: "Create exemption annotation or move to different namespace"
+      template: |
+        # Option 1: Namespace-level exemption
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: {ns}
+          labels:
+            pod-security.kubernetes.io/enforce: privileged
+            pod-security.kubernetes.io/audit: baseline
+            pod-security.kubernetes.io/warn: baseline
+
+        # Option 2: Use RuntimeClass exemption
+        # Option 3: Move to privileged namespace
+
+  step_4_apply_full_restricted_profile:
+    name: "Template for fully compliant restricted profile"
+    template: |
+      spec:
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          fsGroup: 1000
+          seccompProfile:
+            type: RuntimeDefault
+
+        containers:
+        - name: app
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            capabilities:
+              drop: ["ALL"]
+
+          # If app needs to write, add emptyDir
+          volumeMounts:
+          - name: tmp
+            mountPath: /tmp
+
+        volumes:
+        - name: tmp
+          emptyDir: {}
+
+  step_5_verify_fix:
+    name: "Test the fixed pod"
+    commands:
+      - "kubectl apply --dry-run=server -f {pod-spec.yaml}"
+      - "kubectl apply -f {pod-spec.yaml}"
+      - "kubectl get pod {pod} -n {ns}"
+
+common_auto_fixes:
+  - id: "pss-add-seccontext"
+    trigger: "missing runAsNonRoot"
+    rank: "D"
+    action: "add_security_context"
+
+  - id: "pss-drop-caps"
+    trigger: "capabilities violation"
+    rank: "D"
+    action: "drop_all_capabilities"
+
+  - id: "pss-add-seccomp"
+    trigger: "missing seccompProfile"
+    rank: "D"
+    action: "add_runtime_default_seccomp"
+
+  - id: "pss-disable-escalation"
+    trigger: "allowPrivilegeEscalation not set"
+    rank: "D"
+    action: "disable_privilege_escalation"
+
+escalation_triggers:
+  - condition: "App genuinely needs privileged access"
+    escalate_to: "JADE"
+    reason: "Security exemption decision needed"
+
+  - condition: "System component rejected"
+    escalate_to: "JADE"
+    reason: "May need cluster-level policy change"
+
+  - condition: "Unknown how to run without root"
+    escalate_to: "JADE"
+    reason: "May need app modification"
+
+related_playbooks:
+  - rbac-denied
+  - admission-webhook-denied
+  - createcontainererror

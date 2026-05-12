@@ -1,0 +1,203 @@
+# JADE Operational Playbook: Init:Error
+# InitContainer failed with error
+
+name: Init:Error
+category: pod-failures
+severity: HIGH
+frequency: COMMON
+
+trigger_patterns:
+  - "Init:Error"
+  - "Init:CrashLoopBackOff"
+  - "initContainer .* failed"
+  - "Init:0/1"
+  - "Init:0/2"
+
+description: |
+  One or more init containers failed. Main containers won't start until
+  all init containers complete successfully. Common for dependency checks,
+  migrations, or setup tasks.
+
+gameplan:
+  step_1:
+    name: "Identify which init container failed"
+    commands:
+      - "kubectl describe pod {pod} -n {ns} | grep -A20 'Init Containers:'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.status.initContainerStatuses}' | jq"
+
+    extract:
+      - "Which initContainer index failed (0, 1, 2...)"
+      - "Exit code"
+      - "Reason"
+
+  step_2_get_init_logs:
+    name: "Get failed init container logs"
+    commands:
+      - "kubectl logs {pod} -n {ns} -c {init-container-name}"
+      - "kubectl logs {pod} -n {ns} -c {init-container-name} --previous"
+
+    common_init_patterns:
+      wait_for_service:
+        purpose: "Wait for dependency to be ready"
+        patterns:
+          - "wait-for"
+          - "until nc -z"
+          - "waiting for"
+        failure_meaning: "Dependency service not available"
+        fix_rank: "D"
+        fixes:
+          - action: "Check if dependency service exists"
+            command: "kubectl get svc -n {ns}"
+          - action: "Check if dependency pods are running"
+            command: "kubectl get pods -n {ns} -l app={dependency}"
+          - action: "Check endpoints"
+            command: "kubectl get endpoints {service} -n {ns}"
+          - action: "Increase wait timeout if service slow to start"
+
+      database_migration:
+        purpose: "Run database migrations before app starts"
+        patterns:
+          - "migrate"
+          - "flyway"
+          - "liquibase"
+          - "alembic"
+        failure_meaning: "Migration failed"
+        fix_rank: "C"
+        fixes:
+          - action: "Check migration error in logs"
+          - action: "Verify database credentials"
+          - action: "Check for migration conflicts"
+          - action: "May need to run migration manually to fix"
+
+      config_generation:
+        purpose: "Generate config files before app starts"
+        patterns:
+          - "generate config"
+          - "envsubst"
+          - "gomplate"
+          - "render template"
+        failure_meaning: "Config generation failed"
+        fix_rank: "D"
+        fixes:
+          - action: "Check required environment variables are set"
+          - action: "Verify template syntax"
+          - action: "Check source configmap/secret exists"
+
+      permission_setup:
+        purpose: "Fix permissions on mounted volumes"
+        patterns:
+          - "chmod"
+          - "chown"
+          - "permissions"
+        failure_meaning: "Permission change failed"
+        fix_rank: "D"
+        fixes:
+          - action: "Check if running as non-root"
+          - action: "Use fsGroup in pod security context"
+          - action: "May need initContainer to run as root"
+
+  step_3_analyze_exit_code:
+    name: "Interpret init container exit code"
+
+    exit_codes:
+      "0":
+        meaning: "Success (shouldn't be here if status is Error)"
+        investigate: "Check if it's actually CrashLoopBackOff"
+
+      "1":
+        meaning: "General error - check logs"
+        common_causes:
+          - "Script failed"
+          - "Command returned error"
+          - "Missing dependency"
+
+      "2":
+        meaning: "Shell syntax error or misuse"
+        fix: "Check script syntax"
+
+      "126":
+        meaning: "Permission problem or not executable"
+        fix: "chmod +x the script"
+
+      "127":
+        meaning: "Command not found"
+        fix: "Verify command exists in init container image"
+
+      "137":
+        meaning: "OOMKilled"
+        fix: "Increase init container memory limit"
+
+      "143":
+        meaning: "SIGTERM (timeout or killed)"
+        fix: "Increase timeout or terminationGracePeriodSeconds"
+
+  step_4_common_init_fixes:
+    name: "Apply fixes based on init type"
+
+    wait_for_service_fix:
+      template: |
+        initContainers:
+        - name: wait-for-{service}
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z {service}.{ns}.svc.cluster.local {port}; do echo "Waiting for {service}"; sleep 5; done']
+          resources:
+            requests:
+              memory: "16Mi"
+              cpu: "10m"
+
+    wait_with_timeout:
+      template: |
+        initContainers:
+        - name: wait-for-{service}
+          image: busybox:1.36
+          command: ['sh', '-c', 'timeout 300 sh -c "until nc -z {service} {port}; do sleep 2; done" || exit 1']
+
+    permission_fix:
+      template: |
+        initContainers:
+        - name: fix-permissions
+          image: busybox:1.36
+          command: ['sh', '-c', 'chown -R 1000:1000 /data']
+          volumeMounts:
+          - name: data
+            mountPath: /data
+          securityContext:
+            runAsUser: 0  # Run as root to fix permissions
+
+common_auto_fixes:
+  - id: "init-add-timeout"
+    trigger: "wait-for init stuck AND no timeout"
+    rank: "D"
+    action: "add_timeout_to_init"
+    params:
+      timeout: 300
+
+  - id: "init-increase-memory"
+    trigger: "init OOMKilled"
+    rank: "D"
+    action: "increase_init_memory"
+    params:
+      multiplier: 2
+
+  - id: "init-fix-dependency"
+    trigger: "connection refused in wait-for"
+    rank: "D"
+    action: "check_and_create_dependency"
+
+escalation_triggers:
+  - condition: "Database migration failed"
+    escalate_to: "JADE"
+    reason: "May need manual database intervention"
+
+  - condition: "Init keeps failing with same error"
+    escalate_to: "JADE"
+    reason: "Underlying issue needs investigation"
+
+  - condition: "Multiple pods stuck on same init"
+    escalate_to: "JADE"
+    reason: "Systemic dependency issue"
+
+related_playbooks:
+  - crashloopbackoff
+  - createcontainererror
+  - pending

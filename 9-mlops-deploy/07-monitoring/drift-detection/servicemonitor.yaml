@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: vllm-metrics
+  namespace: ml-serving
+  labels:
+    component: monitoring
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      component: model-serving
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+  namespaceSelector:
+    matchNames:
+      - ml-serving

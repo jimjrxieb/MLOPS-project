@@ -1,0 +1,8 @@
+Create a Gatekeeper ConstraintTemplate that blocks containers running as root.
+
+Requirements:
+- Block any pod where securityContext.runAsNonRoot is false or missing
+- Block any container where securityContext.runAsUser is 0
+- Provide a clear violation message
+
+Output: Valid Kubernetes YAML for both ConstraintTemplate and Constraint

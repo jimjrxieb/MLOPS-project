@@ -1,0 +1,105 @@
+# BERU Training Configuration — 3B base
+# Pipeline: 1-local-pipeline (formerly 1-data-pipeline)
+# Authoritative decisions: CAPSTONE-PROJECT/beru-design-decisions.md
+#   D-001 + D-009: base model = LLaMA 3.2-3B-Instruct (rebaselined from 8B)
+#   D-005 + D-012: synthetic-only training data, fresh 500+75 corpus
+#   D-010:         four-eval architecture; this run targets the brain × {knowledge, pentest} pair
+
+project:
+  name: "BERU-Capstone"
+  version: "v1.0-3b"
+  author: "LinkOps Industries"
+  capstone_module: "M3 — Fine-Tuning"
+
+# ── Base model (D-009) ────────────────────────────────────────────────────────
+model:
+  base_model: "unsloth/Llama-3.2-3B-Instruct"
+  max_seq_length: 4096   # 2K too tight for RAG-augmented prompts (retrieved chunks + scenario + 9-field response)
+  load_in_4bit: true     # QLoRA — fits BERU SFT on a single consumer GPU
+
+# ── LoRA (D-009: r=32 / alpha=64 for 3B; was r=64 / alpha=128 for 8B JADE) ────
+lora:
+  r: 32
+  alpha: 64
+  dropout: 0
+  # Full target_modules set is more thorough than the JADE config but matters more
+  # for behavior-shaping (which is what BERU SFT is doing per D-012).
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+
+# ── Training run ──────────────────────────────────────────────────────────────
+training:
+  epochs_per_chunk: 3              # higher than JADE (2) — small targeted corpus benefits from extra passes
+  batch_size: 4
+  gradient_accumulation_steps: 4   # effective batch = 16
+  learning_rate: 2e-5              # standard LoRA LR for behavior-shaping SFT
+  warmup_ratio: 0.03
+  lr_scheduler: "cosine"
+  weight_decay: 0.01
+  logging_steps: 5
+  eval_steps: 25                   # check validation loss every 25 steps
+  save_strategy: "epoch"
+
+# ── Validation split (D-012 — held-out from training, distinct from eval suites) ─
+validation:
+  enabled: true
+  split_file: "1-local-pipeline/01-raw-data-lake/beru_validation_v1.jsonl"
+  not_to_be_confused_with: |
+    The 4-eval-clarify/beru_*_brain_v*.jsonl suites are the FINAL held-out evals
+    (used post-fine-tune to compute promotion gate scores per D-010).
+    This validation_v1 set is used DURING training to monitor loss curves only.
+
+# ── Paths ─────────────────────────────────────────────────────────────────────
+paths:
+  pipeline_dir: "1-local-pipeline"
+  raw_input: "1-local-pipeline/01-raw-data-lake/beru_training_v1.jsonl"
+  etl_output: "1-local-pipeline/02-ETL-data/beru_v1"
+  untrained_chunks: "1-local-pipeline/03-chunked-untrained/beru_v1"
+  trained_chunks: "1-local-pipeline/04-trained-data/beru_v1"
+  model_registry: "3-model-registry/beru-v1.0-3b"
+  eval_dir: "4-eval-clarify"
+  results_dir: "4-eval-clarify/3-results/beru"
+  experiment_dir: "5-experiments/exp-006-beru-v1.0"
+
+# ── Data quality gate (D-012 — must pass before any training run) ────────────
+data_quality_gate:
+  test: "8-tests/test_beru_training_data.py"
+  blocking: true
+  required_passes:
+    - TestChatMLFormat
+    - TestControlIDValidity
+    - TestCorpusQuality       # the gate added by D-012
+  reason: |
+    Training MUST NOT run if the corpus has wrong control-name pairings,
+    cookie-cutter remediation, or fewer than 30% adversarial examples.
+    The bad-200 corpus would have passed pre-D-012 but fails the D-012 gates.
+
+# ── Promotion gate (D-010, four-eval architecture) ───────────────────────────
+promotion_gate:
+  knowledge_brain:
+    overall_threshold: 0.70
+    per_type_floor: 0.60
+    must_beat_baseline: true
+    baseline_score: 0.294        # exp-005-beru-3b-baseline (LLM + RAG)
+  pentest_brain:
+    overall_threshold: 0.70
+    per_category_floor: 0.50
+    critical_categories: ["LLM01", "LLM06", "LLM08"]
+    critical_floor: 0.70
+    must_not_regress_against_baseline: true
+    baseline_score: 0.403         # exp-005-beru-3b-baseline (LLM + RAG)
+
+# ── Cross-references ─────────────────────────────────────────────────────────
+references:
+  design_decisions: "CAPSTONE-PROJECT/beru-design-decisions.md"
+  rag_corpus_collection: "beru-nist-800-53"   # 94 docs in 2-rag-ingestion/05-ragged-data/chroma
+  baseline_experiment: "5-experiments/exp-005-beru-3b-baseline"
+  fine_tune_experiment: "5-experiments/exp-006-beru-v1.0"   # to be created at training time
+  model_card: "6-model-cards/challenger/beru-v1.md"
+  inventory_register: "CAPSTONE-PROJECT/templates/ai-inventory-register.md"   # JSA-AI-003

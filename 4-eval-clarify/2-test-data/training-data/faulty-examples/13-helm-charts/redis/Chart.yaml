@@ -1,0 +1,14 @@
+apiVersion: v2
+name: redis
+description: Production-grade Redis in-memory data store with security hardening
+type: application
+version: 1.0.0
+appVersion: "6.2.7"
+keywords:
+  - redis
+  - cache
+  - in-memory
+  - key-value
+maintainers:
+  - name: GuidePoint Security
+    email: devsecops@guidepointsecurity.com

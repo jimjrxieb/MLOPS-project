@@ -1,0 +1,182 @@
+# JADE Operational Playbook: Connection Refused
+# Pod can't connect to another service
+
+name: Connection-Refused
+category: networking-failures
+severity: HIGH
+frequency: VERY_COMMON
+
+trigger_patterns:
+  - "connection refused"
+  - "ECONNREFUSED"
+  - "dial tcp.*connection refused"
+  - "connect: connection refused"
+
+description: |
+  A pod is trying to connect to a service but getting connection refused.
+  Either the target isn't listening or network policy is blocking.
+
+gameplan:
+  step_1:
+    name: "Identify source and destination"
+    commands:
+      - "kubectl logs {source-pod} -n {ns} --tail=50 | grep -i 'connection refused'"
+      - "kubectl describe pod {source-pod} -n {ns} | grep -A20 'Environment:'"
+
+    extract:
+      - "Target hostname/IP"
+      - "Target port"
+      - "Source pod name and namespace"
+
+  step_2_verify_target_exists:
+    name: "Check if target service/pod exists and is running"
+    commands:
+      - "kubectl get svc {target-service} -n {target-ns}"
+      - "kubectl get endpoints {target-service} -n {target-ns}"
+      - "kubectl get pods -n {target-ns} -l app={target-app}"
+
+    branches:
+      service_not_found:
+        meaning: "Target service doesn't exist"
+        fix_rank: "D"
+        fix: "Create the service or fix the service name"
+
+      endpoints_empty:
+        meaning: "Service exists but no pods behind it"
+        playbook: "service-no-endpoints"
+
+      target_not_running:
+        meaning: "Target pods not in Running state"
+        action: "Check target pod health"
+
+      target_running:
+        meaning: "Target is running - check if it's listening"
+        next_step: "step_3_check_target_listening"
+
+  step_3_check_target_listening:
+    name: "Verify target is listening on expected port"
+    commands:
+      - "kubectl exec {target-pod} -n {target-ns} -- netstat -tlnp"
+      - "kubectl exec {target-pod} -n {target-ns} -- ss -tlnp"
+      - "kubectl exec {target-pod} -n {target-ns} -- cat /proc/net/tcp"
+
+    issues:
+      not_listening:
+        meaning: "Process isn't listening on the expected port"
+        causes:
+          - "App hasn't started yet"
+          - "App listening on different port"
+          - "App bound to 127.0.0.1 instead of 0.0.0.0"
+        fix_rank: "D"
+        fixes:
+          - "Check app startup logs"
+          - "Verify port configuration"
+          - "Ensure app binds to 0.0.0.0, not localhost"
+
+      listening_on_wrong_port:
+        fix_rank: "D"
+        fix: "Update service targetPort or app config"
+
+      listening_on_localhost:
+        meaning: "App bound to 127.0.0.1 - only reachable from inside container"
+        fix_rank: "D"
+        fix: "Configure app to listen on 0.0.0.0"
+
+  step_4_check_network_policies:
+    name: "Check if NetworkPolicy is blocking traffic"
+    commands:
+      - "kubectl get networkpolicy -n {target-ns}"
+      - "kubectl get networkpolicy -n {source-ns}"
+      - "kubectl describe networkpolicy -n {target-ns}"
+
+    analysis:
+      ingress_policy_on_target:
+        check: "Does target namespace have ingress NetworkPolicy?"
+        if_yes: "Verify source pod/namespace is allowed"
+
+      egress_policy_on_source:
+        check: "Does source namespace have egress NetworkPolicy?"
+        if_yes: "Verify target is allowed in egress rules"
+
+    common_policy_issues:
+      deny_all_ingress:
+        template: |
+          # This blocks ALL ingress - you need to add allow rules
+          apiVersion: networking.k8s.io/v1
+          kind: NetworkPolicy
+          spec:
+            podSelector: {}
+            policyTypes: ["Ingress"]
+            ingress: []  # Empty = deny all
+
+      missing_allow_rule:
+        fix_rank: "D"
+        fix: |
+          # Allow from specific namespace
+          ingress:
+          - from:
+            - namespaceSelector:
+                matchLabels:
+                  name: {source-ns}
+            ports:
+            - port: {target-port}
+
+  step_5_dns_vs_direct:
+    name: "Check if it's a DNS issue"
+    commands:
+      - "kubectl exec {source-pod} -n {ns} -- nslookup {target-service}"
+      - "kubectl exec {source-pod} -n {ns} -- nslookup {target-service}.{target-ns}.svc.cluster.local"
+
+    issues:
+      dns_fails:
+        playbook: "dns-resolution-failed"
+
+      dns_resolves_but_conn_refused:
+        meaning: "DNS works, target just not listening or blocked"
+        action: "Continue with step_3 and step_4"
+
+  step_6_test_connectivity:
+    name: "Test connection from source to target"
+    commands:
+      - "kubectl exec {source-pod} -n {ns} -- nc -zv {target-ip} {port}"
+      - "kubectl exec {source-pod} -n {ns} -- curl -v http://{target-service}:{port}/health"
+      - "kubectl exec {source-pod} -n {ns} -- wget -qO- http://{target-service}:{port}/"
+
+common_auto_fixes:
+  - id: "cr-add-initwait"
+    trigger: "target slow to start AND no init container"
+    rank: "D"
+    action: "add_init_container_wait"
+    template: |
+      initContainers:
+      - name: wait-for-{target}
+        image: busybox:1.36
+        command: ['sh', '-c', 'until nc -z {target} {port}; do sleep 2; done']
+
+  - id: "cr-allow-networkpolicy"
+    trigger: "networkpolicy blocking AND should be allowed"
+    rank: "C"
+    action: "add_networkpolicy_allow"
+
+  - id: "cr-fix-binding"
+    trigger: "app listening on localhost"
+    rank: "D"
+    action: "add_bind_address_env"
+    template: |
+      env:
+      - name: BIND_ADDRESS
+        value: "0.0.0.0"
+
+escalation_triggers:
+  - condition: "NetworkPolicy blocking but unclear if should allow"
+    escalate_to: "JADE"
+    reason: "Security decision needed"
+
+  - condition: "App configuration needs to change"
+    escalate_to: "JADE"
+    reason: "May need application team involvement"
+
+related_playbooks:
+  - service-no-endpoints
+  - dns-resolution-failed
+  - networkpolicy-blocking

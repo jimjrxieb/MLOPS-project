@@ -1,0 +1,47 @@
+# Experiment 001 — Katie v1 Bulk Training
+# Date: 2026-01 through 2026-03-15
+# Hypothesis: Train on full 284k corpus, quantity drives quality
+
+model:
+  base: "unsloth/Llama-3.2-3B-Instruct"
+  quantization: "4bit"
+
+lora:
+  r: 64
+  alpha: 128
+  dropout: 0
+  target_modules: ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+
+training:
+  epochs_per_chunk: 2
+  batch_size: 4
+  gradient_accumulation_steps: 8
+  learning_rate: 2e-5
+  warmup_ratio: 0.03
+  lr_scheduler: "cosine"
+  weight_decay: 0.01
+  max_seq_length: 2048
+  chunk_size: 10000
+
+data:
+  corpus: "1-data-pipeline/01-raw-data-lake/"
+  total_examples: 284844
+  chunks_trained: 36
+  examples_trained: 294998
+  format: "mixed"  # This was the problem — not all ChatML
+  curation: "none"
+
+  distribution:
+    kubernetes: 38.5%
+    general: 23.0%
+    devsecops: 16.1%
+    cloud: 12.1%
+    compliance: 3.8%
+    secrets: 3.3%
+    terraform: 3.3%
+
+artifacts:
+  checkpoint: "3-model-registry/v1.1-3b/chunk_0036_10k/merged"
+  checkpoint_config_sha256: "00a0218277c9970f2fa4672af31d26a4ebf6a2809ae3bc3f14ef526d1e5cf22b"
+  eval_results: "4-eval-clarify/3-results/bridge_20260315_134833/"
+  curation_report: "1-data-pipeline/curation_report.txt"

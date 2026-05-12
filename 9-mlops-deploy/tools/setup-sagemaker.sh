@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+# setup-sagemaker.sh — Provision IAM role + S3 bucket for SageMaker
+#
+# Usage: bash tools/setup-sagemaker.sh [--project-name gp-mlops] [--region us-east-1]
+#        bash tools/setup-sagemaker.sh --teardown
+#
+# Creates:
+#   - IAM role: {project}-sagemaker-execution
+#   - S3 bucket: {project}-sagemaker-{account_id}
+#   - Config file: ~/.gp-sagemaker.env (sourced by lifecycle script)
+#
+# Cost: $0 (IAM and empty S3 are free)
+set -euo pipefail
+
+# --- Defaults ---
+PROJECT_NAME="${PROJECT_NAME:-gp-mlops}"
+REGION="${REGION:-us-east-1}"
+TEARDOWN=false
+
+# --- Parse args ---
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --project-name) PROJECT_NAME="$2"; shift 2 ;;
+    --region)       REGION="$2"; shift 2 ;;
+    --teardown)     TEARDOWN=true; shift ;;
+    -h|--help)
+      echo "Usage: bash tools/setup-sagemaker.sh [--project-name NAME] [--region REGION] [--teardown]"
+      exit 0 ;;
+    *) echo "Unknown arg: $1"; exit 1 ;;
+  esac
+done
+
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+ROLE_NAME="${PROJECT_NAME}-sagemaker-execution"
+BUCKET_NAME="${PROJECT_NAME}-sagemaker-${ACCOUNT_ID}"
+ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/${ROLE_NAME}"
+CONFIG_FILE="${HOME}/.gp-sagemaker.env"
+
+echo "=== SageMaker Setup ==="
+echo "  Project:  ${PROJECT_NAME}"
+echo "  Region:   ${REGION}"
+echo "  Account:  ${ACCOUNT_ID}"
+echo "  Role:     ${ROLE_NAME}"
+echo "  Bucket:   ${BUCKET_NAME}"
+echo ""
+
+# --- Teardown ---
+if [[ "$TEARDOWN" == "true" ]]; then
+  echo "=== Tearing down SageMaker resources ==="
+
+  echo "[1/3] Emptying S3 bucket..."
+  aws s3 rb "s3://${BUCKET_NAME}" --force 2>/dev/null && echo "  Deleted ${BUCKET_NAME}" || echo "  Bucket not found (already deleted)"
+
+  echo "[2/3] Detaching IAM policies..."
+  for policy_arn in $(aws iam list-attached-role-policies --role-name "${ROLE_NAME}" --query 'AttachedPolicies[].PolicyArn' --output text 2>/dev/null); do
+    aws iam detach-role-policy --role-name "${ROLE_NAME}" --policy-arn "${policy_arn}"
+    echo "  Detached ${policy_arn}"
+  done
+
+  echo "[3/3] Deleting IAM role..."
+  aws iam delete-role --role-name "${ROLE_NAME}" 2>/dev/null && echo "  Deleted ${ROLE_NAME}" || echo "  Role not found (already deleted)"
+
+  rm -f "${CONFIG_FILE}"
+  echo ""
+  echo "=== Teardown complete ==="
+  exit 0
+fi
+
+# --- Create IAM Role ---
+echo "[1/3] Creating IAM role: ${ROLE_NAME}"
+
+TRUST_POLICY=$(cat <<'POLICY'
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "Service": "sagemaker.amazonaws.com" },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+POLICY
+)
+
+if aws iam get-role --role-name "${ROLE_NAME}" &>/dev/null; then
+  echo "  Role already exists — skipping"
+else
+  aws iam create-role \
+    --role-name "${ROLE_NAME}" \
+    --assume-role-policy-document "${TRUST_POLICY}" \
+    --description "SageMaker execution role for ${PROJECT_NAME}" \
+    --region "${REGION}" \
+    --output text --query 'Role.Arn'
+
+  # Attach managed policies (minimal for training + registry + endpoints)
+  aws iam attach-role-policy \
+    --role-name "${ROLE_NAME}" \
+    --policy-arn "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
+
+  aws iam attach-role-policy \
+    --role-name "${ROLE_NAME}" \
+    --policy-arn "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+
+  echo "  Created and attached policies"
+fi
+
+# --- Create S3 Bucket ---
+echo "[2/3] Creating S3 bucket: ${BUCKET_NAME}"
+
+if aws s3api head-bucket --bucket "${BUCKET_NAME}" &>/dev/null; then
+  echo "  Bucket already exists — skipping"
+else
+  if [[ "${REGION}" == "us-east-1" ]]; then
+    aws s3api create-bucket --bucket "${BUCKET_NAME}" --region "${REGION}"
+  else
+    aws s3api create-bucket --bucket "${BUCKET_NAME}" --region "${REGION}" \
+      --create-bucket-configuration LocationConstraint="${REGION}"
+  fi
+
+  # Enable versioning
+  aws s3api put-bucket-versioning --bucket "${BUCKET_NAME}" \
+    --versioning-configuration Status=Enabled
+
+  # Block public access
+  aws s3api put-public-access-block --bucket "${BUCKET_NAME}" \
+    --public-access-block-configuration \
+    "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
+
+  # Server-side encryption
+  aws s3api put-bucket-encryption --bucket "${BUCKET_NAME}" \
+    --server-side-encryption-configuration \
+    '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms"},"BucketKeyEnabled":true}]}'
+
+  echo "  Created with versioning, encryption, public access blocked"
+fi
+
+# --- Create folder structure ---
+echo "[3/3] Creating bucket folder structure..."
+for prefix in training-data model-output checkpoints data-capture monitoring baseline; do
+  aws s3api put-object --bucket "${BUCKET_NAME}" --key "${prefix}/" --content-length 0 >/dev/null
+done
+echo "  Created: training-data/ model-output/ checkpoints/ data-capture/ monitoring/ baseline/"
+
+# --- Write config file ---
+cat > "${CONFIG_FILE}" <<EOF
+# SageMaker config — generated by setup-sagemaker.sh $(date -I)
+export SAGEMAKER_ROLE="${ROLE_ARN}"
+export SAGEMAKER_BUCKET="${BUCKET_NAME}"
+export SAGEMAKER_REGION="${REGION}"
+export SAGEMAKER_PROJECT="${PROJECT_NAME}"
+EOF
+
+echo ""
+echo "=== Setup complete ==="
+echo ""
+echo "Config written to: ${CONFIG_FILE}"
+echo "  SAGEMAKER_ROLE=${ROLE_ARN}"
+echo "  SAGEMAKER_BUCKET=${BUCKET_NAME}"
+echo ""
+echo "Next: source ${CONFIG_FILE} && python3 tools/sagemaker-lifecycle.py --run-all"
+echo ""
+echo "Teardown: bash tools/setup-sagemaker.sh --teardown"

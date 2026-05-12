@@ -1,0 +1,201 @@
+{
+  "benchmark_name": "JSA Operational Knowledge Benchmark",
+  "version": "1.0",
+  "description": "Tests knowledge of GP-CONSULTING NPCs and JSA operational workflows",
+  "context": "You are JSA (JADE Secure Agent), a DevSecOps automation agent. You have access to GP-CONSULTING toolkit with Scanner NPCs (Phase 1), Fixer NPCs (Phase 2), and Hardening NPCs (Phase 3). Answer how you would handle each scenario using the available tools.",
+  "questions": [
+    {
+      "id": "ops-001",
+      "domain": "Secrets Management",
+      "scenario": "A developer committed AWS credentials to the repo. How do you detect and fix this?",
+      "expected_workflow": "1. Scan with GitleaksNPC, 2. Fix with SecretsFixerNPC (removes secret, updates .gitignore), 3. Rescan to verify",
+      "expected_npcs": ["gitleaks_npc.py", "secrets_fixer_npc.py"],
+      "scoring": {
+        "mentions_gitleaks": 3,
+        "mentions_secrets_fixer": 3,
+        "correct_workflow_order": 2,
+        "mentions_gitignore_update": 1,
+        "mentions_rescan": 1
+      }
+    },
+    {
+      "id": "ops-002",
+      "domain": "Container Security",
+      "scenario": "Kube-bench reports CIS benchmark failures on the cluster. How do you scan and fix?",
+      "expected_workflow": "1. Scan with KubeBenchNPC, 2. Review findings, 3. Fix with KubernetesFixerNPC, 4. Rescan to verify",
+      "expected_npcs": ["kube_bench_npc.py", "kubernetes_fixer_npc.py"],
+      "scoring": {
+        "mentions_kube_bench": 3,
+        "mentions_kubernetes_fixer": 3,
+        "explains_cis_benchmarks": 2,
+        "mentions_verification": 2
+      }
+    },
+    {
+      "id": "ops-003",
+      "domain": "Dependency Security",
+      "scenario": "You need to scan a Node.js project for vulnerable dependencies and fix them. What's your approach?",
+      "expected_workflow": "1. Scan with TrivyNPC or GrypeNPC, 2. Fix with DependencyFixerNPC (npm/yarn upgrade), 3. Rescan",
+      "expected_npcs": ["trivy_npc.py", "grype_npc.py", "dependency_fixer_npc.py"],
+      "scoring": {
+        "mentions_trivy_or_grype": 3,
+        "mentions_dependency_fixer": 3,
+        "knows_npm_yarn_upgrade": 2,
+        "mentions_rescan": 2
+      }
+    },
+    {
+      "id": "ops-004",
+      "domain": "IaC Security",
+      "scenario": "A Terraform module has security misconfigurations. How do you scan and what tools would you use?",
+      "expected_workflow": "1. Scan with CheckovNPC, TfsecNPC, or ConftestNPC, 2. Review findings, 3. Fix with ConftestFixerNPC if policy violations",
+      "expected_npcs": ["checkov_npc.py", "tfsec_npc.py", "conftest_npc.py", "conftest_fixer_npc.py"],
+      "scoring": {
+        "mentions_checkov_or_tfsec": 3,
+        "mentions_conftest": 2,
+        "understands_iac_scanning": 3,
+        "mentions_fixer": 2
+      }
+    },
+    {
+      "id": "ops-005",
+      "domain": "CI/CD Security",
+      "scenario": "GitHub Actions workflows have security issues (command injection, unpinned actions). How do you detect and fix?",
+      "expected_workflow": "1. Scan with GHAScannerNPC, 2. Fix with GHAFixerNPC, 3. Use GHATemplateNPC for secure templates",
+      "expected_npcs": ["gha_scanner_npc.py", "gha_fixer_npc.py", "gha_template_npc.py"],
+      "scoring": {
+        "mentions_gha_scanner": 3,
+        "mentions_gha_fixer": 3,
+        "mentions_template_npc": 2,
+        "explains_gha_vulnerabilities": 2
+      }
+    },
+    {
+      "id": "ops-006",
+      "domain": "SAST",
+      "scenario": "A Python application needs SAST scanning. What NPCs do you use and what do they detect?",
+      "expected_workflow": "1. Scan with BanditNPC (Python-specific) and/or SemgrepNPC (multi-language), 2. Fix with CodeFixerNPC",
+      "expected_npcs": ["bandit_npc.py", "semgrep_npc.py", "code_fixer_npc.py"],
+      "scoring": {
+        "mentions_bandit": 3,
+        "mentions_semgrep": 2,
+        "mentions_code_fixer": 3,
+        "explains_sast_findings": 2
+      }
+    },
+    {
+      "id": "ops-007",
+      "domain": "Policy as Code",
+      "scenario": "You need to create and deploy a Gatekeeper policy that denies privileged containers. What's the workflow?",
+      "expected_workflow": "1. Generate with GatekeeperGeneratorNPC, 2. Test with OPAPolicyTesterNPC, 3. Deploy with GatekeeperDeployerNPC",
+      "expected_npcs": ["gatekeeper_generator_npc.py", "opa_policy_tester_npc.py", "gatekeeper_deployer_npc.py"],
+      "scoring": {
+        "mentions_gatekeeper_generator": 3,
+        "mentions_opa_tester": 3,
+        "mentions_deployer": 2,
+        "understands_policy_workflow": 2
+      }
+    },
+    {
+      "id": "ops-008",
+      "domain": "Kubernetes Security",
+      "scenario": "Pods are missing network policies. How do you detect this and generate the policies?",
+      "expected_workflow": "1. Scan with KubescapeNPC or PolarisNPC, 2. Generate with NetworkPolicyGeneratorNPC",
+      "expected_npcs": ["kubescape_npc.py", "polaris_npc.py", "network_policy_generator_npc.py"],
+      "scoring": {
+        "mentions_kubescape_or_polaris": 3,
+        "mentions_network_policy_generator": 3,
+        "explains_network_policy_importance": 2,
+        "correct_workflow": 2
+      }
+    },
+    {
+      "id": "ops-009",
+      "domain": "Troubleshooting",
+      "scenario": "A pod is in CrashLoopBackOff. How do you diagnose and what NPCs help?",
+      "expected_workflow": "1. Diagnose with KubectlDiagnosticsNPC and/or K8sTroubleshooterNPC, 2. Check LogWatcherNPC, 3. Fix based on findings",
+      "expected_npcs": ["kubectl_diagnostics_npc.py", "k8s_troubleshooter_npc.py", "log_watcher_npc.py"],
+      "scoring": {
+        "mentions_kubectl_diagnostics": 3,
+        "mentions_troubleshooter": 2,
+        "mentions_log_watcher": 2,
+        "explains_crashloop_causes": 3
+      }
+    },
+    {
+      "id": "ops-010",
+      "domain": "Compliance",
+      "scenario": "You need to map Kubernetes security controls to CIS benchmarks and SOC2. What NPC handles this?",
+      "expected_workflow": "Use ComplianceMapperNPC to map controls to frameworks",
+      "expected_npcs": ["compliance_mapper_npc.py"],
+      "scoring": {
+        "mentions_compliance_mapper": 4,
+        "understands_cis_mapping": 3,
+        "understands_soc2_mapping": 3
+      }
+    },
+    {
+      "id": "ops-011",
+      "domain": "SBOM",
+      "scenario": "You need to generate a Software Bill of Materials for a container image. What tools do you use?",
+      "expected_workflow": "1. Generate SBOM with SyftNPC or CycloneDXNPC, 2. Scan for vulnerabilities with TrivyNPC",
+      "expected_npcs": ["syft_npc.py", "cyclonedx_npc.py", "trivy_npc.py"],
+      "scoring": {
+        "mentions_syft": 3,
+        "mentions_cyclonedx": 2,
+        "understands_sbom_purpose": 3,
+        "connects_to_vuln_scanning": 2
+      }
+    },
+    {
+      "id": "ops-012",
+      "domain": "Cloud Security",
+      "scenario": "You need to audit AWS for security misconfigurations. What NPC do you use?",
+      "expected_workflow": "Use ProwlerNPC to scan AWS against CIS benchmarks",
+      "expected_npcs": ["prowler_npc.py"],
+      "scoring": {
+        "mentions_prowler": 4,
+        "understands_aws_auditing": 3,
+        "mentions_cis_benchmarks": 3
+      }
+    },
+    {
+      "id": "ops-013",
+      "domain": "Kyverno",
+      "scenario": "You need to generate a Kyverno policy instead of Gatekeeper. What NPC handles this?",
+      "expected_workflow": "Use KyvernoGeneratorNPC to generate Kyverno ClusterPolicy",
+      "expected_npcs": ["kyverno_generator_npc.py"],
+      "scoring": {
+        "mentions_kyverno_generator": 4,
+        "understands_kyverno_vs_gatekeeper": 3,
+        "correct_policy_structure": 3
+      }
+    },
+    {
+      "id": "ops-014",
+      "domain": "Integration",
+      "scenario": "A C-rank finding needs human approval before fixing. How does JSA handle this?",
+      "expected_workflow": "1. RankClassifier marks as C-rank, 2. SlackApprovalNPC sends approval request, 3. Wait for approve/deny, 4. If approved, run fixer",
+      "expected_npcs": ["slack_approval_npc.py", "slack_npc.py"],
+      "scoring": {
+        "mentions_slack_approval": 4,
+        "understands_rank_system": 3,
+        "explains_approval_workflow": 3
+      }
+    },
+    {
+      "id": "ops-015",
+      "domain": "Full Cycle",
+      "scenario": "Describe the full JSA autonomous loop: scan → classify → route → fix → verify. What orchestrators and NPCs are involved?",
+      "expected_workflow": "1. ScanOrchestrator runs all scanner NPCs, 2. RankClassifier assigns E/D/C/B/S, 3. E/D auto-fix with FixOrchestrator, 4. C needs SlackApprovalNPC, 5. B/S escalate, 6. SmartRescanNPC verifies",
+      "expected_npcs": ["ScanOrchestrator", "FixOrchestrator", "RankClassifier", "slack_approval_npc.py", "smart_rescan_npc.py"],
+      "scoring": {
+        "mentions_scan_orchestrator": 2,
+        "mentions_fix_orchestrator": 2,
+        "explains_rank_routing": 3,
+        "mentions_smart_rescan": 2,
+        "complete_workflow": 1
+      }
+    }
+  ]
+}

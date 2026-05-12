@@ -1,0 +1,35 @@
+# JADE Training Configuration
+# Pipeline: 1-data-pipeline
+
+project:
+  name: "JADE-Copilot"
+  version: "v1.1-3b"
+  author: "LinkOps Industries"
+
+model:
+  base_model: "unsloth/Llama-3.2-3B-Instruct"
+  max_seq_length: 2048
+  load_in_4bit: true
+
+lora:
+  r: 64
+  alpha: 128
+  dropout: 0
+  target_modules: ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+
+training:
+  epochs_per_chunk: 2
+  batch_size: 4
+  gradient_accumulation_steps: 8
+  learning_rate: 2e-5
+  warmup_ratio: 0.03
+  lr_scheduler: "cosine"
+  weight_decay: 0.01
+  logging_steps: 1
+
+paths:
+  pipeline_dir: "1-data-pipeline"
+  untrained_chunks: "1-data-pipeline/03-chunked-untrained"
+  trained_chunks: "1-data-pipeline/04-trained-data"
+  model_registry: "3-model-registry"
+  eval_dir: "4-eval-clarify"

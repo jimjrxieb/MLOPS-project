@@ -1,0 +1,137 @@
+# FIXED VERSION OF RBAC CLUSTERROLE EXAMPLE #1
+# Fixes Applied:
+#   1. Specific verbs only (least privilege)
+#   2. Specific resources only
+#   3. Specific API groups only
+#   4. Use Role instead of ClusterRole where possible
+#   5. Secrets access scoped to namespace
+#   6. No privilege escalation capabilities
+#   7. Resource names restricted where applicable
+#
+# Compliance: CIS K8s 5.1.1, 5.1.3, NIST AC-6, SOC2 CC6.1
+
+---
+# FIXED: Namespaced Role for developers (not ClusterRole)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: developer-role
+  namespace: development
+  annotations:
+    rbac.authorization.k8s.io/reason: "Developer access to dev namespace"
+    security.company.com/reviewed-by: "security-team"
+    security.company.com/review-date: "2024-01-15"
+rules:
+  # FIXED: Only read access to deployments
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch"]
+
+  # FIXED: Can manage pods but not exec
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch", "delete"]
+    # FIXED #7: Only pods with specific label
+    # Note: resourceNames can't use labels, use NetworkPolicy/OPA for fine-grained
+
+  # FIXED: Read-only access to logs
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+
+  # FIXED: Can view services and configmaps
+  - apiGroups: [""]
+    resources: ["services", "configmaps"]
+    verbs: ["get", "list", "watch"]
+
+  # FIXED #5: NO access to secrets (use External Secrets Operator instead)
+  # Developers should not have direct secret access
+
+---
+# FIXED: Separate RoleBinding per namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: developer-access
+  namespace: development
+subjects:
+  - kind: Group
+    name: developers
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: developer-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# FIXED: Monitoring role with minimal permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: monitoring-readonly
+  annotations:
+    rbac.authorization.k8s.io/reason: "Prometheus/Grafana monitoring access"
+rules:
+  # FIXED: Read-only metrics access
+  - apiGroups: [""]
+    resources: ["pods", "nodes", "services", "endpoints"]
+    verbs: ["get", "list", "watch"]
+
+  # FIXED: Metrics endpoint access
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["nodes", "pods"]
+    verbs: ["get", "list"]
+
+  # FIXED #5: NO secrets access for monitoring
+  # Use ServiceMonitor CRD for Prometheus, not direct secret access
+
+  # FIXED #6: NO RBAC modification capabilities
+  # FIXED: NO admission webhook access
+
+---
+# FIXED: Binding monitoring to specific service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: monitoring-binding
+subjects:
+  # FIXED #4: Bind to specific ServiceAccount, not group
+  - kind: ServiceAccount
+    name: prometheus
+    namespace: monitoring
+roleRef:
+  kind: ClusterRole
+  name: monitoring-readonly
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# FIXED: Limited secret access for specific application
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: app-secret-reader
+  namespace: production
+rules:
+  # FIXED #5 & #7: Only specific secrets by name
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["app-db-credentials", "app-api-key"]  # Explicit names only
+    verbs: ["get"]
+
+---
+# FIXED: Aggregated ClusterRole for read-only view
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: namespace-viewer
+  labels:
+    # Can be aggregated with other roles
+    rbac.example.com/aggregate-to-viewer: "true"
+rules:
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods", "services", "configmaps"]
+    verbs: ["get", "list", "watch"]
+  # FIXED: Explicitly no secrets, no exec, no write operations

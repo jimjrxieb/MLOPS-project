@@ -1,0 +1,305 @@
+## PostgreSQL Production Configuration
+## Security-hardened with high availability and backup
+
+## Image Configuration
+image:
+  repository: postgres
+  tag: 13.8-alpine
+  pullPolicy: IfNotPresent
+
+## Architecture - Primary-Standby replication
+architecture: replication
+
+## Primary Configuration
+primary:
+  replicaCount: 1
+
+  ## Security Context
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+    readOnlyRootFilesystem: false  # PostgreSQL needs write access
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+
+  ## Resource Limits
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+  ## Persistence
+  persistence:
+    enabled: true
+    storageClass: ""  # Use default storage class
+    size: 20Gi
+    accessModes:
+      - ReadWriteOnce
+
+  ## Service Configuration
+  service:
+    type: ClusterIP
+    port: 5432
+
+## Standby Replicas Configuration
+readReplicas:
+  replicaCount: 2
+
+  ## Security Context
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+    readOnlyRootFilesystem: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+
+  ## Resource Limits
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+  ## Persistence
+  persistence:
+    enabled: true
+    size: 20Gi
+
+## Authentication
+auth:
+  enablePostgresUser: true
+  postgresPassword: ""  # Set via external secret
+  username: "app_user"
+  password: ""  # Set via external secret
+  database: "app_db"
+  existingSecret: "postgresql-secret"
+  secretKeys:
+    adminPasswordKey: postgres-password
+    userPasswordKey: password
+
+## PostgreSQL Configuration
+postgresql:
+  ## postgresql.conf settings
+  config: |-
+    # Connection Settings
+    listen_addresses = '*'
+    max_connections = 200
+    superuser_reserved_connections = 3
+
+    # Memory Settings
+    shared_buffers = 512MB
+    effective_cache_size = 1536MB
+    maintenance_work_mem = 128MB
+    work_mem = 2621kB
+
+    # WAL (Write-Ahead Logging)
+    wal_level = replica
+    max_wal_senders = 5
+    max_replication_slots = 5
+    wal_keep_size = 1GB
+    hot_standby = on
+
+    # Query Tuning
+    random_page_cost = 1.1
+    effective_io_concurrency = 200
+    min_wal_size = 1GB
+    max_wal_size = 4GB
+
+    # Checkpoints
+    checkpoint_completion_target = 0.9
+    checkpoint_timeout = 10min
+
+    # Logging
+    logging_collector = on
+    log_directory = 'log'
+    log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'
+    log_rotation_age = 1d
+    log_rotation_size = 100MB
+    log_min_duration_statement = 1000
+    log_line_prefix = '%t [%p]: [%l-1] user=%u,db=%d,app=%a,client=%h '
+    log_checkpoints = on
+    log_connections = on
+    log_disconnections = on
+    log_lock_waits = on
+    log_statement = 'ddl'
+
+    # Security
+    password_encryption = scram-sha-256
+    ssl = off  # Enable if SSL certificates are provided
+    # ssl_cert_file = '/tls/tls.crt'
+    # ssl_key_file = '/tls/tls.key'
+    # ssl_ca_file = '/tls/ca.crt'
+
+  ## pg_hba.conf - Client authentication
+  pgHba: |-
+    # TYPE  DATABASE        USER            ADDRESS                 METHOD
+    local   all             all                                     scram-sha-256
+    host    all             all             127.0.0.1/32            scram-sha-256
+    host    all             all             ::1/128                 scram-sha-256
+    host    all             all             0.0.0.0/0               scram-sha-256
+    host    replication     all             0.0.0.0/0               scram-sha-256
+
+  ## initdb scripts
+  initdbScripts:
+    00-init.sql: |
+      -- Create extensions
+      CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
+      CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+      -- Create application user and database
+      CREATE DATABASE app_db;
+
+      -- Grant privileges
+      GRANT ALL PRIVILEGES ON DATABASE app_db TO app_user;
+
+## Health Checks
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+  exec:
+    command:
+      - /bin/sh
+      - -c
+      - pg_isready -U postgres -h localhost
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+  successThreshold: 1
+  exec:
+    command:
+      - /bin/sh
+      - -c
+      - pg_isready -U postgres -h localhost
+
+## Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+## Network Policy
+networkPolicy:
+  enabled: true
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            postgres-client: "true"
+      ports:
+        - protocol: TCP
+          port: 5432
+  egress:
+    - to:
+      - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 5432  # Primary-standby replication
+        - protocol: TCP
+          port: 53  # DNS
+
+## Backup Configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retentionDays: 30
+  storageClass: ""
+  size: 50Gi
+
+  ## Backup script
+  script: |-
+    #!/bin/bash
+    set -e
+    BACKUP_DIR="/backups"
+    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+    BACKUP_FILE="${BACKUP_DIR}/backup_${TIMESTAMP}.sql.gz"
+
+    echo "Starting backup at ${TIMESTAMP}..."
+    pg_dumpall -U postgres | gzip > ${BACKUP_FILE}
+
+    echo "Backup completed: ${BACKUP_FILE}"
+
+    # Clean old backups
+    find ${BACKUP_DIR} -name "backup_*.sql.gz" -mtime +${RETENTION_DAYS} -delete
+
+## Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+## Affinity - Spread across nodes
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - postgresql
+        topologyKey: kubernetes.io/hostname
+
+## Metrics - Prometheus exporter
+metrics:
+  enabled: true
+  image:
+    repository: prometheuscommunity/postgres-exporter
+    tag: v0.11.1
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+
+## TLS Configuration (optional)
+tls:
+  enabled: false
+  certificatesSecret: ""
+  certFilename: "tls.crt"
+  certKeyFilename: "tls.key"
+  certCAFilename: "ca.crt"
+
+## Labels
+labels:
+  app.kubernetes.io/name: postgresql
+  app.kubernetes.io/component: database
+  app.kubernetes.io/part-of: data-layer
+
+## Audit Logging
+audit:
+  enabled: true
+  logConnections: true
+  logDisconnections: true
+  logStatement: "ddl"  # all, ddl, mod, none

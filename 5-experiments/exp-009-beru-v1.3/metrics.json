@@ -1,0 +1,111 @@
+{
+  "experiment_id": "exp-009-beru-v1.3",
+  "model": "beru-v1.3-3b",
+  "base_model": "unsloth/Llama-3.2-3B-Instruct",
+  "training_corpus_size": 234,
+  "validation_corpus_size": 85,
+  "fixes_applied_vs_exp007": {
+    "max_seq_length": "4096 -> 8192",
+    "rag_top_k_eval": "4 -> 2",
+    "epochs_per_chunk": "3 -> 2",
+    "train_on_responses_only": true,
+    "adversarial_floor_change": "DEFERRED (clean variable isolation)"
+  },
+  "lora_config": {
+    "r": 32,
+    "alpha": 64,
+    "dropout": 0,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ]
+  },
+  "training_config": {
+    "epochs_per_chunk": 2,
+    "batch_size": 2,
+    "gradient_accumulation_steps": 8,
+    "learning_rate": "2e-5",
+    "warmup_ratio": 0.03,
+    "lr_scheduler": "cosine",
+    "weight_decay": 0.01,
+    "logging_steps": 5,
+    "eval_steps": 25,
+    "save_strategy": "epoch"
+  },
+  "training_duration_minutes": 3.12268948952357,
+  "final_train_loss": 1.9360227266947427,
+  "run_date_utc": "2026-05-11T04:30:49.647172+00:00",
+  "baseline_exp005": {
+    "knowledge_brain_overall": 0.294,
+    "pentest_brain_overall": 0.403
+  },
+  "prior_exp007": {
+    "knowledge_brain_overall": 0.16666666666666666,
+    "pentest_brain_overall": 0.7272727272727273
+  },
+  "fine_tuned": {
+    "knowledge_brain": {
+      "overall": 0.13333333333333333,
+      "passed": 4,
+      "total": 30,
+      "per_type": {
+        "tool_output_interpretation": 0.2,
+        "evidence_gap_detection": 0.0,
+        "dual_citation": 0.2,
+        "poam_drafting": 0.4,
+        "atlas_mapped_ai_risk": 0.0,
+        "escalation_discipline": 0.0
+      }
+    },
+    "pentest_brain": {
+      "overall": 0.7272727272727273,
+      "passed": 16,
+      "total": 22,
+      "per_owasp_llm": {
+        "LLM01": 0.5,
+        "LLM02": 0.5,
+        "LLM03": 0.0,
+        "LLM04": 1.0,
+        "LLM05": 1.0,
+        "LLM06": 1.0,
+        "LLM07": 1.0,
+        "LLM08": 0.75,
+        "LLM09": 1.0,
+        "LLM10": 1.0
+      }
+    }
+  },
+  "promotion_gate": {
+    "decision": "BLOCKED",
+    "knowledge": {
+      "overall_pass": false,
+      "per_type_pass": false,
+      "beats_baseline": false,
+      "beats_exp007": false
+    },
+    "pentest": {
+      "overall_pass": true,
+      "per_category_pass": false,
+      "critical_pass": false,
+      "no_regression": true
+    }
+  },
+  "lift_over_baseline": {
+    "knowledge_brain": -0.16066666666666665,
+    "pentest_brain": 0.32427272727272727
+  },
+  "lift_over_exp007": {
+    "knowledge_brain": -0.033333333333333326,
+    "pentest_brain": 0.0
+  },
+  "artifacts": {
+    "adapter_path": "GP-MODEL-OPS/3-model-registry/beru-v1.3-3b/lora_adapter",
+    "merged_model_path": "GP-MODEL-OPS/3-model-registry/beru-v1.3-3b/merged_16bit",
+    "script": "CAPSTONE-PROJECT/notebooks/_run_exp007.py"
+  }
+}

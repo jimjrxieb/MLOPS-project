@@ -1,0 +1,275 @@
+# JADE Operational Playbook: Quota Exceeded
+# Resource creation blocked by ResourceQuota
+
+name: Quota-Exceeded
+category: resource-failures
+severity: MEDIUM
+frequency: COMMON
+
+trigger_patterns:
+  - "exceeded quota"
+  - "ResourceQuota"
+  - "forbidden: exceeded quota"
+  - "limited to"
+  - "must specify limits"
+  - "LimitRange"
+
+description: |
+  Resource creation or update blocked because it would exceed the namespace's
+  ResourceQuota. Need to either reduce resource requests, increase quota,
+  or free up resources.
+
+gameplan:
+  step_1:
+    name: "Identify the quota violation"
+    commands:
+      - "kubectl describe resourcequota -n {ns}"
+      - "kubectl get resourcequota -n {ns} -o yaml"
+      - "kubectl get events -n {ns} | grep -i quota"
+
+    extract:
+      - "Which quota is exceeded"
+      - "Current usage vs limit"
+      - "What resource type (cpu, memory, pods, etc.)"
+
+  step_2_understand_quotas:
+    name: "Understand ResourceQuota types"
+
+    compute_quotas:
+      resources:
+        - "requests.cpu"
+        - "requests.memory"
+        - "limits.cpu"
+        - "limits.memory"
+      example: |
+        spec:
+          hard:
+            requests.cpu: "10"
+            requests.memory: 20Gi
+            limits.cpu: "20"
+            limits.memory: 40Gi
+
+    object_count_quotas:
+      resources:
+        - "pods"
+        - "services"
+        - "secrets"
+        - "configmaps"
+        - "persistentvolumeclaims"
+        - "services.loadbalancers"
+        - "services.nodeports"
+      example: |
+        spec:
+          hard:
+            pods: "50"
+            services: "10"
+            secrets: "20"
+
+    storage_quotas:
+      resources:
+        - "requests.storage"
+        - "persistentvolumeclaims"
+        - "{storageclass}.storageclass.storage.k8s.io/requests.storage"
+      example: |
+        spec:
+          hard:
+            requests.storage: 100Gi
+            persistentvolumeclaims: "10"
+
+  step_3_analyze_current_usage:
+    name: "Check current namespace usage"
+    commands:
+      - "kubectl describe resourcequota -n {ns}"
+      - "kubectl top pods -n {ns}"
+      - "kubectl get pods -n {ns} -o jsonpath='{range .items[*]}{.metadata.name} {.spec.containers[*].resources}{\"\\n\"}{end}'"
+
+    analyze:
+      - "Used vs Hard limit"
+      - "What's consuming the most"
+      - "Any abandoned/unused resources"
+
+  step_4_diagnose_cause:
+    name: "Determine why quota exceeded"
+
+    branches:
+      too_many_pods:
+        indicator: "pods.*exceeded\\|pod count"
+        commands:
+          - "kubectl get pods -n {ns} | wc -l"
+          - "kubectl get pods -n {ns} --field-selector status.phase=Running | wc -l"
+        fix_rank: "C"
+        fixes:
+          - "Delete unused pods"
+          - "Scale down deployments"
+          - "Increase pod quota"
+
+      cpu_exceeded:
+        indicator: "cpu.*exceeded\\|requests.cpu\\|limits.cpu"
+        commands:
+          - "kubectl top pods -n {ns} --sort-by=cpu"
+          - "kubectl get pods -n {ns} -o json | jq '.items[].spec.containers[].resources'"
+        fix_rank: "D"
+        fixes:
+          - "Reduce CPU requests in pod specs"
+          - "Delete idle pods"
+          - "Increase CPU quota"
+
+      memory_exceeded:
+        indicator: "memory.*exceeded\\|requests.memory\\|limits.memory"
+        commands:
+          - "kubectl top pods -n {ns} --sort-by=memory"
+        fix_rank: "D"
+        fixes:
+          - "Reduce memory requests in pod specs"
+          - "Delete memory-heavy pods"
+          - "Increase memory quota"
+
+      storage_exceeded:
+        indicator: "storage.*exceeded\\|persistentvolumeclaims"
+        commands:
+          - "kubectl get pvc -n {ns}"
+          - "kubectl df-pv -n {ns}"  # If plugin installed
+        fix_rank: "C"
+        fixes:
+          - "Delete unused PVCs"
+          - "Reduce PVC sizes"
+          - "Increase storage quota"
+
+      service_limit:
+        indicator: "services.*exceeded\\|loadbalancers"
+        commands:
+          - "kubectl get svc -n {ns}"
+        fix_rank: "C"
+        fixes:
+          - "Consolidate services"
+          - "Use Ingress instead of LoadBalancer per-service"
+
+  step_5_fix_options:
+    name: "Resolution options"
+
+    reduce_resource_requests:
+      description: "Lower resource requests in pod spec"
+      rank: "D"
+      template: |
+        resources:
+          requests:
+            cpu: "50m"      # Reduced from 100m
+            memory: "64Mi"  # Reduced from 128Mi
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+
+    delete_unused_resources:
+      description: "Free up quota by removing unused resources"
+      rank: "D"
+      commands:
+        - "kubectl get pods -n {ns} --field-selector status.phase=Failed"
+        - "kubectl delete pods -n {ns} --field-selector status.phase=Failed"
+        - "kubectl get pvc -n {ns} | grep -v Bound"
+        - "kubectl delete pvc -n {ns} {unused-pvc}"
+
+    scale_down_deployments:
+      description: "Reduce replica counts"
+      rank: "D"
+      command: |
+        kubectl scale deployment {deploy} -n {ns} --replicas=2
+
+    increase_quota:
+      description: "Request quota increase"
+      rank: "C"
+      template: |
+        apiVersion: v1
+        kind: ResourceQuota
+        metadata:
+          name: {quota-name}
+          namespace: {ns}
+        spec:
+          hard:
+            requests.cpu: "20"        # Increased
+            requests.memory: 40Gi     # Increased
+            limits.cpu: "40"
+            limits.memory: 80Gi
+            pods: "100"
+
+    use_limitrange_defaults:
+      description: "Set LimitRange for default limits"
+      rank: "D"
+      benefit: "Prevents pods without limits from blocking quota"
+      template: |
+        apiVersion: v1
+        kind: LimitRange
+        metadata:
+          name: default-limits
+          namespace: {ns}
+        spec:
+          limits:
+          - default:
+              cpu: "200m"
+              memory: "256Mi"
+            defaultRequest:
+              cpu: "50m"
+              memory: "64Mi"
+            type: Container
+
+    optimize_requests:
+      description: "Right-size based on actual usage"
+      rank: "D"
+      steps:
+        - "Run 'kubectl top pods' to see actual usage"
+        - "Set requests to actual usage + 20% buffer"
+        - "Set limits to requests * 2 (or based on burst needs)"
+
+  step_6_verify_fix:
+    name: "Verify quota is no longer blocking"
+    commands:
+      - "kubectl describe resourcequota -n {ns}"
+      - "kubectl apply -f {resource.yaml} --dry-run=server"
+      - "kubectl apply -f {resource.yaml}"
+
+    success_criteria:
+      - "Used < Hard for all resources"
+      - "Resource creation succeeds"
+
+common_auto_fixes:
+  - id: "quota-reduce-requests"
+    trigger: "cpu/memory exceeded AND pod over-provisioned"
+    rank: "D"
+    action: "reduce_resource_requests"
+
+  - id: "quota-delete-failed"
+    trigger: "pod count exceeded AND failed pods exist"
+    rank: "D"
+    action: "delete_failed_pods"
+
+  - id: "quota-scale-down"
+    trigger: "exceeded AND deployment has excess replicas"
+    rank: "D"
+    action: "scale_down_deployment"
+
+escalation_triggers:
+  - condition: "Need quota increase"
+    escalate_to: "JADE"
+    reason: "Resource allocation decision"
+
+  - condition: "Production workload blocked"
+    escalate_to: "JADE"
+    reason: "Business impact"
+
+  - condition: "Unclear which resources to reduce"
+    escalate_to: "JADE"
+    reason: "Need usage analysis"
+
+best_practices:
+  - "Always set resource requests and limits"
+  - "Use LimitRange to enforce defaults"
+  - "Right-size based on actual metrics"
+  - "Monitor quota usage with Prometheus"
+  - "Set up alerts before quota is exhausted"
+  - "Use VPA for automatic right-sizing recommendations"
+  - "Reserve some headroom (don't run at 100% quota)"
+
+related_playbooks:
+  - pending
+  - oomkilled
+  - pvc-pending
+  - evicted

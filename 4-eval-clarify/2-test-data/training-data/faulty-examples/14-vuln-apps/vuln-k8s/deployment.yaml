@@ -1,0 +1,61 @@
+# Intentionally insecure Kubernetes deployment for JSA testing
+# Contains multiple security violations
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vuln-app
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vuln-app
+  template:
+    metadata:
+      labels:
+        app: vuln-app
+    spec:
+      # VULN: Host network access
+      hostNetwork: true
+
+      # VULN: Host PID namespace
+      hostPID: true
+
+      containers:
+      - name: app
+        # VULN: Using latest tag
+        image: nginx:latest
+
+        # VULN: Running as privileged
+        securityContext:
+          privileged: true
+          runAsUser: 0  # VULN: Running as root
+
+        # VULN: No resource limits
+        # resources: {}
+
+        # VULN: No health probes
+        # livenessProbe: {}
+        # readinessProbe: {}
+
+        env:
+        # VULN: Hardcoded secrets
+        - name: DB_PASSWORD
+          value: "mysecretpassword"
+        - name: API_KEY
+          value: "sk-1234567890abcdef"
+
+        ports:
+        - containerPort: 80
+
+        # VULN: Host path mount
+        volumeMounts:
+        - name: host-vol
+          mountPath: /host
+
+      volumes:
+      - name: host-vol
+        hostPath:
+          path: /
+          type: Directory

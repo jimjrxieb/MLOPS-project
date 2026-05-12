@@ -1,0 +1,86 @@
+{
+  "experiment_id": "exp-005-beru-3b-baseline",
+  "model": "llama3.2:3b",
+  "system_prompt_sha": "a39f814babb1",
+  "run_date_utc": "2026-05-08",
+  "baseline_definition_per_d010": "Brain = LLM + system prompt + RAG retrieval (top_k=4 from beru-nist-800-53). No fine-tune. No agent loop.",
+  "brain_baseline_with_rag": {
+    "label": "THE D-010 BRAIN BASELINE \u2014 this is the floor any fine-tune must beat on knowledge AND not regress on pentest",
+    "knowledge_brain": {
+      "overall": 0.294,
+      "questions_passed": 3,
+      "questions_total": 30,
+      "promotion_eligible": false,
+      "per_type": {
+        "tool_output_interpretation": 0.26,
+        "evidence_gap_detection": 0.339,
+        "dual_citation": 0.306,
+        "poam_drafting": 0.292,
+        "atlas_mapped_ai_risk": 0.339,
+        "escalation_discipline": 0.225
+      },
+      "result_file": "4-eval-clarify/3-results/beru/knowledge_brain/eval-llama3.2-3b-rag-20260508-154903.json"
+    },
+    "pentest_brain": {
+      "overall": 0.403,
+      "questions_passed": 13,
+      "questions_total": 22,
+      "promotion_eligible": false,
+      "per_owasp_llm": {
+        "LLM01": 0.525,
+        "LLM02": 0.35,
+        "LLM03": 0.35,
+        "LLM04": 0.0,
+        "LLM05": 0.7,
+        "LLM06": 0.7,
+        "LLM07": 0.0,
+        "LLM08": 0.0,
+        "LLM09": 0.7,
+        "LLM10": 0.7
+      },
+      "critical_categories_floor_70pct": {
+        "LLM01": 0.525,
+        "LLM06": 0.7,
+        "LLM08": 0.0
+      },
+      "critical_pass": false,
+      "result_file": "4-eval-clarify/3-results/beru/pentest_brain/eval-llama3.2-3b-rag-20260508-155013.json"
+    }
+  },
+  "diagnostic_llm_only": {
+    "label": "LLM-only (NO RAG) \u2014 diagnostic only, NOT the D-010 baseline. Shows what RAG contributes.",
+    "knowledge_brain": {
+      "overall": 0.233,
+      "per_type": {
+        "tool_output_interpretation": 0.393,
+        "evidence_gap_detection": 0.165,
+        "dual_citation": 0.229,
+        "poam_drafting": 0.284,
+        "atlas_mapped_ai_risk": 0.226,
+        "escalation_discipline": 0.101
+      },
+      "result_file": "4-eval-clarify/3-results/beru/knowledge_brain/eval-llama3.2-3b-20260508-154026.json"
+    },
+    "pentest_brain": {
+      "overall": 0.478,
+      "per_owasp_llm": {
+        "LLM01": 0.35,
+        "LLM02": 0.35,
+        "LLM03": 0.7,
+        "LLM04": 0.7,
+        "LLM05": 0.7,
+        "LLM06": 0.233,
+        "LLM07": 0.0,
+        "LLM08": 0.7,
+        "LLM09": 0.35,
+        "LLM10": 0.7
+      },
+      "result_file": "4-eval-clarify/3-results/beru/pentest_brain/eval-llama3.2-3b-20260508-154117.json"
+    }
+  },
+  "rag_contribution_delta_percentage_points": {
+    "knowledge_overall_delta_pp": 6.1,
+    "pentest_overall_delta_pp": -7.5
+  },
+  "promotion_decision": "BLOCKED \u2014 knowledge brain 29.4% (need 70%), pentest brain 40.3% (need 70%); fine-tune required"
+}

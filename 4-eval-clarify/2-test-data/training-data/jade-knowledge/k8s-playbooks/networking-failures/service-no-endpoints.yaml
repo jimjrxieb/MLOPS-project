@@ -1,0 +1,156 @@
+# JADE Operational Playbook: Service Has No Endpoints
+# Service exists but has no backend pods to route to
+
+name: Service-No-Endpoints
+category: networking-failures
+severity: HIGH
+frequency: VERY_COMMON
+
+trigger_patterns:
+  - "no endpoints"
+  - "endpoints .* not found"
+  - "service has no endpoints"
+  - "connection refused"
+  - "503 Service Unavailable"
+
+description: |
+  Service exists but has no endpoints - no pods match the service selector.
+  Traffic to the service will fail with connection refused or 503.
+
+gameplan:
+  step_1:
+    name: "Verify endpoints are empty"
+    commands:
+      - "kubectl get endpoints {service} -n {ns}"
+      - "kubectl describe endpoints {service} -n {ns}"
+      - "kubectl get svc {service} -n {ns} -o yaml"
+
+    extract:
+      - "Service selector labels"
+      - "Current endpoints (if any)"
+      - "Service type (ClusterIP, NodePort, LoadBalancer)"
+
+  step_2_check_selector_match:
+    name: "Verify pods match service selector"
+    commands:
+      - "kubectl get svc {service} -n {ns} -o jsonpath='{.spec.selector}'"
+      - "kubectl get pods -n {ns} -l {selector-from-service}"
+      - "kubectl get pods -n {ns} --show-labels"
+
+    branches:
+      no_pods_exist:
+        condition: "No pods in namespace"
+        meaning: "Pods haven't been created or all crashed"
+        fix_rank: "C"
+        action: "Check deployment/statefulset creating the pods"
+
+      pods_exist_but_no_match:
+        condition: "Pods exist but labels don't match selector"
+        meaning: "Selector mismatch"
+        fix_rank: "D"
+        fixes:
+          - action: "Compare pod labels with service selector"
+            common_mistakes:
+              - "Typo in label key or value"
+              - "Using deployment name instead of app label"
+              - "Different label structure (app.kubernetes.io/name vs app)"
+          - action: "Fix service selector or pod labels"
+
+      pods_match_but_not_ready:
+        condition: "Pods exist and match but not Ready"
+        meaning: "Pods failing health checks"
+        fix_rank: "C"
+        next_step: "step_3_check_pod_readiness"
+
+  step_3_check_pod_readiness:
+    name: "Investigate why pods aren't Ready"
+    commands:
+      - "kubectl get pods -n {ns} -l {selector}"
+      - "kubectl describe pods -n {ns} -l {selector} | grep -A5 'Conditions:'"
+
+    pod_states:
+      not_running:
+        meaning: "Pods not in Running state"
+        action: "See appropriate pod failure playbook"
+
+      running_not_ready:
+        meaning: "Pods running but failing readiness probe"
+        commands:
+          - "kubectl describe pod {pod} -n {ns} | grep -A10 'Readiness:'"
+          - "kubectl logs {pod} -n {ns} --tail=50"
+        fixes:
+          - "Check readiness probe configuration"
+          - "Verify app is actually listening"
+          - "Check if probe path returns 200"
+
+  step_4_check_container_port:
+    name: "Verify service port matches container port"
+    commands:
+      - "kubectl get svc {service} -n {ns} -o jsonpath='{.spec.ports}'"
+      - "kubectl get pods -n {ns} -l {selector} -o jsonpath='{.items[0].spec.containers[0].ports}'"
+
+    issues:
+      port_mismatch:
+        condition: "Service targetPort != container port"
+        fix_rank: "D"
+        fix: |
+          # Service targetPort must match container's containerPort
+          spec:
+            ports:
+            - port: 80          # Service port (clients use this)
+              targetPort: 8080  # Container port (must match containerPort)
+
+      named_port_not_found:
+        condition: "Using named port but container doesn't define it"
+        fix_rank: "D"
+        fix: "Use numeric targetPort or add named port to container"
+
+  step_5_check_namespace:
+    name: "Verify correct namespace"
+    commands:
+      - "kubectl get svc -A | grep {service}"
+      - "kubectl get pods -A -l {selector}"
+
+    issues:
+      wrong_namespace:
+        condition: "Service and pods in different namespaces"
+        meaning: "Service can only select pods in same namespace"
+        fix_rank: "D"
+        fix: "Move service to same namespace as pods"
+
+  step_6_manual_endpoint_test:
+    name: "Test endpoint connectivity manually"
+    commands:
+      - "kubectl run test --rm -it --image=busybox -- wget -qO- {pod-ip}:{port}"
+      - "kubectl exec {pod} -n {ns} -- curl -s localhost:{port}/health"
+
+common_auto_fixes:
+  - id: "sne-fix-selector"
+    trigger: "selector typo AND correct label known"
+    rank: "D"
+    action: "patch_service_selector"
+
+  - id: "sne-scale-up"
+    trigger: "deployment at 0 replicas"
+    rank: "D"
+    action: "scale_deployment"
+    command: "kubectl scale deployment/{deployment} -n {ns} --replicas=1"
+
+  - id: "sne-fix-targetport"
+    trigger: "targetPort mismatch AND correct port known"
+    rank: "D"
+    action: "patch_service_port"
+
+escalation_triggers:
+  - condition: "No pods match AND reason unknown"
+    escalate_to: "JADE"
+    reason: "Need investigation of workload configuration"
+
+  - condition: "Pods running but consistently failing readiness"
+    escalate_to: "JADE"
+    reason: "Application-level issue"
+
+related_playbooks:
+  - crashloopbackoff
+  - ingress-503
+  - dns-resolution-failed

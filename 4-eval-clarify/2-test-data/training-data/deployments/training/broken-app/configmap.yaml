@@ -1,0 +1,63 @@
+# ConfigMap with sensitive-looking data
+# VULN: Secrets stored in ConfigMap instead of Secret
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: broken-app
+  labels:
+    app: vulnerable-app
+data:
+  # VULN: Database credentials in ConfigMap
+  database.properties: |
+    db.host=prod-database.internal
+    db.port=5432
+    db.name=production
+    db.user=admin
+    db.password=super-secret-password-123
+    db.ssl=false
+
+  # VULN: API keys in ConfigMap
+  api-config.json: |
+    {
+      "stripe_api_key": "sk_live_XXXXXXXXXXXXXXXXXXXX",
+      "sendgrid_key": "SG.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "twilio_auth_token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "slack_webhook": "https://hooks.slack.com/services/TXXXX/BXXXX/XXXXXXXX"
+    }
+
+  # VULN: Private key in ConfigMap
+  private-key.pem: |
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEpAIBAAKCAQEA0Z3VS5JJcds3xfn/ygWyF8PbnGy0AHB7MvHl7ygMBL
+    (truncated for training purposes)
+    -----END RSA PRIVATE KEY-----
+
+  # VULN: SSH key in ConfigMap
+  ssh-config: |
+    Host *
+      IdentityFile ~/.ssh/id_rsa
+      User admin
+      StrictHostKeyChecking no
+
+  # Regular config (not sensitive - for comparison)
+  app.yaml: |
+    server:
+      port: 8080
+      host: 0.0.0.0
+    logging:
+      level: DEBUG
+      format: json
+
+---
+# Another ConfigMap with environment-specific secrets
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-config
+  namespace: broken-app
+data:
+  # VULN: Production credentials
+  PROD_DB_PASSWORD: "production-db-password-do-not-share"
+  PROD_API_KEY: "prod-api-key-12345"
+  ENCRYPTION_KEY: "aes-256-encryption-key-here"

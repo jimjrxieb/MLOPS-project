@@ -1,0 +1,157 @@
+# JADE Operational Playbook: ReplicaFailure
+# Deployment can't create or maintain desired replicas
+
+name: ReplicaFailure
+category: deployment-failures
+severity: HIGH
+frequency: COMMON
+
+trigger_patterns:
+  - "ReplicaFailure"
+  - "has minimum availability"
+  - "replicas.*unavailable"
+  - "desired .* current .* ready 0"
+  - "Deployment does not have minimum availability"
+
+description: |
+  Deployment cannot create or maintain the desired number of replicas.
+  Pods keep failing and ReplicaSet can't reach target count.
+
+gameplan:
+  step_1:
+    name: "Check deployment and replicaset status"
+    commands:
+      - "kubectl get deployment {deployment} -n {ns}"
+      - "kubectl get rs -n {ns} -l app={app} --sort-by='.metadata.creationTimestamp'"
+      - "kubectl describe deployment {deployment} -n {ns} | grep -E 'Replicas:|Conditions:'"
+
+    extract:
+      - "Desired replicas"
+      - "Current replicas"
+      - "Ready replicas"
+      - "Available replicas"
+
+  step_2_check_replicasets:
+    name: "Analyze ReplicaSets"
+    commands:
+      - "kubectl get rs -n {ns} -o wide"
+      - "kubectl describe rs {replicaset} -n {ns} | tail -20"
+
+    branches:
+      new_rs_stuck:
+        condition: "New RS has 0 ready pods"
+        meaning: "New pods failing to start"
+        action: "Check newest pods for errors"
+        next_step: "step_3_check_pods"
+
+      old_rs_not_scaling_down:
+        condition: "Old RS still has all pods"
+        meaning: "Rollout stuck, not progressing"
+        action: "Check if new pods are being created at all"
+
+      multiple_rs_with_pods:
+        condition: "Multiple RS have pods"
+        meaning: "Mid-rollout, possibly stuck"
+        action: "Check deployment strategy and progress"
+
+  step_3_check_pods:
+    name: "Investigate failing pods"
+    commands:
+      - "kubectl get pods -n {ns} -l app={app} --sort-by='.metadata.creationTimestamp'"
+      - "kubectl describe pod {failing-pod} -n {ns}"
+      - "kubectl logs {failing-pod} -n {ns} --previous"
+
+    route_to_playbook:
+      CrashLoopBackOff: "crashloopbackoff"
+      ImagePullBackOff: "imagepullbackoff"
+      Pending: "pending"
+      CreateContainerError: "createcontainererror"
+
+  step_4_check_quotas:
+    name: "Check for quota restrictions"
+    commands:
+      - "kubectl get resourcequota -n {ns}"
+      - "kubectl describe resourcequota -n {ns}"
+
+    quota_issues:
+      pod_quota:
+        condition: "pods quota exceeded"
+        fix_rank: "C"
+        fixes:
+          - "Request quota increase"
+          - "Delete unused pods"
+          - "Reduce replica count"
+
+      cpu_memory_quota:
+        condition: "cpu/memory quota exceeded"
+        fix_rank: "C"
+        fixes:
+          - "Request quota increase"
+          - "Reduce resource requests"
+          - "Clean up unused deployments"
+
+  step_5_check_limits:
+    name: "Check LimitRange constraints"
+    commands:
+      - "kubectl get limitrange -n {ns}"
+      - "kubectl describe limitrange -n {ns}"
+
+    limit_issues:
+      max_exceeded:
+        condition: "Container requests exceed LimitRange max"
+        fix_rank: "D"
+        fix: "Reduce container resource requests to below max"
+
+      min_not_met:
+        condition: "Container requests below LimitRange min"
+        fix_rank: "D"
+        fix: "Increase container resource requests to meet minimum"
+
+  step_6_check_pdb:
+    name: "Check if PodDisruptionBudget is blocking"
+    commands:
+      - "kubectl get pdb -n {ns}"
+      - "kubectl describe pdb {pdb} -n {ns}"
+
+    pdb_issues:
+      too_strict:
+        condition: "minAvailable too high or maxUnavailable too low"
+        meaning: "PDB preventing pod replacement"
+        fix_rank: "C"
+        fix: "Temporarily relax PDB or fix underlying pod issues first"
+
+common_auto_fixes:
+  - id: "rf-scale-down"
+    trigger: "quota exceeded AND deployment not critical"
+    rank: "D"
+    action: "scale_deployment"
+    params:
+      replicas_delta: -1
+
+  - id: "rf-rollback"
+    trigger: "new RS has 0 ready AND old RS was healthy"
+    rank: "D"
+    action: "rollback_deployment"
+
+  - id: "rf-reduce-requests"
+    trigger: "limitrange max exceeded by small amount"
+    rank: "D"
+    action: "reduce_resource_requests"
+
+escalation_triggers:
+  - condition: "All replicas failing for > 10 minutes"
+    escalate_to: "JADE"
+    reason: "May need investigation beyond pod-level issues"
+
+  - condition: "Quota increase needed"
+    escalate_to: "JADE"
+    reason: "Need admin approval for quota change"
+
+  - condition: "PDB blocking and can't be changed"
+    escalate_to: "JADE"
+    reason: "Need decision on PDB vs availability tradeoff"
+
+related_playbooks:
+  - progressdeadlineexceeded
+  - crashloopbackoff
+  - pending

@@ -1,0 +1,185 @@
+# JADE Operational Playbook: Seccomp/AppArmor Violation
+# Container blocked by seccomp or AppArmor
+
+name: Seccomp-AppArmor-Violation
+category: security-failures
+severity: MEDIUM
+frequency: MODERATE
+
+trigger_patterns:
+  - "seccomp"
+  - "apparmor"
+  - "operation not permitted"
+  - "function not implemented"
+  - "EPERM"
+  - "audit"
+
+description: |
+  Container operation blocked by seccomp (syscall filter) or AppArmor
+  (mandatory access control). Container is trying to do something the
+  security profile doesn't allow.
+
+gameplan:
+  step_1:
+    name: "Identify the violation"
+    commands:
+      - "kubectl describe pod {pod} -n {ns} | grep -i 'seccomp\\|apparmor'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.securityContext.seccompProfile}'"
+      - "kubectl logs {pod} -n {ns} | grep -i 'permission\\|denied\\|operation'"
+
+    extract:
+      - "Current seccomp profile type"
+      - "AppArmor annotation value"
+      - "What operation is failing"
+
+  step_2_check_profile:
+    name: "Understand what profile is applied"
+
+    seccomp_profiles:
+      RuntimeDefault:
+        description: "Container runtime's default seccomp profile"
+        blocks: "Dangerous syscalls like ptrace, reboot, mount"
+        compatibility: "Works for most applications"
+
+      Unconfined:
+        description: "No seccomp filtering"
+        warning: "Less secure - allows all syscalls"
+        use_when: "Debugging or legacy apps that need it"
+
+      Localhost:
+        description: "Custom profile from node"
+        check: "Profile must exist on all nodes"
+
+    apparmor_profiles:
+      runtime_default:
+        annotation: "container.apparmor.security.beta.kubernetes.io/{container}: runtime/default"
+        description: "Container runtime's default AppArmor profile"
+
+      localhost:
+        annotation: "container.apparmor.security.beta.kubernetes.io/{container}: localhost/{profile}"
+        description: "Custom profile loaded on node"
+
+      unconfined:
+        annotation: "container.apparmor.security.beta.kubernetes.io/{container}: unconfined"
+        description: "No AppArmor restrictions"
+        warning: "Less secure"
+
+  step_3_diagnose_blocked_operation:
+    name: "Find what's being blocked"
+
+    check_audit_logs:
+      linux: "dmesg | grep -i 'seccomp\\|apparmor\\|audit'"
+      node_access: "kubectl debug node/{node} -it --image=busybox -- dmesg"
+
+    common_blocked_operations:
+      ptrace:
+        syscall: "ptrace"
+        meaning: "Process tracing (debugging)"
+        legitimate_uses: ["Debuggers", "Strace", "Some profilers"]
+        fix_rank: "C"
+        fix: "Use unconfined seccomp or add capability CAP_SYS_PTRACE"
+
+      mount:
+        syscall: "mount"
+        meaning: "Mounting filesystems"
+        legitimate_uses: ["Container storage drivers"]
+        fix_rank: "B"
+        fix: "Usually needs privileged mode"
+
+      syslog:
+        syscall: "syslog"
+        meaning: "Reading kernel logs"
+        fix_rank: "D"
+        fix: "Remove syslog calls or use unconfined"
+
+      raw_network:
+        syscall: "socket(AF_PACKET)"
+        meaning: "Raw network access"
+        legitimate_uses: ["Ping", "Network tools"]
+        fix_rank: "C"
+        fix: "Add NET_RAW capability"
+
+  step_4_fix_options:
+    name: "Options to resolve the violation"
+
+    use_runtime_default:
+      description: "Switch from strict to RuntimeDefault"
+      rank: "D"
+      template: |
+        securityContext:
+          seccompProfile:
+            type: RuntimeDefault
+
+    use_unconfined:
+      description: "Disable seccomp (less secure)"
+      rank: "C"
+      warning: "Only if RuntimeDefault doesn't work"
+      template: |
+        securityContext:
+          seccompProfile:
+            type: Unconfined
+
+    custom_profile:
+      description: "Create custom seccomp profile"
+      rank: "C"
+      steps:
+        - "Identify needed syscalls"
+        - "Create profile JSON"
+        - "Deploy to nodes"
+        - "Reference in pod"
+      template: |
+        # Save as /var/lib/kubelet/seccomp/profiles/my-app.json on nodes
+        {
+          "defaultAction": "SCMP_ACT_ERRNO",
+          "architectures": ["SCMP_ARCH_X86_64"],
+          "syscalls": [
+            {
+              "names": ["accept", "bind", "clone", "close", ...],
+              "action": "SCMP_ACT_ALLOW"
+            }
+          ]
+        }
+
+    add_capability:
+      description: "Add specific capability instead of full privilege"
+      rank: "D"
+      template: |
+        securityContext:
+          capabilities:
+            add: ["NET_RAW", "SYS_PTRACE"]  # Only what's needed
+
+  step_5_verify_fix:
+    name: "Test the fixed configuration"
+    commands:
+      - "kubectl apply -f {pod.yaml}"
+      - "kubectl logs {pod} -n {ns}"
+      - "kubectl exec {pod} -n {ns} -- {command-that-was-failing}"
+
+common_auto_fixes:
+  - id: "sec-use-runtime"
+    trigger: "seccomp violation AND no custom profile needed"
+    rank: "D"
+    action: "set_seccomp_runtime_default"
+
+  - id: "sec-add-netraw"
+    trigger: "raw socket denied AND app needs ping"
+    rank: "D"
+    action: "add_net_raw_capability"
+
+escalation_triggers:
+  - condition: "App needs unconfined/privileged"
+    escalate_to: "JADE"
+    reason: "Security exemption needed"
+
+  - condition: "Need custom seccomp profile"
+    escalate_to: "JADE"
+    reason: "Requires node-level changes"
+
+  - condition: "Unsure what syscalls app needs"
+    escalate_to: "JADE"
+    reason: "Need security analysis"
+
+related_playbooks:
+  - pss-psa-violation
+  - createcontainererror
+  - crashloopbackoff

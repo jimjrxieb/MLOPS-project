@@ -1,0 +1,162 @@
+# Scanner -> output format -> primary NIST control families + AI RMF subcategories
+# Used by findings_ingestion.py, triage_engine.py, and nist_mapper.py
+# ai_context: true means findings from this scanner require AI RMF dual citation
+
+scanners:
+  nessus:
+    output_formats: ["csv", "nessus_xml"]
+    primary_controls: ["SI-2", "RA-5", "CM-6"]
+    description: "Vulnerability scanner — CVEs, misconfigs, compliance checks"
+    key_fields: ["Plugin ID", "CVE", "CVSS", "Risk", "Host", "Protocol", "Port", "Name", "Synopsis", "Solution"]
+
+  openvas:
+    output_formats: ["xml", "csv"]
+    primary_controls: ["SI-2", "RA-5", "CM-6"]
+    description: "Open-source vulnerability scanner — similar coverage to Nessus"
+    key_fields: ["NVT OID", "CVE", "CVSS", "Severity", "Host", "Port", "Summary", "Solution"]
+
+  trivy:
+    output_formats: ["json", "sarif", "table"]
+    primary_controls: ["SI-2", "CM-6", "SA-11"]
+    description: "Container/host/IaC scanner — CVEs, misconfigs, secrets"
+    key_fields: ["VulnerabilityID", "Severity", "PkgName", "InstalledVersion", "FixedVersion", "Target"]
+
+  nuclei:
+    output_formats: ["json", "jsonl"]
+    primary_controls: ["SI-2", "RA-5", "SC-7"]
+    description: "Template-based vulnerability scanner — web app, network, cloud"
+    key_fields: ["template-id", "severity", "host", "matched-at", "type"]
+
+  guardduty:
+    output_formats: ["json"]
+    primary_controls: ["SI-4", "IR-4", "AC-6"]
+    description: "AWS threat detection — network, identity, malware findings"
+    key_fields: ["type", "severity", "resource.resourceType", "resource.instanceDetails", "service.action"]
+
+  securityhub:
+    output_formats: ["json"]
+    primary_controls: ["CA-7", "SI-4", "CM-6"]
+    description: "AWS security posture — aggregates findings from multiple sources"
+    key_fields: ["GeneratorId", "Severity.Label", "Title", "Description", "Remediation", "Compliance.Status"]
+
+  prowler:
+    output_formats: ["json", "csv"]
+    primary_controls: ["CM-6", "AC-6", "SC-7"]
+    description: "AWS/Azure/GCP CIS benchmark scanner"
+    key_fields: ["CheckID", "Status", "Severity", "ServiceName", "ResourceId", "StatusExtended"]
+
+  wazuh:
+    output_formats: ["json"]
+    primary_controls: ["SI-4", "AU-6", "IR-5"]
+    description: "Host-based IDS/SIEM — file integrity, rootkit detection, log analysis"
+    key_fields: ["rule.id", "rule.level", "rule.description", "agent.name", "data", "decoder.name"]
+
+  suricata:
+    output_formats: ["json", "fast_log"]
+    primary_controls: ["SI-4", "SC-7", "IR-4"]
+    description: "Network IDS/IPS — signature-based traffic analysis"
+    key_fields: ["alert.signature_id", "alert.severity", "alert.signature", "src_ip", "dest_ip", "proto"]
+
+  zeek:
+    output_formats: ["tsv", "json"]
+    primary_controls: ["SI-4", "AU-12", "SC-7"]
+    description: "Network security monitor — connection logs, protocol analysis, file extraction"
+    key_fields: ["uid", "id.orig_h", "id.resp_h", "id.resp_p", "proto", "service", "conn_state"]
+
+  openscap:
+    output_formats: ["xml", "html"]
+    primary_controls: ["CM-6", "SI-2", "RA-5"]
+    description: "SCAP compliance scanner — CIS benchmarks, STIG checks"
+    key_fields: ["rule-id", "result", "severity", "title", "description", "fix"]
+
+  lynis:
+    output_formats: ["log", "json"]
+    primary_controls: ["CM-6", "AC-6", "AU-2"]
+    description: "Linux host hardening audit — system config, permissions, services"
+    key_fields: ["test", "result", "severity", "suggestion", "details"]
+
+  checkov:
+    output_formats: ["json", "sarif"]
+    primary_controls: ["CM-6", "SA-11", "SC-7"]
+    description: "IaC scanner — Terraform, CloudFormation, Kubernetes, Dockerfile"
+    key_fields: ["check_id", "check_result.result", "file_path", "resource", "guideline"]
+
+  crowdstrike:
+    output_formats: ["json"]
+    primary_controls: ["SI-4", "IR-4", "SC-7"]
+    description: "EDR — endpoint detection, threat intelligence, incident response"
+    key_fields: ["detection_id", "severity", "tactic", "technique", "hostname", "filename"]
+
+# AI-specific scanners — these set ai_context: true in normalized findings
+# Findings from these scanners trigger dual citation (800-53 + AI RMF subcategory)
+  garak:
+    output_formats: ["json", "jsonl"]
+    primary_controls: ["SI-3", "SC-7", "RA-5"]
+    ai_rmf_subcategories: ["MEASURE-2.11", "MAP-3.5", "MANAGE-2.2"]
+    ai_context: true
+    description: "LLM red-teaming — prompt injection, jailbreak, harmful output detection"
+    key_fields: ["probe", "detector", "passed", "run_id", "generations"]
+
+  promptfoo:
+    output_formats: ["json"]
+    primary_controls: ["SI-3", "RA-5", "SC-7"]
+    ai_rmf_subcategories: ["MEASURE-2.5", "MEASURE-2.11", "MAP-3.1"]
+    ai_context: true
+    description: "LLM evaluation and red-teaming — adversarial prompts, policy violations"
+    key_fields: ["testCase", "result", "score", "provider", "prompt", "output"]
+
+  mlflow-audit:
+    output_formats: ["json"]
+    primary_controls: ["CM-3", "AU-12", "CA-7"]
+    ai_rmf_subcategories: ["MEASURE-2.7", "GOVERN-6.1", "MANAGE-3.2"]
+    ai_context: true
+    description: "MLflow experiment and run audit — tracking completeness, metric gaps, artifact lineage"
+    key_fields: ["run_id", "experiment_id", "params", "metrics", "tags", "artifact_uri"]
+
+  model-card-audit:
+    output_formats: ["json", "yaml"]
+    primary_controls: ["CM-8", "SA-22", "PL-2"]
+    ai_rmf_subcategories: ["GOVERN-1.3", "MAP-2.3", "MANAGE-4.2"]
+    ai_context: true
+    description: "Model card completeness check — eval scores, limitations, version, training data"
+    key_fields: ["model_name", "version", "eval_scores", "limitations", "training_data", "last_updated"]
+
+  lineage-audit:
+    output_formats: ["json"]
+    primary_controls: ["SR-4", "SA-9", "CM-3"]
+    ai_rmf_subcategories: ["MAP-2.2", "MAP-4.1", "GOVERN-1.6"]
+    ai_context: true
+    description: "Training data lineage audit — provenance, PII check, dedup status"
+    key_fields: ["dataset_id", "source", "pii_scanned", "dedup_status", "record_count", "created"]
+
+  ai-inventory-audit:
+    output_formats: ["json", "md"]
+    primary_controls: ["CM-8", "PL-2", "PM-10"]
+    ai_rmf_subcategories: ["GOVERN-1.1", "GOVERN-5.2", "MAP-1.1"]
+    ai_context: true
+    description: "AI system inventory gap check — unregistered models, missing registration forms"
+    key_fields: ["system_name", "registered", "risk_tier", "last_reviewed", "registration_path"]
+
+# NIST 800-53 control family quick reference
+# Used by nist_mapper.py for validation
+nist_control_families:
+  AC: "Access Control"
+  AT: "Awareness and Training"
+  AU: "Audit and Accountability"
+  CA: "Assessment, Authorization, and Monitoring"
+  CM: "Configuration Management"
+  CP: "Contingency Planning"
+  IA: "Identification and Authentication"
+  IR: "Incident Response"
+  MA: "Maintenance"
+  MP: "Media Protection"
+  PE: "Physical and Environmental Protection"
+  PL: "Planning"
+  PM: "Program Management"
+  PS: "Personnel Security"
+  PT: "Personally Identifiable Information Processing and Transparency"
+  RA: "Risk Assessment"
+  SA: "System and Services Acquisition"
+  SC: "System and Communications Protection"
+  SI: "System and Information Integrity"
+  SR: "Supply Chain Risk Management"

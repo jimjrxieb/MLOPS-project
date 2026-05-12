@@ -1,0 +1,202 @@
+# JADE Operational Playbook: PodInitializing Stuck
+# Pod stuck in Initializing state for extended period
+
+name: PodInitializing-Stuck
+category: pod-failures
+severity: MEDIUM
+frequency: COMMON
+
+trigger_patterns:
+  - "PodInitializing"
+  - "Init:0/1"
+  - "ContainerCreating"
+  - "status.phase: Pending"
+  - "Initializing for more than 5 minutes"
+
+description: |
+  Pod is stuck in initialization phase. Could be slow init containers,
+  volume mount issues, or image pull delays. Different from Pending
+  (not scheduled) - this pod IS scheduled but can't finish starting.
+
+gameplan:
+  step_1:
+    name: "Determine what's blocking initialization"
+    commands:
+      - "kubectl describe pod {pod} -n {ns} | grep -A20 'Events:'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.status.phase}'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.status.conditions}' | jq"
+
+    branches:
+      pulling_image:
+        patterns:
+          - "Pulling image"
+          - "pulling"
+        meaning: "Image download in progress (large image or slow network)"
+        fix_rank: "D"
+        fixes:
+          - action: "Wait if image is large (check image size)"
+          - action: "Check node network connectivity"
+          - action: "Consider using smaller base images"
+          - action: "Pre-pull images with DaemonSet"
+            template: |
+              apiVersion: apps/v1
+              kind: DaemonSet
+              metadata:
+                name: prepull-images
+              spec:
+                selector:
+                  matchLabels:
+                    app: prepull
+                template:
+                  spec:
+                    initContainers:
+                    - name: prepull
+                      image: {your-image}
+                      command: ["echo", "Image pulled"]
+                    containers:
+                    - name: pause
+                      image: k8s.gcr.io/pause:3.9
+
+      volume_mounting:
+        patterns:
+          - "Mounting"
+          - "MountVolume"
+          - "AttachVolume"
+          - "WaitForAttach"
+        meaning: "Volume attachment or mount in progress"
+        fix_rank: "C"
+        next_step: "step_2_check_volumes"
+
+      init_container_running:
+        patterns:
+          - "Init:0/1"
+          - "Init:1/2"
+          - "running init"
+        meaning: "Init container is actively running (check if it's slow or stuck)"
+        fix_rank: "D"
+        next_step: "step_3_check_init_containers"
+
+      containercreating:
+        patterns:
+          - "ContainerCreating"
+        meaning: "Container runtime is setting up the container"
+        fixes:
+          - action: "Usually resolves in seconds - if stuck, check runtime logs"
+          - action: "Check node kubelet logs"
+            command: "kubectl logs -n kube-system -l k8s-app=kubelet --tail=100"
+
+  step_2_check_volumes:
+    name: "Investigate volume issues"
+    commands:
+      - "kubectl get pvc -n {ns}"
+      - "kubectl describe pvc {pvc} -n {ns}"
+      - "kubectl get pv | grep {pvc}"
+      - "kubectl get volumeattachment"
+
+    issues:
+      pvc_pending:
+        condition: "PVC in Pending state"
+        causes:
+          - "No matching PV"
+          - "StorageClass provisioner failing"
+          - "Zone mismatch"
+        fixes:
+          - action: "Check StorageClass provisioner"
+            command: "kubectl logs -n kube-system -l app=ebs-csi-controller"
+          - action: "Verify storage quota"
+          - action: "Check if storage class exists"
+            command: "kubectl get storageclass"
+
+      volume_attachment_stuck:
+        condition: "VolumeAttachment not completing"
+        causes:
+          - "Volume attached to different node"
+          - "Node not ready"
+          - "CSI driver issue"
+        fixes:
+          - action: "Check volume attachment status"
+            command: "kubectl get volumeattachment -o wide"
+          - action: "For RWO volumes, ensure pod schedules to same node"
+          - action: "Force detach if stuck (dangerous)"
+            note: "May cause data corruption if volume is in use"
+
+      mount_timeout:
+        condition: "Mount taking too long"
+        causes:
+          - "Slow storage backend"
+          - "Network latency to storage"
+          - "NFS server not responding"
+        fixes:
+          - action: "Check storage backend health"
+          - action: "Verify network connectivity to storage"
+          - action: "Check NFS server status"
+
+  step_3_check_init_containers:
+    name: "Analyze init container progress"
+    commands:
+      - "kubectl logs {pod} -n {ns} -c {init-container} --tail=50"
+      - "kubectl describe pod {pod} -n {ns} | grep -A10 'Init Containers:'"
+
+    common_slow_init:
+      dependency_check:
+        pattern: "Waiting for database/service"
+        fix: "Check if dependency is actually ready"
+
+      large_download:
+        pattern: "Downloading/Fetching large files"
+        fix: "Consider caching or using persistent storage"
+
+      migration_running:
+        pattern: "Running migrations"
+        fix: "Normal for first deployment - monitor progress"
+
+  step_4_check_node:
+    name: "Check node-level issues"
+    commands:
+      - "kubectl describe node {node} | grep -A10 'Conditions:'"
+      - "kubectl get pods -A --field-selector spec.nodeName={node} | head -20"
+
+    issues:
+      node_disk_pressure:
+        effect: "Image pulls and volume mounts may be slow/stuck"
+        fix: "Clean up node disk space"
+
+      node_memory_pressure:
+        effect: "Container creation may be delayed"
+        fix: "Free up memory or reschedule to different node"
+
+      many_pods_initializing:
+        effect: "Node overwhelmed with simultaneous pod starts"
+        fix: "Stagger deployments or use PodDisruptionBudget"
+
+common_auto_fixes:
+  - id: "init-stuck-add-timeout"
+    trigger: "init container running > 10 minutes without progress"
+    rank: "D"
+    action: "add_activeDeadlineSeconds"
+    params:
+      seconds: 600
+
+  - id: "init-stuck-restart"
+    trigger: "pod stuck > 30 minutes with no events"
+    rank: "D"
+    action: "delete_and_recreate"
+    note: "Sometimes pods get stuck due to transient issues"
+
+escalation_triggers:
+  - condition: "Volume attachment stuck > 15 minutes"
+    escalate_to: "JADE"
+    reason: "May need to force-detach volume (risky)"
+
+  - condition: "All pods on node stuck initializing"
+    escalate_to: "JADE"
+    reason: "Node-level issue needs investigation"
+
+  - condition: "Init container running > 1 hour"
+    escalate_to: "JADE"
+    reason: "Abnormal init time needs investigation"
+
+related_playbooks:
+  - initerror
+  - pending
+  - imagepullbackoff

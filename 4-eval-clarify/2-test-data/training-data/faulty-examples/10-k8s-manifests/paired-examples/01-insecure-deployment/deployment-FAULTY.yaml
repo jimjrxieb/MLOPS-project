@@ -1,0 +1,84 @@
+# FAULTY HELM CHART EXAMPLE #1
+# Common Mistakes: Insecure Deployment Configuration
+# Issues:
+#   1. Running as root (no securityContext)
+#   2. No resource limits (can exhaust node resources)
+#   3. Privileged container
+#   4. No health checks (liveness/readiness probes)
+#   5. Using 'latest' tag
+#   6. No pod anti-affinity (single point of failure)
+#   7. Host network access
+#
+# Severity: CRITICAL (multiple high-severity issues)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "app.fullname" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "app.selectorLabels" . | nindent 8 }}
+    spec:
+      # BUG #7: hostNetwork allows access to host networking
+      hostNetwork: true
+
+      containers:
+      - name: {{ .Chart.Name }}
+        # BUG #5: Using 'latest' tag is unpredictable
+        image: "{{ .Values.image.repository }}:latest"
+        imagePullPolicy: Always
+
+        # BUG #3: Running as privileged gives unnecessary permissions
+        securityContext:
+          privileged: true
+
+        # BUG #1: No securityContext means running as root (uid 0)
+        # Missing: runAsNonRoot, runAsUser, readOnlyRootFilesystem
+
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+
+        # BUG #4: No liveness probe - pod won't self-heal if app crashes
+        # BUG #4: No readiness probe - traffic sent before app is ready
+
+        # BUG #2: No resource limits can cause:
+        #   - Node resource exhaustion
+        #   - OOMKilled pods
+        #   - Poor scheduling decisions
+        # resources:
+        #   limits:
+        #     cpu: 100m
+        #     memory: 128Mi
+        #   requests:
+        #     cpu: 100m
+        #     memory: 128Mi
+
+        env:
+        - name: DATABASE_URL
+          # BUG: Hardcoded secrets in values
+          value: "postgres://admin:password123@db:5432/myapp"
+
+      # BUG #6: No pod anti-affinity
+      # Multiple replicas could land on same node (single point of failure)
+      # affinity:
+      #   podAntiAffinity:
+      #     preferredDuringSchedulingIgnoredDuringExecution:
+      #     - weight: 100
+      #       podAffinityTerm:
+      #         labelSelector:
+      #           matchExpressions:
+      #           - key: app
+      #             operator: In
+      #             values:
+      #             - myapp
+      #         topologyKey: kubernetes.io/hostname

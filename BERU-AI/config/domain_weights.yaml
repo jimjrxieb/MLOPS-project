@@ -1,0 +1,98 @@
+# BERU-AI Domain Weights
+# Maps to CompTIA CySA+ exam domains, extended with NIST depth
+# Used by training data generators and eval runners to balance coverage
+
+domains:
+  threat_vuln_management:
+    weight: 0.30
+    description: "Scanner output interpretation, CVE triage, vuln lifecycle, patch prioritization, CVSS contextual scoring"
+    keywords:
+      - CVE
+      - CVSS
+      - Nessus
+      - OpenVAS
+      - Trivy
+      - Nuclei
+      - vulnerability
+      - patch
+      - remediation
+      - exploit
+      - plugin
+      - scan result
+      - severity
+      - false positive
+
+  security_ops_monitoring:
+    weight: 0.25
+    description: "SIEM correlation, log analysis, IDS/IPS alerts, GuardDuty/SecurityHub findings, network traffic patterns"
+    keywords:
+      - SIEM
+      - Splunk
+      - Wazuh
+      - GuardDuty
+      - SecurityHub
+      - Suricata
+      - Zeek
+      - IDS
+      - IPS
+      - alert
+      - correlation
+      - log analysis
+      - network traffic
+      - detection rule
+      - sigma
+
+  nist_compliance_mapping:
+    weight: 0.20
+    description: "800-53 control mapping, CSF categories, control families, evidence packaging, gap analysis, POA&M"
+    keywords:
+      - NIST
+      - "800-53"
+      - "800-171"
+      - CSF
+      - control family
+      - FedRAMP
+      - POA&M
+      - evidence
+      - gap analysis
+      - compliance
+      - audit
+      - AC-
+      - AU-
+      - CM-
+      - IA-
+      - IR-
+      - SC-
+      - SI-
+
+  incident_response_forensics:
+    weight: 0.15
+    description: "800-61 IR lifecycle, containment decisions, forensic preservation, timeline reconstruction"
+    keywords:
+      - incident response
+      - "800-61"
+      - containment
+      - eradication
+      - recovery
+      - forensic
+      - chain of custody
+      - timeline
+      - IOC
+      - indicator of compromise
+      - malware
+      - lateral movement
+
+  risk_management_reporting:
+    weight: 0.10
+    description: "CISO-ready summaries, risk scoring, business impact translation, remediation ROI"
+    keywords:
+      - CISO
+      - risk score
+      - business impact
+      - executive summary
+      - risk register
+      - risk acceptance
+      - remediation priority
+      - cost-benefit
+      - risk appetite
+      - board report

@@ -1,0 +1,14 @@
+{
+  "id": "fix-trivy-001",
+  "scanner": "trivy",
+  "vuln_id": "CVE-2024-21538",
+  "finding": "express 4.17.1 has known vulnerability allowing regex DoS",
+  "package": "express",
+  "installed_version": "4.17.1",
+  "fixed_version": "4.18.0",
+  "file": "package.json",
+  "severity": "HIGH",
+  "expected_rank": "D",
+  "context": "{\n  \"dependencies\": {\n    \"express\": \"^4.17.1\"\n  }\n}",
+  "instructions": "Generate the fix for this vulnerability by updating the package.json dependency."
+}

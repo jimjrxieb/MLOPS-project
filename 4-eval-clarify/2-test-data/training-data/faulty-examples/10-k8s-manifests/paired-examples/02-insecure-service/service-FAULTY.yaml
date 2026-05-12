@@ -1,0 +1,70 @@
+# FAULTY HELM CHART EXAMPLE #2
+# Common Mistakes: Insecure Service Configuration
+# Issues:
+#   1. NodePort type exposes service on all nodes
+#   2. No Network Policy to restrict traffic
+#   3. Exposing unnecessary ports
+#   4. No session affinity configuration
+#   5. Using external IPs (bypasses load balancer)
+#
+# Severity: HIGH (exposes service unnecessarily)
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "app.fullname" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+  annotations:
+    # BUG: Exposing internal service metrics endpoint externally
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+spec:
+  # BUG #1: NodePort opens ports on ALL nodes (30000-32767)
+  # Use ClusterIP for internal or LoadBalancer for external
+  type: NodePort
+
+  # BUG #5: External IPs bypass cloud load balancer and ingress
+  # Can lead to IP exhaustion and routing issues
+  externalIPs:
+    - 192.168.1.100
+
+  # BUG #3: Exposing too many ports increases attack surface
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+      # BUG #1: Specific NodePort assignment can conflict
+      nodePort: 30080
+    - port: 443
+      targetPort: https
+      protocol: TCP
+      name: https
+      nodePort: 30443
+    # BUG #3: Debug port exposed externally
+    - port: 8888
+      targetPort: debug
+      protocol: TCP
+      name: debug
+      nodePort: 30888
+    # BUG #3: Metrics port exposed to all nodes
+    - port: 9090
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+      nodePort: 30090
+
+  selector:
+    {{- include "app.selectorLabels" . | nindent 4 }}
+
+  # BUG #4: No session affinity can break stateful apps
+  # sessionAffinity: ClientIP
+  # sessionAffinityConfig:
+  #   clientIP:
+  #     timeoutSeconds: 10800
+
+---
+# BUG #2: NO NETWORK POLICY
+# Service is accessible from any pod in any namespace
+# Should restrict ingress to only authorized sources

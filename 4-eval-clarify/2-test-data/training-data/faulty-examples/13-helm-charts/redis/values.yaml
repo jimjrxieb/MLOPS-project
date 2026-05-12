@@ -1,0 +1,279 @@
+## Redis Production Configuration
+## Security-hardened with persistence and replication
+
+## Architecture: Master-Replica with Sentinel
+architecture: replication
+
+## Master Configuration
+master:
+  replicaCount: 1
+
+  ## Security Context
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    fsGroup: 1001
+    readOnlyRootFilesystem: false  # Redis needs to write to disk
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+
+  ## Resource Limits
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+  ## Persistence
+  persistence:
+    enabled: true
+    storageClass: ""  # Use default storage class
+    size: 8Gi
+    accessModes:
+      - ReadWriteOnce
+
+  ## Service Configuration
+  service:
+    type: ClusterIP
+    port: 6379
+
+## Replica Configuration
+replica:
+  replicaCount: 2
+
+  ## Security Context
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    fsGroup: 1001
+    readOnlyRootFilesystem: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+
+  ## Resource Limits
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+  ## Persistence for replicas
+  persistence:
+    enabled: true
+    size: 8Gi
+
+## Image Configuration
+image:
+  repository: redis
+  tag: 6.2.7-alpine
+  pullPolicy: IfNotPresent
+
+## Authentication
+auth:
+  enabled: true
+  sentinel: true
+  password: ""  # Set via external secret
+  existingSecret: "redis-secret"
+  existingSecretPasswordKey: "redis-password"
+
+## Redis Configuration
+redis:
+  ## Redis config file
+  configmap: |-
+    # Network
+    bind 0.0.0.0
+    protected-mode yes
+    port 6379
+    tcp-backlog 511
+    timeout 0
+    tcp-keepalive 300
+
+    # Security
+    requirepass ${REDIS_PASSWORD}
+
+    # Persistence - RDB + AOF
+    save 900 1
+    save 300 10
+    save 60 10000
+    stop-writes-on-bgsave-error yes
+    rdbcompression yes
+    rdbchecksum yes
+    dbfilename dump.rdb
+
+    appendonly yes
+    appendfilename "appendonly.aof"
+    appendfsync everysec
+    no-appendfsync-on-rewrite no
+    auto-aof-rewrite-percentage 100
+    auto-aof-rewrite-min-size 64mb
+
+    # Limits
+    maxmemory 768mb
+    maxmemory-policy allkeys-lru
+    maxclients 10000
+
+    # Slow log
+    slowlog-log-slower-than 10000
+    slowlog-max-len 128
+
+    # TLS (if enabled)
+    # tls-port 6379
+    # tls-cert-file /tls/redis.crt
+    # tls-key-file /tls/redis.key
+    # tls-ca-cert-file /tls/ca.crt
+
+## Sentinel Configuration for HA
+sentinel:
+  enabled: true
+  replicaCount: 3
+
+  ## Security Context
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    fsGroup: 1001
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+
+  ## Resource Limits
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+  ## Sentinel configuration
+  quorum: 2
+  downAfterMilliseconds: 5000
+  failoverTimeout: 10000
+  parallelSyncs: 1
+
+## Health Checks
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+  exec:
+    command:
+      - sh
+      - -c
+      - redis-cli -a ${REDIS_PASSWORD} ping | grep PONG
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  successThreshold: 1
+  failureThreshold: 5
+  exec:
+    command:
+      - sh
+      - -c
+      - redis-cli -a ${REDIS_PASSWORD} ping | grep PONG
+
+## Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+## Network Policy
+networkPolicy:
+  enabled: true
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            redis-client: "true"
+      ports:
+        - protocol: TCP
+          port: 6379
+  egress:
+    - to:
+      - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 6379  # Master-replica communication
+        - protocol: TCP
+          port: 26379  # Sentinel communication
+    - to:
+      - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 53  # DNS
+
+## Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+## Affinity - Spread across nodes
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - redis
+        topologyKey: kubernetes.io/hostname
+
+## Metrics - Prometheus exporter
+metrics:
+  enabled: true
+  image:
+    repository: oliver006/redis_exporter
+    tag: v1.43.0
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+
+## TLS Configuration (optional)
+tls:
+  enabled: false
+  certificatesSecret: ""
+  certFilename: "redis.crt"
+  certKeyFilename: "redis.key"
+  certCAFilename: "ca.crt"
+
+## Labels
+labels:
+  app.kubernetes.io/name: redis
+  app.kubernetes.io/component: database
+  app.kubernetes.io/part-of: data-layer

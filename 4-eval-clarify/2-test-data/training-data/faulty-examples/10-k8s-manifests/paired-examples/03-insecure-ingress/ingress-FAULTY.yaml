@@ -1,0 +1,92 @@
+# FAULTY HELM CHART EXAMPLE #3
+# Common Mistakes: Insecure Ingress Configuration
+# Issues:
+#   1. No TLS/SSL configuration (HTTP only)
+#   2. Wildcard host allowing any subdomain
+#   3. No rate limiting annotations
+#   4. No CORS configuration
+#   5. Missing security headers
+#   6. No authentication/authorization
+#   7. Exposing admin paths without restrictions
+#
+# Severity: CRITICAL (exposes application over unencrypted HTTP)
+
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "app.fullname" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # BUG #3: No rate limiting - vulnerable to DoS
+    # BUG #4: No CORS configuration
+    # BUG #5: Missing security headers
+spec:
+  # BUG #1: NO TLS CONFIGURATION
+  # Traffic sent over plain HTTP (port 80)
+  # Vulnerable to:
+  #   - Man-in-the-middle attacks
+  #   - Credential theft
+  #   - Session hijacking
+  #   - Data tampering
+  # tls:
+  #   - hosts:
+  #     - example.com
+  #     secretName: example-tls
+
+  rules:
+    # BUG #2: Wildcard host accepts any subdomain
+    # Should be specific: app.example.com
+    - host: "*.example.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "app.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
+
+          # BUG #7: Exposing admin path to internet without restrictions
+          - path: /admin
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "app.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
+
+          # BUG #7: Exposing metrics without authentication
+          - path: /metrics
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "app.fullname" . }}-metrics
+                port:
+                  number: 9090
+
+          # BUG #7: Debug endpoint exposed
+          - path: /debug/pprof
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "app.fullname" . }}
+                port:
+                  number: 8888
+
+    # BUG #2: Another wildcard allowing unrestricted access
+    - host: "*.dev.example.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "app.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
+
+{{- end }}

@@ -1,0 +1,13 @@
+# BERU API runtime dependencies — inference path only.
+# Deliberately excludes torch / transformers / unsloth (training-only).
+# The agent calls the model over Ollama's HTTP API and reads playbooks from disk.
+fastapi>=0.111,<0.120
+uvicorn[standard]>=0.29,<0.40
+pydantic>=2.6,<3.0
+requests>=2.31,<3.0
+pyyaml>=6.0,<7.0
+langgraph>=0.6,<0.7
+langchain-core>=0.3,<0.4
+# mlflow-skinny: tracking client only — no pandas/scipy/sklearn/matplotlib.
+# We only call log_params/log_metrics/set_tags, so the full mlflow is dead weight.
+mlflow-skinny>=3.0,<4.0

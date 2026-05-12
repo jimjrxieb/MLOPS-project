@@ -1,0 +1,185 @@
+# JADE Operational Playbook: Ingress 503/504
+# Ingress returning 5xx errors
+
+name: Ingress-503
+category: networking-failures
+severity: HIGH
+frequency: COMMON
+
+trigger_patterns:
+  - "503 Service Unavailable"
+  - "504 Gateway Timeout"
+  - "502 Bad Gateway"
+  - "upstream connect error"
+  - "no healthy upstream"
+
+description: |
+  Ingress controller returning 503 (no healthy backend) or 504 (timeout)
+  or 502 (bad gateway). Traffic isn't reaching the backend pods.
+
+gameplan:
+  step_1:
+    name: "Identify the ingress and backend"
+    commands:
+      - "kubectl get ingress -A | grep {hostname}"
+      - "kubectl describe ingress {ingress} -n {ns}"
+      - "kubectl get ingress {ingress} -n {ns} -o yaml"
+
+    extract:
+      - "Backend service name"
+      - "Backend service port"
+      - "Ingress class"
+      - "TLS configuration"
+
+  step_2_check_backend_service:
+    name: "Verify backend service health"
+    commands:
+      - "kubectl get svc {backend-service} -n {ns}"
+      - "kubectl get endpoints {backend-service} -n {ns}"
+      - "kubectl get pods -n {ns} -l {selector}"
+
+    branches:
+      no_endpoints:
+        meaning: "Service has no healthy backends"
+        playbook: "service-no-endpoints"
+
+      endpoints_exist:
+        meaning: "Endpoints exist - issue is routing"
+        next_step: "step_3_check_ingress_config"
+
+  step_3_check_ingress_config:
+    name: "Verify ingress configuration"
+    commands:
+      - "kubectl describe ingress {ingress} -n {ns}"
+      - "kubectl get ingress {ingress} -n {ns} -o yaml"
+
+    issues:
+      wrong_service_port:
+        condition: "Ingress backend port doesn't match service port"
+        fix_rank: "D"
+        fix: |
+          spec:
+            rules:
+            - host: example.com
+              http:
+                paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: my-service
+                      port:
+                        number: 80  # Must match service port
+
+      invalid_path:
+        condition: "Path doesn't match backend expectations"
+        check: "Does backend expect path prefix to be stripped?"
+        fix: "Add rewrite annotations or fix path"
+
+      missing_ingress_class:
+        condition: "No ingressClassName specified"
+        fix_rank: "D"
+        fix: |
+          spec:
+            ingressClassName: nginx  # or your ingress class
+
+  step_4_check_ingress_controller:
+    name: "Verify ingress controller health"
+    commands:
+      - "kubectl get pods -n {ingress-namespace} -l app.kubernetes.io/component=controller"
+      - "kubectl logs -n {ingress-namespace} -l app.kubernetes.io/component=controller --tail=100"
+
+    controller_namespaces:
+      nginx: "ingress-nginx"
+      traefik: "traefik"
+      istio: "istio-system"
+      contour: "projectcontour"
+
+    issues:
+      controller_not_running:
+        fix_rank: "C"
+        fix: "Restart or reinstall ingress controller"
+
+      controller_errors:
+        action: "Check controller logs for specific errors"
+
+  step_5_specific_error_codes:
+    name: "Diagnose by error code"
+
+    "502":
+      meaning: "Bad Gateway - backend returned invalid response"
+      causes:
+        - "Backend crashed mid-request"
+        - "Backend protocol mismatch (HTTP vs HTTPS)"
+        - "Backend returned malformed response"
+      fixes:
+        - "Check backend pod logs"
+        - "Verify protocol annotations"
+        - "Check backend health"
+
+    "503":
+      meaning: "Service Unavailable - no healthy backends"
+      causes:
+        - "All backend pods down"
+        - "Backend pods failing health checks"
+        - "Service selector mismatch"
+      fixes:
+        - "Check service endpoints"
+        - "Check pod readiness"
+        - "See service-no-endpoints playbook"
+
+    "504":
+      meaning: "Gateway Timeout - backend too slow"
+      causes:
+        - "Backend taking too long to respond"
+        - "Backend deadlock or resource exhaustion"
+        - "Network latency"
+      fixes:
+        - "Increase timeout annotations"
+        - "Check backend performance"
+        - "Add more backend replicas"
+      timeout_annotations:
+        nginx: |
+          nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+          nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+          nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+
+  step_6_test_connectivity:
+    name: "Test end-to-end connectivity"
+    commands:
+      - "kubectl exec -n {ingress-ns} {controller-pod} -- curl -v http://{backend-svc}.{ns}.svc.cluster.local"
+      - "kubectl run test --rm -it --image=curlimages/curl -- curl -v http://{service}.{ns}.svc.cluster.local"
+
+common_auto_fixes:
+  - id: "ing-fix-port"
+    trigger: "backend port mismatch"
+    rank: "D"
+    action: "patch_ingress_backend_port"
+
+  - id: "ing-add-class"
+    trigger: "missing ingressClassName AND only one controller"
+    rank: "D"
+    action: "add_ingress_class"
+
+  - id: "ing-increase-timeout"
+    trigger: "504 errors AND backend actually responding slowly"
+    rank: "D"
+    action: "add_timeout_annotations"
+
+escalation_triggers:
+  - condition: "Ingress controller itself unhealthy"
+    escalate_to: "JADE"
+    reason: "Cluster infrastructure issue"
+
+  - condition: "502 errors with unclear cause"
+    escalate_to: "JADE"
+    reason: "Need application-level debugging"
+
+  - condition: "All backends healthy but still 503"
+    escalate_to: "JADE"
+    reason: "Possible ingress configuration issue"
+
+related_playbooks:
+  - service-no-endpoints
+  - crashloopbackoff
+  - connection-refused

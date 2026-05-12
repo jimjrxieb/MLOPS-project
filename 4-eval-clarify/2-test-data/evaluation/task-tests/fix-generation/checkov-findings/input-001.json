@@ -1,0 +1,11 @@
+{
+  "id": "fix-checkov-001",
+  "scanner": "checkov",
+  "check_id": "CKV_AWS_19",
+  "finding": "S3 bucket does not have encryption enabled",
+  "resource": "aws_s3_bucket.data",
+  "file": "main.tf",
+  "severity": "HIGH",
+  "expected_rank": "D",
+  "instructions": "Generate Terraform code to fix this finding. The fix should enable server-side encryption on the S3 bucket."
+}

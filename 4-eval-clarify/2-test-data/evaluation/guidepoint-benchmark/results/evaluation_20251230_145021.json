@@ -1,0 +1,671 @@
+{
+  "benchmark_file": "results/benchmark_20251230_144732.json",
+  "evaluation_timestamp": "2025-12-30T14:50:21.801051",
+  "questions": [
+    {
+      "jade_scores": {
+        "correctness": 8,
+        "npc_knowledge": 4,
+        "workflow": 3,
+        "practicality": 7,
+        "total": 22
+      },
+      "haiku_scores": {
+        "correctness": 9,
+        "npc_knowledge": 9,
+        "workflow": 9,
+        "practicality": 8,
+        "total": 35
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku correctly identified both required NPCs (gitleaks_npc.py and secrets_fixer_npc.py), followed the proper scan\u2192fix\u2192verify workflow, and mentioned key details like .gitignore updates and rescanning, while JADE focused on manual git commands instead of using the GP-CONSULTING toolkit.",
+      "question_id": "ops-001",
+      "domain": "Secrets Management",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 6,
+        "npc_knowledge": 4,
+        "workflow": 7,
+        "practicality": 8,
+        "total": 25
+      },
+      "haiku_scores": {
+        "correctness": 9,
+        "npc_knowledge": 9,
+        "workflow": 9,
+        "practicality": 8,
+        "total": 35
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku correctly identified and used the expected NPCs (kube_bench_npc.py and kubernetes_fixer_npc.py) while following the proper workflow, whereas JADE used incorrect tool names like kubescape_npc.py instead of the required kube_bench_npc.py and provided overly verbose content with some inaccuracies.",
+      "question_id": "ops-002",
+      "domain": "Container Security",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 8,
+        "npc_knowledge": 9,
+        "workflow": 9,
+        "practicality": 9,
+        "total": 35
+      },
+      "haiku_scores": {
+        "correctness": 7,
+        "npc_knowledge": 8,
+        "workflow": 8,
+        "practicality": 6,
+        "total": 29
+      },
+      "winner": "JADE",
+      "explanation": "JADE provides concrete, executable commands with proper NPC references and demonstrates the complete scan\u2192fix\u2192verify workflow with practical code examples, while Haiku gives a more theoretical overview with some hallucinated components like RankClassifier and orchestrators not mentioned in the toolkit.",
+      "question_id": "ops-003",
+      "domain": "Dependency Security",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 7,
+        "npc_knowledge": 6,
+        "workflow": 6,
+        "practicality": 8,
+        "total": 27
+      },
+      "haiku_scores": {
+        "correctness": 9,
+        "npc_knowledge": 9,
+        "workflow": 9,
+        "practicality": 8,
+        "total": 35
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku correctly identified all expected NPCs (checkov_npc.py, tfsec_npc.py, conftest_npc.py, conftest_fixer_npc.py) and demonstrated proper understanding of the scan\u2192classify\u2192fix\u2192verify workflow, while JADE used incorrect NPC naming conventions and missed the fixer component.",
+      "question_id": "ops-004",
+      "domain": "IaC Security",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 9,
+        "npc_knowledge": 9,
+        "workflow": 10,
+        "practicality": 9,
+        "total": 37
+      },
+      "haiku_scores": {
+        "correctness": 8,
+        "npc_knowledge": 8,
+        "workflow": 9,
+        "practicality": 7,
+        "total": 32
+      },
+      "winner": "JADE",
+      "explanation": "JADE provides more comprehensive implementation details with actual code examples, JSON outputs, and complete CI/CD integration, while Haiku gives a good conceptual overview but lacks the practical depth and concrete examples needed for real implementation.",
+      "question_id": "ops-005",
+      "domain": "CI/CD Security",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 8,
+        "npc_knowledge": 6,
+        "workflow": 7,
+        "practicality": 9,
+        "total": 30
+      },
+      "haiku_scores": {
+        "correctness": 9,
+        "npc_knowledge": 9,
+        "workflow": 9,
+        "practicality": 8,
+        "total": 35
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku correctly identified and explained the expected NPCs (bandit_npc.py, semgrep_npc.py, code_fixer_npc.py) with proper workflow, while JADE provided detailed scan results but missed the code_fixer_npc and included non-SAST tools not requested in the expected elements.",
+      "question_id": "ops-006",
+      "domain": "SAST",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 9,
+        "npc_knowledge": 0,
+        "workflow": 3,
+        "practicality": 9,
+        "total": 21
+      },
+      "haiku_scores": {
+        "correctness": 8,
+        "npc_knowledge": 10,
+        "workflow": 9,
+        "practicality": 7,
+        "total": 34
+      },
+      "winner": "HAIKU",
+      "explanation": "While JADE provided excellent technical implementation details with correct YAML and commands, it completely ignored the GP-CONSULTING toolkit. HAIKU correctly referenced all three expected NPCs and followed the proper workflow, despite being less detailed in implementation.",
+      "question_id": "ops-007",
+      "domain": "Policy as Code",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 8,
+        "npc_knowledge": 9,
+        "workflow": 9,
+        "practicality": 7,
+        "total": 33
+      },
+      "haiku_scores": {
+        "correctness": 9,
+        "npc_knowledge": 10,
+        "workflow": 10,
+        "practicality": 9,
+        "total": 38
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku provides a clearer, more actionable workflow that directly addresses the question with correct NPC references and proper scan\u2192classify\u2192fix\u2192verify sequence, while JADE's response is overly verbose with YAML examples that don't add practical value.",
+      "question_id": "ops-008",
+      "domain": "Kubernetes Security",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 8,
+        "npc_knowledge": 3,
+        "workflow": 5,
+        "practicality": 8,
+        "total": 24
+      },
+      "haiku_scores": {
+        "correctness": 9,
+        "npc_knowledge": 10,
+        "workflow": 9,
+        "practicality": 9,
+        "total": 37
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku correctly referenced all three expected NPCs by name and followed the proper workflow sequence, while JADE only mentioned one NPC and provided generic kubectl commands instead of leveraging the GP-CONSULTING toolkit.",
+      "question_id": "ops-009",
+      "domain": "Troubleshooting",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 7,
+        "npc_knowledge": 6,
+        "workflow": 8,
+        "practicality": 8,
+        "total": 29
+      },
+      "haiku_scores": {
+        "correctness": 8,
+        "npc_knowledge": 9,
+        "workflow": 7,
+        "practicality": 7,
+        "total": 31
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku correctly references the specific compliance_mapper_npc.py tool and provides a clear, actionable workflow, while JADE creates elaborate YAML configurations that may not align with the actual toolkit structure.",
+      "question_id": "ops-010",
+      "domain": "Compliance",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 8,
+        "npc_knowledge": 2,
+        "workflow": 6,
+        "practicality": 8,
+        "total": 24
+      },
+      "haiku_scores": {
+        "correctness": 9,
+        "npc_knowledge": 10,
+        "workflow": 8,
+        "practicality": 7,
+        "total": 34
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku correctly identified the specific NPCs (syft_npc.py, cyclonedx_npc.py) from the GP-CONSULTING toolkit and understood the expected workflow, while JADE provided generic tool usage without referencing the actual NPCs in the toolkit.",
+      "question_id": "ops-011",
+      "domain": "SBOM",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 9,
+        "npc_knowledge": 8,
+        "workflow": 6,
+        "practicality": 8,
+        "total": 31
+      },
+      "haiku_scores": {
+        "correctness": 9,
+        "npc_knowledge": 9,
+        "workflow": 9,
+        "practicality": 9,
+        "total": 36
+      },
+      "winner": "HAIKU",
+      "explanation": "While both responses correctly identified prowler_npc.py and understood AWS auditing, Haiku provided a more complete workflow explanation including the full scan\u2192classify\u2192fix\u2192verify cycle with specific NPC references like RankClassifier, FixOrchestrator, and SmartRescanNPC, making it more operationally comprehensive.",
+      "question_id": "ops-012",
+      "domain": "Cloud Security",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 9,
+        "npc_knowledge": 10,
+        "workflow": 7,
+        "practicality": 10,
+        "total": 36
+      },
+      "haiku_scores": {
+        "correctness": 8,
+        "npc_knowledge": 6,
+        "workflow": 6,
+        "practicality": 7,
+        "total": 27
+      },
+      "winner": "JADE",
+      "explanation": "JADE provides comprehensive, actionable examples with correct NPC usage and proper Kyverno policy structure, while Haiku gives a more generic overview with some incorrect NPC references and less practical detail.",
+      "question_id": "ops-013",
+      "domain": "Kyverno",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 9,
+        "npc_knowledge": 9,
+        "workflow": 8,
+        "practicality": 9,
+        "total": 35
+      },
+      "haiku_scores": {
+        "correctness": 8,
+        "npc_knowledge": 7,
+        "workflow": 9,
+        "practicality": 7,
+        "total": 31
+      },
+      "winner": "JADE",
+      "explanation": "JADE provides a more concise, practical response with specific Kubernetes context and concrete Slack approval example, while Haiku is overly verbose and generic despite covering the workflow comprehensively.",
+      "question_id": "ops-014",
+      "domain": "Integration",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 9,
+        "npc_knowledge": 9,
+        "workflow": 10,
+        "practicality": 8,
+        "total": 36
+      },
+      "haiku_scores": {
+        "correctness": 8,
+        "npc_knowledge": 7,
+        "workflow": 9,
+        "practicality": 7,
+        "total": 31
+      },
+      "winner": "JADE",
+      "explanation": "JADE provides a more structured, concise response with clear YAML formatting and correctly identifies all key orchestrators (ScanOrchestrator, RankClassifier, FixOrchestrator, SmartRescanNPC). Haiku is comprehensive but includes some hallucinated NPCs not mentioned in the toolkit and is overly verbose without the clean structure.",
+      "question_id": "ops-015",
+      "domain": "Full Cycle",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 9,
+        "npc_knowledge": 2,
+        "workflow": 4,
+        "practicality": 9,
+        "total": 24
+      },
+      "haiku_scores": {
+        "correctness": 8,
+        "npc_knowledge": 3,
+        "workflow": 7,
+        "practicality": 7,
+        "total": 25
+      },
+      "winner": "HAIKU",
+      "explanation": "While JADE provided more technically comprehensive solutions with multiple approaches, HAIKU better addressed the GP-CONSULTING toolkit context by referencing specific NPCs and explaining the scan\u2192fix\u2192verify workflow, which was central to the question's requirements.",
+      "question_id": "k8s-001",
+      "domain": "Container Security",
+      "question_type": "domain"
+    },
+    {
+      "jade_scores": {
+        "correctness": 9,
+        "npc_knowledge": 1,
+        "workflow": 6,
+        "practicality": 9,
+        "total": 25
+      },
+      "haiku_scores": {
+        "correctness": 7,
+        "npc_knowledge": 3,
+        "workflow": 4,
+        "practicality": 5,
+        "total": 19
+      },
+      "winner": "JADE",
+      "explanation": "JADE provides a technically accurate, complete Kyverno policy with proper testing steps and handles both pod-level and container-level security contexts, while Haiku references non-existent NPCs and provides an incomplete policy that only checks pod-level security context.",
+      "question_id": "k8s-002",
+      "domain": "Container Security",
+      "question_type": "domain"
+    },
+    {
+      "jade_scores": {
+        "correctness": 9,
+        "npc_knowledge": 2,
+        "workflow": 3,
+        "practicality": 9,
+        "total": 23
+      },
+      "haiku_scores": {
+        "correctness": 6,
+        "npc_knowledge": 4,
+        "workflow": 5,
+        "practicality": 4,
+        "total": 19
+      },
+      "winner": "JADE",
+      "explanation": "JADE provided technically accurate PSS configuration with correct YAML syntax and comprehensive restricted profile details, while Haiku incorrectly suggested using Gatekeeper/Kyverno when PSS labels are sufficient and referenced non-existent NPCs.",
+      "question_id": "k8s-003",
+      "domain": "Container Security",
+      "question_type": "domain"
+    },
+    {
+      "jade_scores": {
+        "correctness": 8,
+        "npc_knowledge": 2,
+        "workflow": 1,
+        "practicality": 9,
+        "total": 20
+      },
+      "haiku_scores": {
+        "correctness": 7,
+        "npc_knowledge": 6,
+        "workflow": 8,
+        "practicality": 7,
+        "total": 28
+      },
+      "winner": "HAIKU",
+      "explanation": "While JADE provided more comprehensive technical content with multiple deployment methods, Haiku better understood the GP-CONSULTING framework by correctly referencing the NPC structure and explaining the proper scan\u2192classify\u2192fix\u2192verify workflow that was expected.",
+      "question_id": "opa-001",
+      "domain": "CNAPP",
+      "question_type": "domain"
+    },
+    {
+      "jade_scores": {
+        "correctness": 3,
+        "npc_knowledge": 0,
+        "workflow": 2,
+        "practicality": 4,
+        "total": 9
+      },
+      "haiku_scores": {
+        "correctness": 8,
+        "npc_knowledge": 2,
+        "workflow": 1,
+        "practicality": 8,
+        "total": 19
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku provided a much more technically correct Gatekeeper implementation with proper Rego logic and parameterization, while JADE's solution had fundamental errors in the Rego code and hardcoded values that don't match the requirements.",
+      "question_id": "opa-002",
+      "domain": "CNAPP",
+      "question_type": "domain"
+    },
+    {
+      "jade_scores": {
+        "correctness": 3,
+        "npc_knowledge": 0,
+        "workflow": 2,
+        "practicality": 4,
+        "total": 9
+      },
+      "haiku_scores": {
+        "correctness": 8,
+        "npc_knowledge": 8,
+        "workflow": 9,
+        "practicality": 8,
+        "total": 33
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku correctly identified the SSH security issue, referenced specific NPCs from the toolkit, and explained the proper scan\u2192classify\u2192fix\u2192verify workflow, while JADE focused on an unrelated egress rules issue and didn't reference any NPCs.",
+      "question_id": "iac-001",
+      "domain": "IaC Security",
+      "question_type": "domain"
+    },
+    {
+      "jade_scores": {
+        "correctness": 6,
+        "npc_knowledge": 0,
+        "workflow": 2,
+        "practicality": 7,
+        "total": 15
+      },
+      "haiku_scores": {
+        "correctness": 8,
+        "npc_knowledge": 0,
+        "workflow": 1,
+        "practicality": 8,
+        "total": 17
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku provides a more technically accurate Checkov implementation with proper Terraform resource handling and correct method implementations, while both models completely failed to reference the GP-CONSULTING NPCs or demonstrate understanding of the DevSecOps toolkit.",
+      "question_id": "iac-002",
+      "domain": "IaC Security",
+      "question_type": "domain"
+    },
+    {
+      "jade_scores": {
+        "correctness": 8,
+        "npc_knowledge": 2,
+        "workflow": 3,
+        "practicality": 7,
+        "total": 20
+      },
+      "haiku_scores": {
+        "correctness": 6,
+        "npc_knowledge": 3,
+        "workflow": 2,
+        "practicality": 6,
+        "total": 17
+      },
+      "winner": "JADE",
+      "explanation": "JADE provides more comprehensive and technically accurate solutions with multiple fix approaches, though both models failed to properly reference the GP-CONSULTING NPCs or follow the expected scan\u2192fix\u2192verify workflow.",
+      "question_id": "cicd-001",
+      "domain": "CI/CD Security",
+      "question_type": "domain"
+    },
+    {
+      "jade_scores": {
+        "correctness": 8,
+        "npc_knowledge": 2,
+        "workflow": 4,
+        "practicality": 8,
+        "total": 22
+      },
+      "haiku_scores": {
+        "correctness": 9,
+        "npc_knowledge": 2,
+        "workflow": 5,
+        "practicality": 9,
+        "total": 25
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku provides a more complete and correct implementation using the proper aquasecurity/trivy-action with all required parameters, while JADE uses manual installation which is less maintainable and misses key configuration options.",
+      "question_id": "cicd-002",
+      "domain": "CI/CD Security",
+      "question_type": "domain"
+    },
+    {
+      "jade_scores": {
+        "correctness": 4,
+        "npc_knowledge": 0,
+        "workflow": 2,
+        "practicality": 3,
+        "total": 9
+      },
+      "haiku_scores": {
+        "correctness": 6,
+        "npc_knowledge": 2,
+        "workflow": 4,
+        "practicality": 5,
+        "total": 17
+      },
+      "winner": "HAIKU",
+      "explanation": "While JADE provided more detailed YAML configurations, it completely ignored the GP-CONSULTING toolkit and contained technical errors (wrong API versions, incomplete manifests). Haiku correctly referenced specific NPCs and followed a proper workflow structure, despite some conceptual confusion about using Gatekeeper for IAM roles.",
+      "question_id": "aws-001",
+      "domain": "Cloud Security",
+      "question_type": "domain"
+    },
+    {
+      "jade_scores": {
+        "correctness": 6,
+        "npc_knowledge": 0,
+        "workflow": 2,
+        "practicality": 8,
+        "total": 16
+      },
+      "haiku_scores": {
+        "correctness": 4,
+        "npc_knowledge": 0,
+        "workflow": 1,
+        "practicality": 3,
+        "total": 8
+      },
+      "winner": "JADE",
+      "explanation": "JADE provides more accurate Prowler syntax and actionable security findings with specific remediation steps, while Haiku uses incorrect command flags and focuses on low-priority password policy issues rather than critical infrastructure vulnerabilities.",
+      "question_id": "aws-002",
+      "domain": "Cloud Security",
+      "question_type": "domain"
+    },
+    {
+      "jade_scores": {
+        "correctness": 6,
+        "npc_knowledge": 7,
+        "workflow": 4,
+        "practicality": 3,
+        "total": 20
+      },
+      "haiku_scores": {
+        "correctness": 8,
+        "npc_knowledge": 9,
+        "workflow": 7,
+        "practicality": 8,
+        "total": 32
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku provided a focused, practical response that correctly referenced the GP-CONSULTING NPCs and explained the proper workflow order, while JADE was overly verbose with many hallucinated tools and stages not mentioned in the toolkit.",
+      "question_id": "devsecops-001",
+      "domain": "DevSecOps",
+      "question_type": "domain"
+    },
+    {
+      "jade_scores": {
+        "correctness": 6,
+        "npc_knowledge": 2,
+        "workflow": 1,
+        "practicality": 8,
+        "total": 17
+      },
+      "haiku_scores": {
+        "correctness": 4,
+        "npc_knowledge": 8,
+        "workflow": 9,
+        "practicality": 7,
+        "total": 28
+      },
+      "winner": "HAIKU",
+      "explanation": "While JADE provided more detailed technical content and configurations, it completely ignored the GP-CONSULTING toolkit and workflow requirements. HAIKU correctly referenced specific NPCs, explained the proper scan\u2192classify\u2192fix\u2192verify workflow, and demonstrated understanding of the JSA agent context.",
+      "question_id": "compliance-001",
+      "domain": "Compliance",
+      "question_type": "domain"
+    },
+    {
+      "jade_scores": {
+        "correctness": 9,
+        "npc_knowledge": 0,
+        "workflow": 3,
+        "practicality": 8,
+        "total": 20
+      },
+      "haiku_scores": {
+        "correctness": 8,
+        "npc_knowledge": 0,
+        "workflow": 4,
+        "practicality": 7,
+        "total": 19
+      },
+      "winner": "JADE",
+      "explanation": "JADE provides more comprehensive and practical guidance with better troubleshooting commands and verification steps, though neither model referenced the GP-CONSULTING NPCs as required for JSA.",
+      "question_id": "zerotrust-001",
+      "domain": "Zero Trust",
+      "question_type": "domain"
+    },
+    {
+      "jade_scores": {
+        "correctness": 4,
+        "npc_knowledge": 0,
+        "workflow": 2,
+        "practicality": 3,
+        "total": 9
+      },
+      "haiku_scores": {
+        "correctness": 7,
+        "npc_knowledge": 6,
+        "workflow": 6,
+        "practicality": 8,
+        "total": 27
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku provides a comprehensive incident response workflow with proper evidence capture, network isolation, and correctly references GP-CONSULTING NPCs like kube_bench_npc.py and kubescape_npc.py, while JADE focuses too narrowly on pod deletion without proper containment procedures.",
+      "question_id": "incident-001",
+      "domain": "Incident Response",
+      "question_type": "domain"
+    }
+  ],
+  "summary": {
+    "total_evaluated": 30,
+    "skipped": 0,
+    "jade_wins": 10,
+    "haiku_wins": 20,
+    "ties": 0,
+    "jade_win_rate": 0.3333333333333333,
+    "haiku_win_rate": 0.6666666666666666,
+    "jade_avg_total": 23.433333333333334,
+    "haiku_avg_total": 27.766666666666666,
+    "by_category": {
+      "jade": {
+        "correctness": 7.333333333333333,
+        "npc_knowledge": 3.8,
+        "workflow": 4.833333333333333,
+        "practicality": 7.466666666666667
+      },
+      "haiku": {
+        "correctness": 7.7,
+        "npc_knowledge": 6.2,
+        "workflow": 6.733333333333333,
+        "practicality": 7.133333333333334
+      }
+    },
+    "operational_questions": {
+      "jade_wins": 5,
+      "haiku_wins": 10,
+      "ties": 0
+    },
+    "domain_questions": {
+      "jade_wins": 5,
+      "haiku_wins": 10,
+      "ties": 0
+    }
+  }
+}

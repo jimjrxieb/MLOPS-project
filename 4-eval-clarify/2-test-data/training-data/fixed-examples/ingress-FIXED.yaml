@@ -1,0 +1,163 @@
+# FIXED VERSION OF INGRESS EXAMPLE #1
+# Fixes Applied:
+#   1. TLS with cert-manager
+#   2. Specific hostname validation
+#   3. Rate limiting annotations
+#   4. ModSecurity WAF enabled
+#   5. Backend service HTTPS with health checks
+#   6. Security headers (HSTS, CSP, X-Frame-Options)
+#   7. Path restrictions with auth where needed
+#
+# Compliance: CIS K8s 5.1.5, OWASP, PCI-DSS 4.1
+
+---
+# FIXED: Certificate managed by cert-manager
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: app-tls
+  namespace: production
+spec:
+  secretName: app-tls-secret
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - app.company.com
+    - api.company.com
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  duration: 2160h  # 90 days
+  renewBefore: 360h  # 15 days before expiry
+
+---
+# FIXED: Secure Ingress configuration
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  namespace: production
+  labels:
+    app.kubernetes.io/name: app
+    compliance: pci-dss
+  annotations:
+    # FIXED: Force HTTPS redirect
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+
+    # FIXED #6: Security headers
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+      add_header X-Frame-Options "DENY" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header X-XSS-Protection "1; mode=block" always;
+      add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'" always;
+      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+      add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+
+    # FIXED #3: Rate limiting
+    nginx.ingress.kubernetes.io/limit-connections: "10"
+    nginx.ingress.kubernetes.io/limit-rps: "20"
+    nginx.ingress.kubernetes.io/limit-rpm: "100"
+    nginx.ingress.kubernetes.io/limit-whitelist: "10.0.0.0/8"  # Allow internal
+
+    # FIXED #4: ModSecurity WAF
+    nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+    nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
+    nginx.ingress.kubernetes.io/modsecurity-snippet: |
+      SecRuleEngine On
+      SecAuditEngine RelevantOnly
+      SecAuditLogParts ABCDEFHIJKZ
+
+    # FIXED: Backend protocol
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+
+    # FIXED: Proxy settings
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+
+    # FIXED: Custom error pages
+    nginx.ingress.kubernetes.io/custom-http-errors: "403,404,500,502,503,504"
+    nginx.ingress.kubernetes.io/default-backend: error-pages
+
+spec:
+  ingressClassName: nginx
+
+  # FIXED #1: TLS configuration
+  tls:
+    - hosts:
+        - app.company.com
+        - api.company.com
+      secretName: app-tls-secret
+
+  rules:
+    # FIXED #2: Specific hostname
+    - host: app.company.com
+      http:
+        paths:
+          # FIXED #7: Specific paths, not catchall
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 443
+
+    - host: api.company.com
+      http:
+        paths:
+          - path: /api/v1
+            pathType: Prefix
+            backend:
+              service:
+                name: api-service
+                port:
+                  number: 443
+
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: api-service
+                port:
+                  number: 443
+
+---
+# FIXED #7: Admin ingress with auth
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: admin-ingress
+  namespace: production
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+    # FIXED: OAuth2 proxy authentication
+    nginx.ingress.kubernetes.io/auth-url: "https://oauth2-proxy.company.com/oauth2/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.company.com/oauth2/start?rd=$scheme://$host$request_uri"
+
+    # FIXED: IP whitelist for admin
+    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,192.168.1.0/24"
+
+    # FIXED: Stricter rate limiting for admin
+    nginx.ingress.kubernetes.io/limit-rps: "5"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - admin.company.com
+      secretName: admin-tls-secret
+  rules:
+    - host: admin.company.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: admin-service
+                port:
+                  number: 443

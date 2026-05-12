@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "JSA Finding",
+  "description": "Security finding from scanners, stored in GP-PROJECTS/{instance}/{slot}/jsa/inbox/. Also the input format for RANK-AI classification.",
+  "type": "object",
+  "required": ["finding_id", "scanner", "severity", "title", "state"],
+  "properties": {
+    "finding_id": {
+      "type": "string",
+      "description": "Unique finding identifier"
+    },
+    "scanner": {
+      "type": "string",
+      "description": "Scanner that found it (trivy, kubescape, gitleaks, bandit, etc.)"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"],
+      "description": "Severity level from scanner"
+    },
+    "rank": {
+      "type": "string",
+      "enum": ["E", "D", "C", "B", "S"],
+      "description": "Automation rank assigned by RANK-AI"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable finding title"
+    },
+    "file_path": {
+      "type": "string",
+      "description": "File or resource where the finding was detected"
+    },
+    "line": {
+      "type": "integer",
+      "description": "Line number in file (if applicable)"
+    },
+    "rule_id": {
+      "type": "string",
+      "description": "Scanner rule ID (CVE-*, CKV_K8S_*, C-00*, etc.)"
+    },
+    "state": {
+      "type": "string",
+      "enum": ["inbox", "in_progress", "fixed", "escalated", "wont_fix", "false_positive"],
+      "description": "Current finding lifecycle state"
+    },
+    "added_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "context": {
+      "type": "object",
+      "description": "Additional context from the scanner",
+      "properties": {
+        "description": {"type": "string"},
+        "remediation": {"type": "string"},
+        "references": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    }
+  }
+}

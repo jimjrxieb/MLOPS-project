@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Training Example",
+  "description": "ChatML format training example for JADE/Katie fine-tuning. Every example in the curated corpus must match this schema.",
+  "type": "object",
+  "required": ["messages"],
+  "additionalProperties": false,
+  "properties": {
+    "messages": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["role", "content"],
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": ["system", "user", "assistant"]
+          },
+          "content": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "contains": {
+        "properties": {
+          "role": {"const": "assistant"}
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "messages": [
+        {"role": "system", "content": "You are a Kubernetes security engineer."},
+        {"role": "user", "content": "A pod in namespace 'payments' is running as root. How do I fix this?"},
+        {"role": "assistant", "content": "Add securityContext to the pod spec:\n\n```yaml\nspec:\n  securityContext:\n    runAsNonRoot: true\n    runAsUser: 1000\n  containers:\n  - name: app\n    securityContext:\n      allowPrivilegeEscalation: false\n      readOnlyRootFilesystem: true\n      capabilities:\n        drop: [\"ALL\"]\n```\n\nIf the app writes to disk, add an emptyDir volume for /tmp."}
+      ]
+    }
+  ]
+}

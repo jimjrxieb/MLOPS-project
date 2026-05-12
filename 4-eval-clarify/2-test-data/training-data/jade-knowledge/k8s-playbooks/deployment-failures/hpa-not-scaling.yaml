@@ -1,0 +1,193 @@
+# JADE Operational Playbook: HPA Not Scaling
+# Horizontal Pod Autoscaler not working as expected
+
+name: HPA-Not-Scaling
+category: deployment-failures
+severity: MEDIUM
+frequency: COMMON
+
+trigger_patterns:
+  - "HPA"
+  - "autoscaler"
+  - "not scaling"
+  - "unable to fetch metrics"
+  - "FailedGetResourceMetric"
+  - "pods not scaling up"
+  - "pods not scaling down"
+
+description: |
+  Horizontal Pod Autoscaler is not scaling pods as expected.
+  Could be metrics unavailable, min/max constraints, or configuration issues.
+
+gameplan:
+  step_1:
+    name: "Check HPA status"
+    commands:
+      - "kubectl get hpa {hpa} -n {ns}"
+      - "kubectl describe hpa {hpa} -n {ns}"
+      - "kubectl get hpa {hpa} -n {ns} -o yaml"
+
+    status_fields:
+      current_replicas: "How many pods are running"
+      desired_replicas: "How many HPA wants"
+      current_metrics: "Current utilization values"
+      conditions: "HPA health conditions"
+
+  step_2_diagnose_issue:
+    name: "Identify why HPA isn't working"
+    commands:
+      - "kubectl describe hpa {hpa} -n {ns} | grep -A10 'Conditions:'"
+      - "kubectl get events -n {ns} | grep -i hpa"
+
+    branches:
+      unable_to_fetch_metrics:
+        patterns:
+          - "unable to fetch metrics"
+          - "FailedGetResourceMetric"
+          - "missing request for"
+        meaning: "Metrics server not providing data"
+        fix_rank: "C"
+        next_step: "step_3_fix_metrics"
+
+      unable_to_scale:
+        patterns:
+          - "unable to scale"
+          - "failed to scale"
+        meaning: "Scaling action failed"
+        fix_rank: "C"
+        action: "Check deployment/replicaset issues"
+
+      at_min_replicas:
+        patterns:
+          - "current replicas: {min}"
+          - "at minimum"
+        meaning: "HPA wants to scale down but at minimum"
+        info: "This is expected behavior"
+
+      at_max_replicas:
+        patterns:
+          - "current replicas: {max}"
+          - "at maximum"
+        meaning: "HPA wants to scale up but at maximum"
+        fix_rank: "C"
+        action: "Consider increasing max replicas"
+
+      target_not_found:
+        patterns:
+          - "target not found"
+          - "no matches for"
+        meaning: "Target deployment/statefulset doesn't exist"
+        fix_rank: "D"
+        fix: "Fix scaleTargetRef in HPA"
+
+  step_3_fix_metrics:
+    name: "Fix metrics issues"
+    commands:
+      - "kubectl get pods -n kube-system | grep metrics-server"
+      - "kubectl top pods -n {ns}"
+      - "kubectl get --raw /apis/metrics.k8s.io/v1beta1/pods"
+
+    issues:
+      metrics_server_not_running:
+        fix_rank: "C"
+        fix: "Install or fix metrics-server"
+        check: "kubectl get deployment metrics-server -n kube-system"
+
+      no_resource_requests:
+        meaning: "HPA can't calculate utilization without requests"
+        fix_rank: "D"
+        fix: "Add resource requests to containers"
+        template: |
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+
+      metrics_not_ready:
+        meaning: "Metrics not yet collected for new pods"
+        fix: "Wait a few minutes for metrics to populate"
+
+  step_4_check_configuration:
+    name: "Verify HPA configuration"
+    commands:
+      - "kubectl get hpa {hpa} -n {ns} -o yaml"
+
+    configuration_checks:
+      target_cpu_utilization:
+        recommended: "50-80%"
+        too_low: "Below 30% may cause excessive scaling"
+        too_high: "Above 90% may not scale fast enough"
+
+      min_replicas:
+        recommended: "At least 2 for HA"
+        warning: "1 replica means potential downtime during scaling"
+
+      max_replicas:
+        check: "Is max high enough for expected load?"
+        warning: "Very high max may cause cost issues"
+
+      scale_down_behavior:
+        check: "Is scale-down too aggressive?"
+        template: |
+          behavior:
+            scaleDown:
+              stabilizationWindowSeconds: 300
+              policies:
+              - type: Percent
+                value: 10
+                periodSeconds: 60
+
+  step_5_check_external_metrics:
+    name: "For custom/external metrics"
+    condition: "HPA using custom or external metrics"
+    commands:
+      - "kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1"
+      - "kubectl get --raw /apis/external.metrics.k8s.io/v1beta1"
+
+    issues:
+      adapter_not_running:
+        fix: "Install prometheus-adapter or similar"
+
+      metric_not_found:
+        fix: "Verify metric name and labels match"
+
+common_auto_fixes:
+  - id: "hpa-add-requests"
+    trigger: "missing request for cpu/memory"
+    rank: "D"
+    action: "add_resource_requests"
+    template: |
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "128Mi"
+
+  - id: "hpa-increase-max"
+    trigger: "at max replicas AND high load"
+    rank: "C"
+    action: "increase_max_replicas"
+    params:
+      increase_by: 2
+
+  - id: "hpa-fix-target"
+    trigger: "target not found AND deployment exists with similar name"
+    rank: "D"
+    action: "fix_scale_target_ref"
+
+escalation_triggers:
+  - condition: "Metrics server not running in production"
+    escalate_to: "JADE"
+    reason: "Cluster component issue"
+
+  - condition: "HPA at max and still overloaded"
+    escalate_to: "JADE"
+    reason: "May need capacity planning review"
+
+  - condition: "Custom metrics adapter failing"
+    escalate_to: "JADE"
+    reason: "Need monitoring team involvement"
+
+related_playbooks:
+  - replicafailure
+  - pending
+  - oomkilled

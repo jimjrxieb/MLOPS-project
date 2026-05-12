@@ -1,0 +1,24 @@
+# FAULTY: NetworkPolicy allows all egress - defeats purpose of network segmentation
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-network-policy
+  namespace: production
+spec:
+  podSelector:
+    matchLabels:
+      app: backend-api
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: frontend
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    # ISSUE: Allows ALL egress - pod can reach internet, other namespaces, metadata service
+    - {}

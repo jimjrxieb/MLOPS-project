@@ -1,0 +1,254 @@
+# JADE Operational Playbook: ConfigMap Not Found
+# Pod fails because referenced ConfigMap doesn't exist
+
+name: ConfigMap-Not-Found
+category: resource-failures
+severity: MEDIUM
+frequency: COMMON
+
+trigger_patterns:
+  - "configmap.*not found"
+  - "couldn't find key.*in ConfigMap"
+  - "failed to sync.*configmap"
+  - "MountVolume.SetUp failed for volume.*configMap"
+  - "CreateContainerConfigError"
+
+description: |
+  Pod references a ConfigMap that doesn't exist or is missing expected keys.
+  This blocks pod creation or causes container startup failures.
+
+gameplan:
+  step_1:
+    name: "Identify the missing ConfigMap"
+    commands:
+      - "kubectl describe pod {pod} -n {ns} | grep -i configmap"
+      - "kubectl get events -n {ns} --field-selector involvedObject.name={pod}"
+      - "kubectl get pod {pod} -n {ns} -o yaml | grep -A5 configMap"
+
+    extract:
+      - "ConfigMap name"
+      - "ConfigMap namespace"
+      - "How it's used (volume vs envFrom vs env valueFrom)"
+      - "Specific key if applicable"
+
+  step_2_check_configmap_exists:
+    name: "Verify ConfigMap existence"
+    commands:
+      - "kubectl get configmap {cm} -n {ns}"
+      - "kubectl get configmap -n {ns}"
+
+    branches:
+      configmap_missing:
+        indicator: "not found"
+        meaning: "ConfigMap doesn't exist in this namespace"
+        fix_rank: "D"
+        causes:
+          - "ConfigMap not created yet"
+          - "Deployed to wrong namespace"
+          - "Name typo in pod spec"
+          - "ConfigMap deleted"
+
+      configmap_exists:
+        indicator: "ConfigMap found"
+        meaning: "ConfigMap exists but key might be wrong"
+        next_step: "Check specific key"
+
+  step_3_check_keys:
+    name: "Verify ConfigMap has expected keys"
+    commands:
+      - "kubectl get configmap {cm} -n {ns} -o yaml"
+      - "kubectl describe configmap {cm} -n {ns}"
+
+    check:
+      - "List all keys in ConfigMap"
+      - "Compare with what pod expects"
+      - "Check for typos in key names"
+
+    common_issues:
+      wrong_key_name:
+        example: "Pod expects 'database_url' but CM has 'DATABASE_URL'"
+        fix_rank: "D"
+        fix: "Update ConfigMap or pod spec"
+
+      key_missing:
+        example: "Pod expects key that was never added"
+        fix_rank: "D"
+        fix: "Add missing key to ConfigMap"
+
+      empty_value:
+        example: "Key exists but value is empty"
+        fix_rank: "D"
+        fix: "Set proper value"
+
+  step_4_usage_patterns:
+    name: "Understand how ConfigMap is used"
+
+    as_environment:
+      pattern: |
+        envFrom:
+        - configMapRef:
+            name: {cm}
+      behavior: "All keys become env vars"
+      fix: "ConfigMap must exist (unless optional: true)"
+
+    as_single_env:
+      pattern: |
+        env:
+        - name: MY_VAR
+          valueFrom:
+            configMapKeyRef:
+              name: {cm}
+              key: {key}
+      behavior: "Single key as env var"
+      fix: "Both ConfigMap and key must exist"
+
+    as_volume:
+      pattern: |
+        volumes:
+        - name: config
+          configMap:
+            name: {cm}
+        volumeMounts:
+        - name: config
+          mountPath: /etc/config
+      behavior: "Keys become files in mount path"
+      fix: "ConfigMap must exist"
+
+    as_volume_specific_key:
+      pattern: |
+        volumes:
+        - name: config
+          configMap:
+            name: {cm}
+            items:
+            - key: app.conf
+              path: app.conf
+      behavior: "Only specified keys become files"
+      fix: "Specified keys must exist"
+
+  step_5_fix_options:
+    name: "Resolution options"
+
+    create_configmap:
+      description: "Create the missing ConfigMap"
+      rank: "D"
+      template: |
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: {cm}
+          namespace: {ns}
+        data:
+          key1: value1
+          key2: value2
+          # For file-like content:
+          config.yaml: |
+            setting1: value
+            setting2: value
+
+    create_from_file:
+      description: "Create ConfigMap from file"
+      rank: "D"
+      command: |
+        kubectl create configmap {cm} -n {ns} \
+          --from-file=config.yaml=/path/to/config.yaml
+
+    create_from_literal:
+      description: "Create ConfigMap from literal values"
+      rank: "D"
+      command: |
+        kubectl create configmap {cm} -n {ns} \
+          --from-literal=key1=value1 \
+          --from-literal=key2=value2
+
+    add_missing_key:
+      description: "Add key to existing ConfigMap"
+      rank: "D"
+      command: |
+        kubectl patch configmap {cm} -n {ns} \
+          --type=merge \
+          -p='{"data":{"missing_key":"value"}}'
+
+    make_optional:
+      description: "Make ConfigMap reference optional"
+      rank: "D"
+      templates:
+        env_optional: |
+          envFrom:
+          - configMapRef:
+              name: {cm}
+              optional: true
+
+        volume_optional: |
+          volumes:
+          - name: config
+            configMap:
+              name: {cm}
+              optional: true
+
+    fix_namespace:
+      description: "Create ConfigMap in correct namespace"
+      rank: "D"
+      note: "ConfigMaps are namespace-scoped"
+      command: |
+        # If exists in wrong namespace:
+        kubectl get configmap {cm} -n {wrong-ns} -o yaml | \
+          sed 's/namespace: {wrong-ns}/namespace: {ns}/' | \
+          kubectl apply -f -
+
+  step_6_verify_fix:
+    name: "Verify fix"
+    commands:
+      - "kubectl get configmap {cm} -n {ns}"
+      - "kubectl describe configmap {cm} -n {ns}"
+      - "kubectl delete pod {pod} -n {ns}  # Force recreation"
+      - "kubectl get pod {pod} -n {ns}"
+      - "kubectl logs {pod} -n {ns}"
+
+    success_criteria:
+      - "ConfigMap exists"
+      - "All required keys present"
+      - "Pod starts successfully"
+      - "Application reads config correctly"
+
+common_auto_fixes:
+  - id: "cm-create-empty"
+    trigger: "ConfigMap not found AND optional=false"
+    rank: "D"
+    action: "create_placeholder_configmap"
+    note: "Creates with TODO placeholder values"
+
+  - id: "cm-add-key"
+    trigger: "ConfigMap exists but key missing"
+    rank: "D"
+    action: "patch_add_key"
+
+  - id: "cm-make-optional"
+    trigger: "ConfigMap not critical for startup"
+    rank: "D"
+    action: "patch_pod_optional_configmap"
+
+escalation_triggers:
+  - condition: "ConfigMap contains sensitive values"
+    escalate_to: "JADE"
+    reason: "May need to use Secret instead"
+
+  - condition: "ConfigMap should come from external source"
+    escalate_to: "JADE"
+    reason: "Need to set up config management"
+
+  - condition: "Multiple pods affected by same missing ConfigMap"
+    escalate_to: "JADE"
+    reason: "Possible deployment issue"
+
+best_practices:
+  - "Always set optional: true for non-critical configs"
+  - "Use kustomize or Helm to manage ConfigMaps with apps"
+  - "Don't store secrets in ConfigMaps - use Secrets instead"
+  - "Consider ConfigMap immutability for critical configs"
+  - "Use checksums/annotations to trigger pod restarts on config change"
+
+related_playbooks:
+  - secret-not-found
+  - createcontainererror
+  - pending

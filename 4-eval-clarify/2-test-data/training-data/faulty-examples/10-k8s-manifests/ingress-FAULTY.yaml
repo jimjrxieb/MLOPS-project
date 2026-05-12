@@ -1,0 +1,59 @@
+# FAULTY INGRESS EXAMPLE #1
+# Common Mistakes: Insecure Ingress Configuration
+# Issues:
+#   1. No TLS - traffic in plaintext
+#   2. Wildcard host - catchall routing
+#   3. No rate limiting
+#   4. No WAF annotations
+#   5. Backend service not validated
+#   6. Missing security headers
+#   7. No path restrictions
+#
+# Severity: HIGH (MITM, XSS, injection attacks)
+# Compliance: CIS K8s 5.1.5, OWASP
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  namespace: production
+  # BUG #3, #4, #6: Missing security annotations
+spec:
+  ingressClassName: nginx
+
+  # BUG #1: No TLS configuration - HTTP only
+  # tls: missing
+
+  rules:
+    # BUG #2: Wildcard host accepts any domain
+    - host: "*"
+      http:
+        paths:
+          # BUG #7: Catchall path - routes everything
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app-service
+                port:
+                  number: 80  # BUG: HTTP port, not HTTPS
+
+    # BUG #2: No host validation
+    - http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api-service
+                port:
+                  number: 8080
+
+          # BUG #7: Admin path exposed without auth
+          - path: /admin
+            pathType: Prefix
+            backend:
+              service:
+                name: admin-service
+                port:
+                  number: 8080

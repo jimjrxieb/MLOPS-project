@@ -1,0 +1,21 @@
+{
+  "experiment": "exp-003-jade-v1-8b",
+  "model": "LLaMA-3.1-8B-Instruct + LoRA",
+  "checkpoint": "3-model-registry/v1.1/",
+  "serving_as": "jade:v1.0 (Ollama)",
+  "eval_date": "2026-03-16",
+  "eval_suite": "10 questions (benchmark v1 — limited suite)",
+  "overall": {
+    "total": 10,
+    "passed": 0,
+    "accuracy": 0.0,
+    "hallucinations": 0
+  },
+  "categories": {
+    "cks": {"passed": 0, "total": 3, "accuracy": 0.0},
+    "cloud": {"passed": 0, "total": 3, "accuracy": 0.0},
+    "fix-generation": {"passed": 0, "total": 4, "accuracy": 0.0}
+  },
+  "notes": "0% on benchmark but model is functional for general Q&A. Benchmark framework was testing strict keyword matching against a 10-question suite — too narrow. Model generates useful security analysis in practice but fails automated eval. Eval framework needs expansion (done in bridge eval with 466 questions).",
+  "promotion_decision": "DEPLOYED as jade:v1.0 — used for C-rank approvals with RAG augmentation. Eval gap acknowledged."
+}

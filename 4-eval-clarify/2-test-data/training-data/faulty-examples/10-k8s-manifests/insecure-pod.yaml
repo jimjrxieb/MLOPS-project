@@ -1,0 +1,87 @@
+---
+# INSECURE Pod - Maximum Violations Example
+# Tags: insecure, test-negative, critical-violations
+# Violations: 15+ policy violations for ML training
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: insecure-crypto-miner
+  # VIOLATION: default namespace
+spec:
+  # VIOLATION: No security context
+  # VIOLATION: hostNetwork = true
+  hostNetwork: true
+  # VIOLATION: hostPID = true
+  hostPID: true
+  # VIOLATION: hostIPC = true
+  hostIPC: true
+
+  containers:
+  - name: miner
+    # VIOLATION: :latest tag
+    image: ubuntu:latest
+    # VIOLATION: IfNotPresent (should be Always)
+    imagePullPolicy: IfNotPresent
+
+    # VIOLATION: Privileged container
+    securityContext:
+      privileged: true
+      # VIOLATION: Running as root
+      runAsUser: 0
+      # VIOLATION: Allows privilege escalation
+      allowPrivilegeEscalation: true
+      # VIOLATION: Read-write filesystem
+      readOnlyRootFilesystem: false
+      # VIOLATION: Dangerous capabilities
+      capabilities:
+        add:
+        - SYS_ADMIN
+        - NET_ADMIN
+        - SYS_PTRACE
+
+    # VIOLATION: No resource limits
+    # VIOLATION: No resource requests
+
+    # VIOLATION: No liveness probe
+    # VIOLATION: No readiness probe
+
+    command: ["/bin/bash"]
+    args:
+    - -c
+    - |
+      # Simulated malicious activity
+      while true; do
+        echo "Mining crypto..."
+        sleep 3600
+      done
+
+    # VIOLATION: Hardcoded credentials
+    env:
+    - name: ROOT_PASSWORD
+      value: "root123"
+    - name: CRYPTO_WALLET
+      value: "bc1q0123456789abcdef"
+
+    volumeMounts:
+    # VIOLATION: Mounting Docker socket
+    - name: docker
+      mountPath: /var/run/docker.sock
+    # VIOLATION: Mounting host root
+    - name: host
+      mountPath: /host-root
+    # VIOLATION: Mounting /etc
+    - name: host-etc
+      mountPath: /host-etc
+
+  volumes:
+  # VIOLATION: hostPath volumes
+  - name: docker
+    hostPath:
+      path: /var/run/docker.sock
+  - name: host
+    hostPath:
+      path: /
+  - name: host-etc
+    hostPath:
+      path: /etc

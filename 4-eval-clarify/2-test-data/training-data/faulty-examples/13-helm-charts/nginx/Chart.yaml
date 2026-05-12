@@ -1,0 +1,14 @@
+apiVersion: v2
+name: nginx
+description: Production-grade NGINX web server with security hardening
+type: application
+version: 1.0.0
+appVersion: "1.21.6"
+keywords:
+  - nginx
+  - web
+  - http
+  - reverse-proxy
+maintainers:
+  - name: GuidePoint Security
+    email: devsecops@guidepointsecurity.com

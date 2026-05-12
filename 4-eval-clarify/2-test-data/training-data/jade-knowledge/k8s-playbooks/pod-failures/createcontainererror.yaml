@@ -1,0 +1,244 @@
+# JADE Operational Playbook: CreateContainerError
+# Container runtime failed to create the container
+
+name: CreateContainerError
+category: pod-failures
+severity: HIGH
+frequency: COMMON
+
+trigger_patterns:
+  - "CreateContainerError"
+  - "Error: failed to create containerd task"
+  - "Error: failed to start container"
+  - "rpc error: code = Unknown"
+  - "OCI runtime create failed"
+
+description: |
+  The container runtime (containerd/CRI-O) failed to create the container.
+  Usually caused by misconfiguration, missing resources, or runtime issues.
+
+gameplan:
+  step_1:
+    name: "Get the specific error"
+    commands:
+      - "kubectl describe pod {pod} -n {ns} | grep -A20 'Events:'"
+      - "kubectl get events -n {ns} --field-selector involvedObject.name={pod} | tail -10"
+
+    branches:
+      configmap_not_found:
+        patterns:
+          - "configmap .* not found"
+          - "configmaps .* not found"
+        meaning: "Referenced ConfigMap doesn't exist"
+        fix_rank: "D"
+        fixes:
+          - action: "List available ConfigMaps"
+            command: "kubectl get configmap -n {ns}"
+          - action: "Create missing ConfigMap"
+          - action: "Fix ConfigMap name in pod spec"
+
+      secret_not_found:
+        patterns:
+          - "secret .* not found"
+          - "secrets .* not found"
+        meaning: "Referenced Secret doesn't exist"
+        fix_rank: "D"
+        fixes:
+          - action: "List available Secrets"
+            command: "kubectl get secret -n {ns}"
+          - action: "Create missing Secret"
+          - action: "Fix Secret name in pod spec"
+
+      volume_mount_error:
+        patterns:
+          - "failed to mount"
+          - "MountVolume.SetUp failed"
+          - "volume .* not found"
+        meaning: "Volume mount configuration error"
+        fix_rank: "D"
+        next_step: "step_2_check_volumes"
+
+      seccomp_profile_error:
+        patterns:
+          - "seccomp profile"
+          - "cannot load seccomp profile"
+        meaning: "Invalid or missing seccomp profile"
+        fix_rank: "D"
+        fixes:
+          - action: "Use RuntimeDefault instead of custom profile"
+            template: |
+              securityContext:
+                seccompProfile:
+                  type: RuntimeDefault
+
+      apparmor_error:
+        patterns:
+          - "AppArmor"
+          - "cannot enforce AppArmor"
+        meaning: "AppArmor profile issue"
+        fix_rank: "C"
+        fixes:
+          - action: "Use runtime default or unconfined"
+          - action: "Verify AppArmor profile is loaded on node"
+
+      capability_error:
+        patterns:
+          - "cannot set capability"
+          - "operation not permitted"
+        meaning: "Requested capability not available"
+        fix_rank: "D"
+        fixes:
+          - action: "Remove unnecessary capabilities"
+          - action: "Check if container needs privileged mode"
+
+      user_not_found:
+        patterns:
+          - "unable to find user"
+          - "getpwnam"
+          - "no matching entries in passwd"
+        meaning: "Specified user doesn't exist in container image"
+        fix_rank: "D"
+        fixes:
+          - action: "Check what users exist in image"
+            command: "kubectl run test --rm -it --image={image} -- cat /etc/passwd"
+          - action: "Use numeric UID instead of username"
+            template: |
+              securityContext:
+                runAsUser: 1000  # Use UID instead of username
+
+      readonly_fs_error:
+        patterns:
+          - "read-only file system"
+          - "cannot write"
+          - "EROFS"
+        meaning: "Container trying to write to read-only location"
+        fix_rank: "D"
+        fixes:
+          - action: "Add emptyDir volume for writable directories"
+            template: |
+              volumeMounts:
+              - name: tmp
+                mountPath: /tmp
+              volumes:
+              - name: tmp
+                emptyDir: {}
+          - action: "Remove readOnlyRootFilesystem if not needed"
+
+      port_conflict:
+        patterns:
+          - "address already in use"
+          - "bind: address already in use"
+        meaning: "Container port conflicts with another process"
+        fix_rank: "D"
+        fixes:
+          - action: "Check what's using the port"
+          - action: "Use hostPort carefully - it binds to node"
+          - action: "Use different containerPort"
+
+  step_2_check_volumes:
+    name: "Analyze volume mount issues"
+    commands:
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.volumes}' | jq"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.containers[*].volumeMounts}' | jq"
+      - "kubectl get configmap,secret,pvc -n {ns}"
+
+    checks:
+      - name: "Volume exists"
+        verify: "All referenced configmaps, secrets, PVCs exist"
+
+      - name: "Mount path is valid"
+        verify: "mountPath doesn't conflict with image paths"
+
+      - name: "SubPath exists (if used)"
+        verify: "subPath key exists in ConfigMap/Secret"
+
+      - name: "Permissions are correct"
+        verify: "fsGroup set if needed for volume permissions"
+
+  step_3_check_security_context:
+    name: "Analyze security context issues"
+    commands:
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.securityContext}' | jq"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.containers[0].securityContext}' | jq"
+
+    common_issues:
+      runasnonroot_with_root_image:
+        condition: "runAsNonRoot: true but image runs as root"
+        fix_rank: "D"
+        fixes:
+          - action: "Add explicit runAsUser"
+            template: |
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 1000
+          - action: "Use image that supports non-root"
+
+      missing_fsgroup:
+        condition: "Volume mount with permission denied"
+        fix_rank: "D"
+        fix: |
+          securityContext:
+            fsGroup: 1000
+
+  step_4_check_runtime:
+    name: "Check container runtime issues"
+    commands:
+      - "kubectl get nodes -o wide"  # Check runtime version
+      - "kubectl logs -n kube-system -l k8s-app=kube-proxy"
+
+    runtime_issues:
+      containerd_issue:
+        check: "kubectl get nodes -o jsonpath='{.items[*].status.nodeInfo.containerRuntimeVersion}'"
+        common_problems:
+          - "Disk full on node"
+          - "containerd socket issues"
+          - "Image layers corrupted"
+
+      crio_issue:
+        check: "journalctl -u crio on node"
+        common_problems:
+          - "Storage driver issues"
+          - "Image pull failures"
+
+common_auto_fixes:
+  - id: "cce-create-configmap"
+    trigger: "configmap not found AND default config available"
+    rank: "D"
+    action: "create_default_configmap"
+
+  - id: "cce-add-emptydir"
+    trigger: "read-only file system error"
+    rank: "D"
+    action: "add_emptydir_volume"
+    paths:
+      - "/tmp"
+      - "/var/run"
+      - "/var/cache"
+
+  - id: "cce-fix-user"
+    trigger: "unable to find user AND numeric uid known"
+    rank: "D"
+    action: "use_numeric_uid"
+
+  - id: "cce-use-runtime-seccomp"
+    trigger: "seccomp profile error"
+    rank: "D"
+    action: "set_runtime_default_seccomp"
+
+escalation_triggers:
+  - condition: "OCI runtime create failed with unknown error"
+    escalate_to: "JADE"
+    reason: "May require node-level investigation"
+
+  - condition: "Same error on multiple nodes"
+    escalate_to: "JADE"
+    reason: "Systemic issue with cluster or image"
+
+  - condition: "Cannot determine root cause from events"
+    escalate_to: "JADE"
+    reason: "Need to check node logs"
+
+related_playbooks:
+  - crashloopbackoff
+  - imagepullbackoff
+  - runcontainererror

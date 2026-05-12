@@ -1,0 +1,167 @@
+{
+  "manifest_version": "1.0",
+  "generated_at_utc": "2026-05-08T15:43:46.738402Z",
+  "owner": "BERU capstone \u2014 JSA-AI-003",
+  "purpose": "Document the lineage of BERU's synthetic training corpus to satisfy beru-design-decisions.md D-005 (synthetic-only training data) and AI RMF MAP 2.2 (training data and provenance documented). Required reading before any fine-tune run.",
+  "policy_decisions": {
+    "D-005": "Synthetic-only training data. No real client SSPs, scanner output, or PII.",
+    "D-009": "Target model: LLaMA 3.2-3B-Instruct (rebaselined from 8B).",
+    "D-010": "Promotion gate requires post-fine-tune evals to beat baseline scores recorded in 5-experiments/exp-005-beru-3b-baseline/."
+  },
+  "artifacts": {
+    "chatml_corpus": {
+      "path": "BERU-AI/training-data/chatml-examples/beru-training-examples.jsonl",
+      "format": "ChatML JSONL \u2014 one example per line, messages array with system/user/assistant roles",
+      "example_count": 150,
+      "sha256": "9339cc10ce986567e6ff7e1293e5d4664d8093fd502b2bcb7362645e3849faad",
+      "size_bytes": 502909,
+      "generation_source": {
+        "model": "Hand-authored by Claude Opus 4.7 (instructor agent) per CAPSTONE-PROJECT/beru-design-decisions.md D-012",
+        "generated_by": "Claude Code instructor sessions, validated by project lead",
+        "generation_method": "Manual authoring with contrast-pair structure: each unsafe authority-bypass scenario paired with a near-twin legitimate scenario sharing similar RAG context",
+        "generation_dates": "2026-05-08",
+        "rejected_predecessor": "_archived-200-rejected.jsonl (200 examples, all 200 with wrong control-name pairings, see chatml-examples/README.md)"
+      },
+      "validation_status": "passes 8-tests/test_beru_training_data.py (25 tests, 1 skipped) as of 2026-05-08; control-name pairings 100% correct against canonical NIST 800-53 names from GP-CONSULTING/NIST-800-53/controls/*.md frontmatter",
+      "intended_use": "LoRA fine-tuning of llama3.2:3b base into beru:v1.0 challenger. r=32, alpha=64, 2 epochs, target_modules=q_proj,v_proj.",
+      "out_of_scope": [
+        "Real client SSPs (forbidden by D-005)",
+        "Real client scanner output (forbidden by D-005)",
+        "PII or PHI of any kind (forbidden by D-005)",
+        "Examples that hallucinate control IDs (caught by test_beru_training_data.py)"
+      ],
+      "category_breakdown": {
+        "phase_1_llm08": 150,
+        "phase_2_pending": "100 LLM01 + 75 LLM03 + 75 LLM06 + 50 schema + 50 normal-compliant",
+        "phase_3_pending": "75 validation (held out from training)"
+      }
+    },
+    "synthetic_ssps": {
+      "path": "BERU-AI/training-data/ssps",
+      "format": "Markdown \u2014 one SSP per file, quality-suffix in filename (bad/mediocre/good)",
+      "file_count": 10,
+      "files": [
+        {
+          "name": "ssp-01-bad.md",
+          "sha256": "4ceeb4f1e710462c0c1b5ffb87f349004ed4af77afe39c575bb574301026ca83",
+          "size_bytes": 607
+        },
+        {
+          "name": "ssp-02-mediocre.md",
+          "sha256": "d64277e02cc6f6edeb56d6ba8166c687c9bbad4836b7350b6470affc7fd00bbb",
+          "size_bytes": 953
+        },
+        {
+          "name": "ssp-03-mediocre.md",
+          "sha256": "4529565ab6d34a8bbb12743002ea92b98fd75b8cc4abab477067bc5aaa0aefbf",
+          "size_bytes": 946
+        },
+        {
+          "name": "ssp-04-good.md",
+          "sha256": "fb856972b1ccaaaa189afdd01f007c22d9d921214b0624cda50391e3a5edd02f",
+          "size_bytes": 1510
+        },
+        {
+          "name": "ssp-05-good.md",
+          "sha256": "db0ba35df34da05a102253ea484cea24469012caa5c2ea5c29c5a7619e2f6bd5",
+          "size_bytes": 1446
+        },
+        {
+          "name": "ssp-06-good.md",
+          "sha256": "1a9566a813a4c8abfea03e5bdcc9523aa9a4b3df16be5656f9f488a4505b2f00",
+          "size_bytes": 1590
+        },
+        {
+          "name": "ssp-07-good.md",
+          "sha256": "b66f241b39795de72a2b7451be6bd99f7a5cc0cdf1e1c3d622bfa46242c700fd",
+          "size_bytes": 1473
+        },
+        {
+          "name": "ssp-08-good.md",
+          "sha256": "b75c614ca3b90e6ffe975890e3203e85e18e287a90c1668d0b16c83ad3672cb4",
+          "size_bytes": 1524
+        },
+        {
+          "name": "ssp-09-good.md",
+          "sha256": "9870ea1d0870d369a29dfe74f23e7138889b61e6fa3db665fe70a8faa22c326a",
+          "size_bytes": 1499
+        },
+        {
+          "name": "ssp-10-good.md",
+          "sha256": "07c520cc2c7ddcea65e01e0b31f6a0a2113841626de842c6fdb44ef24b51cb44",
+          "size_bytes": 1568
+        }
+      ],
+      "purpose": "Train BERU's SSP-quality discrimination \u2014 bad (vague 'organization implements'), mediocre (named tooling), good (specific control + tool + last review date + evidence path)",
+      "generation_source": {
+        "model": "Gemini Flash + manual edits",
+        "generated_by": "human operator"
+      },
+      "intended_use": "RAG retrieval target for SSP quality examples; possible future fine-tune signal for SSP narrative authoring."
+    },
+    "intake_samples": {
+      "path": "BERU-AI/training-data/intake-samples",
+      "format": "Markdown \u2014 AI System Registration forms (per AI RMF GOVERN 1.1)",
+      "file_count": 5,
+      "files": [
+        {
+          "name": "ai-intake-01.md",
+          "sha256": "35761258aaeede8de36c80e5651f07bfede98ea234e3a459bcde5e3cbe770e6b",
+          "size_bytes": 1144
+        },
+        {
+          "name": "ai-intake-02.md",
+          "sha256": "7dc8731753177508f2b67115800aaef28fb615a8e9e3d8d61cd3ed0c5c82c97a",
+          "size_bytes": 1139
+        },
+        {
+          "name": "ai-intake-03.md",
+          "sha256": "63c09022305689985ba505990439f756030497c30e3f768d89551ba5e04fb07b",
+          "size_bytes": 1143
+        },
+        {
+          "name": "ai-intake-04.md",
+          "sha256": "c167457b763d566bf167b2fc90d882339e4a9dae261521771bd4b2e3e43fa8d5",
+          "size_bytes": 1151
+        },
+        {
+          "name": "ai-intake-05.md",
+          "sha256": "bd05f01760ab4580751cb29281bcb0a6ab805472d19c29942c8bf13801fe8227",
+          "size_bytes": 1150
+        }
+      ],
+      "purpose": "Train BERU's recognition of intake-form completeness \u2014 represent 5 fictional AI systems (Atlas-v1, Apex-v2, BERU-v4, Nimbus-v1, Orion-v3) at varying completeness levels",
+      "note_on_beru_v4": "ai-intake-04.md describes a fictional 'BERU-v4' synthetic system. The model field was updated 2026-05-08 from 'Llama 3.1-8B' to 'Llama 3.2-3B' per D-009 to keep training samples consistent with the real BERU's base model \u2014 this prevents BERU learning that 8B is a normal answer for itself."
+    },
+    "rejected_corpus": {
+      "path": "BERU-AI/training-data/chatml-examples/_archived-200-rejected.jsonl",
+      "format": "ChatML JSONL (archived, NOT used for training)",
+      "example_count": 200,
+      "sha256": "a4d047e1dbf612600df60fb97bfd7eda32b5df89ac06d036e4b7ddcb2b3fef39",
+      "rejection_reason": "200/200 examples had wrong control-name pairings; cookie-cutter remediation/risk/evidence-gap strings; zero adversarial examples. See CAPSTONE-PROJECT/beru-design-decisions.md D-012.",
+      "kept_for": "Audit traceability and as a teaching artifact for 'what bad synthetic data looks like'"
+    }
+  },
+  "compliance_evidence": {
+    "nist_800_53": {
+      "SR-3 (Supply Chain Controls)": "Synthetic origin documented above; no public-hub downloads.",
+      "SR-4 (Provenance)": "Generation source, model, operator, and date recorded for every artifact.",
+      "SI-7 (Information Integrity)": "SHA-256 hash recorded for every file. Drift detectable.",
+      "PT-1 (PII Processing Policy)": "Synthetic-only policy eliminates PII processing in training pipeline."
+    },
+    "nist_ai_rmf": {
+      "MAP 2.2 (Training data and its provenance is documented)": "This manifest is the documentation.",
+      "MAP 4.1 (Component risks mapped)": "Training data is a third-party component (Gemini-generated). Risks listed in 'out_of_scope' above.",
+      "MEASURE 2.10 (Privacy)": "Synthetic data is privacy-safe by construction.",
+      "GOVERN 1.4 (Risk management goals documented)": "Promotion gates referenced via D-010."
+    },
+    "owasp_llm_top_10": {
+      "LLM03 (Training Data Poisoning)": "Synthetic-only sourcing reduces external poisoning surface. Pre-train data quality gate at 8-tests/test_beru_training_data.py."
+    }
+  },
+  "drift_detection": {
+    "rule": "If any artifact's SHA-256 changes without a corresponding manifest update, that is a CM-3 (Configuration Change Control) violation. Fine-tune MUST NOT run against drifted data.",
+    "verify_command": "python3 GP-MODEL-OPS/8-tests/verify_training_lineage.py  # planned"
+  },
+  "last_updated_utc": "2026-05-09T02:17:26.328923Z"
+}

@@ -1,0 +1,221 @@
+{
+  "benchmark_name": "GuidePoint Security Domain Benchmark",
+  "version": "1.0",
+  "description": "Tests specialized knowledge in GuidePoint Security consulting domains",
+  "questions": [
+    {
+      "id": "k8s-001",
+      "domain": "Container Security",
+      "priority": "HIGH",
+      "difficulty": "C-rank",
+      "question": "A pod is failing with CrashLoopBackOff. The logs show 'OOMKilled'. The deployment has no resource limits set. Write the specific YAML patch to fix this for a Node.js application that typically uses 256Mi memory.",
+      "expected_elements": ["resources.limits.memory", "resources.requests.memory", "256Mi or 512Mi", "proper YAML format"],
+      "scoring_rubric": {
+        "correct_yaml_syntax": 2,
+        "includes_limits": 2,
+        "includes_requests": 2,
+        "reasonable_values": 2,
+        "explains_why": 2
+      }
+    },
+    {
+      "id": "k8s-002",
+      "domain": "Container Security",
+      "priority": "HIGH",
+      "difficulty": "C-rank",
+      "question": "Write a Kyverno ClusterPolicy that denies pods running as root (runAsNonRoot must be true).",
+      "expected_elements": ["apiVersion: kyverno.io/v1", "kind: ClusterPolicy", "validate", "runAsNonRoot", "deny or Enforce"],
+      "scoring_rubric": {
+        "correct_api_version": 2,
+        "proper_policy_structure": 2,
+        "correct_validation_rule": 3,
+        "handles_containers_and_initContainers": 2,
+        "clear_message": 1
+      }
+    },
+    {
+      "id": "k8s-003",
+      "domain": "Container Security",
+      "priority": "HIGH",
+      "difficulty": "B-rank",
+      "question": "Create a Pod Security Standard (PSS) restricted namespace configuration using labels. Show the namespace YAML and explain what gets blocked.",
+      "expected_elements": ["pod-security.kubernetes.io/enforce: restricted", "namespace labels", "what restricted blocks"],
+      "scoring_rubric": {
+        "correct_labels": 3,
+        "correct_namespace_yaml": 2,
+        "explains_restricted_profile": 3,
+        "mentions_audit_warn_modes": 2
+      }
+    },
+    {
+      "id": "opa-001",
+      "domain": "CNAPP",
+      "priority": "HIGH",
+      "difficulty": "C-rank",
+      "question": "Write an OPA Rego policy that denies deployments without the label 'app.kubernetes.io/managed-by'.",
+      "expected_elements": ["package", "deny", "input.request.object", "metadata.labels", "app.kubernetes.io/managed-by"],
+      "scoring_rubric": {
+        "correct_package_declaration": 1,
+        "proper_deny_rule": 3,
+        "correct_label_check": 3,
+        "descriptive_message": 2,
+        "handles_missing_labels": 1
+      }
+    },
+    {
+      "id": "opa-002",
+      "domain": "CNAPP",
+      "priority": "HIGH",
+      "difficulty": "B-rank",
+      "question": "Write a Gatekeeper ConstraintTemplate that limits container images to only come from 'gcr.io/my-project/' or 'docker.io/library/'. Include the Constraint that uses it.",
+      "expected_elements": ["ConstraintTemplate", "Constraint", "allowedRepos parameter", "startswith or regex"],
+      "scoring_rubric": {
+        "correct_constrainttemplate_structure": 3,
+        "proper_rego_in_template": 3,
+        "correct_constraint_that_uses_it": 2,
+        "parameterized_repos": 2
+      }
+    },
+    {
+      "id": "iac-001",
+      "domain": "IaC Security",
+      "priority": "HIGH",
+      "difficulty": "C-rank",
+      "question": "This Terraform has a security issue. Identify and fix it:\n\nresource \"aws_security_group\" \"web\" {\n  ingress {\n    from_port   = 22\n    to_port     = 22\n    protocol    = \"tcp\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n}",
+      "expected_elements": ["SSH open to world", "restrict CIDR", "use specific IP or bastion"],
+      "scoring_rubric": {
+        "identifies_issue": 3,
+        "provides_fix": 3,
+        "explains_risk": 2,
+        "suggests_bastion_or_vpn": 2
+      }
+    },
+    {
+      "id": "iac-002",
+      "domain": "IaC Security",
+      "priority": "HIGH",
+      "difficulty": "B-rank",
+      "question": "Write a Checkov custom check (in Python) that fails if an S3 bucket doesn't have versioning enabled.",
+      "expected_elements": ["from checkov.terraform.checks.resource.base_resource_check", "CheckResult", "versioning", "get_inspected_key"],
+      "scoring_rubric": {
+        "correct_base_class": 2,
+        "proper_check_structure": 3,
+        "correct_resource_type": 2,
+        "proper_scan_logic": 3
+      }
+    },
+    {
+      "id": "cicd-001",
+      "domain": "CI/CD Security",
+      "priority": "HIGH",
+      "difficulty": "C-rank",
+      "question": "This GitHub Actions workflow has a command injection vulnerability. Identify and fix it:\n\non: issue_comment\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo \"Processing: ${{ github.event.comment.body }}\"",
+      "expected_elements": ["command injection", "untrusted input", "environment variable", "use env: block"],
+      "scoring_rubric": {
+        "identifies_injection": 3,
+        "explains_attack_vector": 2,
+        "provides_correct_fix": 3,
+        "uses_env_block": 2
+      }
+    },
+    {
+      "id": "cicd-002",
+      "domain": "CI/CD Security",
+      "priority": "HIGH",
+      "difficulty": "B-rank",
+      "question": "Write a GitHub Actions workflow that runs Trivy on a Docker image, fails on HIGH/CRITICAL CVEs, and uploads results as SARIF to GitHub Security tab.",
+      "expected_elements": ["aquasecurity/trivy-action", "severity filter", "sarif output", "github/codeql-action/upload-sarif"],
+      "scoring_rubric": {
+        "correct_trivy_action": 2,
+        "severity_threshold": 2,
+        "sarif_output": 3,
+        "upload_to_security_tab": 3
+      }
+    },
+    {
+      "id": "aws-001",
+      "domain": "Cloud Security",
+      "priority": "HIGH",
+      "difficulty": "C-rank",
+      "question": "An EKS pod needs to access S3. Write the IAM policy and explain how to attach it using IRSA (IAM Roles for Service Accounts).",
+      "expected_elements": ["IAM policy with S3 permissions", "ServiceAccount annotation", "eks.amazonaws.com/role-arn", "trust policy with OIDC"],
+      "scoring_rubric": {
+        "correct_iam_policy": 2,
+        "explains_irsa_setup": 3,
+        "correct_serviceaccount_annotation": 3,
+        "mentions_trust_policy": 2
+      }
+    },
+    {
+      "id": "aws-002",
+      "domain": "Cloud Security",
+      "priority": "HIGH",
+      "difficulty": "B-rank",
+      "question": "Write a Prowler check command to audit AWS for CIS Benchmark compliance, output to HTML, and explain the top 5 most critical findings to look for.",
+      "expected_elements": ["prowler command", "CIS compliance flag", "HTML output", "critical findings explanation"],
+      "scoring_rubric": {
+        "correct_prowler_syntax": 2,
+        "cis_compliance_flag": 2,
+        "output_format": 2,
+        "critical_findings_explanation": 4
+      }
+    },
+    {
+      "id": "devsecops-001",
+      "domain": "DevSecOps",
+      "priority": "HIGH",
+      "difficulty": "C-rank",
+      "question": "Design a shift-left security pipeline with these stages: secrets scan, SAST, dependency scan, container scan. Which tools would you use for each and in what order?",
+      "expected_elements": ["gitleaks/trufflehog for secrets", "semgrep/bandit for SAST", "trivy/grype for deps", "trivy/snyk for containers", "order matters"],
+      "scoring_rubric": {
+        "appropriate_tools": 3,
+        "correct_order": 2,
+        "explains_shift_left": 2,
+        "fail_fast_strategy": 2,
+        "mentions_speed_vs_thoroughness": 1
+      }
+    },
+    {
+      "id": "compliance-001",
+      "domain": "Compliance",
+      "priority": "MEDIUM",
+      "difficulty": "B-rank",
+      "question": "Map these Kubernetes controls to CIS and SOC2: (1) Pod Security Standards, (2) Network Policies, (3) RBAC. Provide specific CIS benchmark IDs.",
+      "expected_elements": ["CIS Kubernetes Benchmark IDs", "SOC2 criteria mapping", "specific control numbers"],
+      "scoring_rubric": {
+        "correct_cis_ids": 4,
+        "soc2_mapping": 3,
+        "explains_relationship": 3
+      }
+    },
+    {
+      "id": "zerotrust-001",
+      "domain": "Zero Trust",
+      "priority": "MEDIUM",
+      "difficulty": "B-rank",
+      "question": "Implement mTLS between two Kubernetes services using Istio. Show the PeerAuthentication and DestinationRule YAMLs needed.",
+      "expected_elements": ["PeerAuthentication", "DestinationRule", "mtls mode STRICT", "trafficPolicy"],
+      "scoring_rubric": {
+        "correct_peerauthentication": 3,
+        "correct_destinationrule": 3,
+        "strict_mtls": 2,
+        "namespace_scope": 2
+      }
+    },
+    {
+      "id": "incident-001",
+      "domain": "Incident Response",
+      "priority": "MEDIUM",
+      "difficulty": "C-rank",
+      "question": "A Kubernetes cluster has a compromised pod. List the immediate containment steps in order and the kubectl commands for each.",
+      "expected_elements": ["network isolation", "cordon node", "capture evidence", "delete pod", "specific kubectl commands"],
+      "scoring_rubric": {
+        "correct_order": 2,
+        "network_isolation_first": 2,
+        "evidence_capture": 2,
+        "correct_kubectl_commands": 3,
+        "post_incident_steps": 1
+      }
+    }
+  ]
+}

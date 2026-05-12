@@ -1,0 +1,9 @@
+Create a Kyverno ClusterPolicy that ensures all containers have resource limits defined.
+
+Requirements:
+- Validate that resources.limits.cpu is set
+- Validate that resources.limits.memory is set
+- Apply to all Pods in all namespaces except kube-system
+- Use validationFailureAction: Enforce
+
+Output: Valid Kubernetes YAML for a Kyverno ClusterPolicy

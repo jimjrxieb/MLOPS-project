@@ -1,0 +1,46 @@
+# FAULTY DOCKERFILE EXAMPLE #1
+# Common Mistakes: Insecure Container Build
+# Issues:
+#   1. Running as root (no USER directive)
+#   2. Using 'latest' tag (unpredictable builds)
+#   3. Installing with package cache (larger image)
+#   4. Hardcoded secrets in ENV
+#   5. No health check
+#   6. Unnecessary packages installed
+#   7. COPY . . brings in everything (including secrets)
+#   8. No .dockerignore
+#
+# Severity: CRITICAL (privilege escalation, secret exposure)
+# Compliance: CIS Docker 4.1, 4.2, 4.6, 4.9
+
+# BUG #2: Using 'latest' - unpredictable builds
+FROM python:latest
+
+# BUG #6: Installing unnecessary tools
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    vim \
+    net-tools \
+    ssh \
+    telnet
+
+# BUG #4: CRITICAL - Hardcoded secrets
+ENV DATABASE_URL="postgres://admin:secretpassword@db:5432/app"
+ENV AWS_SECRET_ACCESS_KEY="AKIAIOSFODNN7EXAMPLE"
+ENV API_KEY="sk-live-12345678901234567890"
+
+WORKDIR /app
+
+# BUG #7: COPY . . brings in .env, .git, etc
+COPY . .
+
+# BUG #3: Not cleaning up apt cache
+RUN pip install -r requirements.txt
+
+# BUG #1: Running as root (no USER directive)
+# BUG #5: No HEALTHCHECK
+
+EXPOSE 8000
+
+CMD ["python", "app.py"]

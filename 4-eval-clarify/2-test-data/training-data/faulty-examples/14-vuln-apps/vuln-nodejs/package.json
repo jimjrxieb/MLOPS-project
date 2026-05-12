@@ -1,0 +1,13 @@
+{
+  "name": "vuln-nodejs-test",
+  "version": "1.0.0",
+  "description": "Intentionally vulnerable Node.js app for JSA testing",
+  "main": "index.js",
+  "dependencies": {
+    "lodash": "4.17.15",
+    "express": "4.16.0",
+    "jsonwebtoken": "8.0.0",
+    "axios": "0.18.0",
+    "minimist": "1.2.0"
+  }
+}

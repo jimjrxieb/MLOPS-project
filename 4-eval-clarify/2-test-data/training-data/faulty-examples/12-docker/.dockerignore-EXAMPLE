@@ -1,0 +1,72 @@
+# EXAMPLE .dockerignore
+# Prevents sensitive files from being copied into container
+
+# Secrets - CRITICAL
+.env
+.env.*
+*.pem
+*.key
+secrets/
+credentials/
+*.credentials
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+venv/
+.venv/
+
+# Node
+node_modules/
+npm-debug.log
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Documentation
+docs/
+*.md
+LICENSE
+CHANGELOG
+
+# Tests (not needed in prod image)
+tests/
+test/
+*_test.py
+test_*.py
+
+# Docker
+Dockerfile*
+docker-compose*
+.docker/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+Jenkinsfile
+.circleci/
+
+# Terraform (if in same repo)
+*.tf
+*.tfstate
+*.tfvars
+.terraform/

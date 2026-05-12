@@ -1,0 +1,168 @@
+# JADE Operational Playbook: Rollback Needed
+# Deployment needs to be rolled back to previous version
+
+name: Rollback-Needed
+category: deployment-failures
+severity: HIGH
+frequency: COMMON
+
+trigger_patterns:
+  - "rollback"
+  - "revert"
+  - "previous version"
+  - "bad deployment"
+  - "deployment broke"
+
+description: |
+  A deployment needs to be rolled back because the new version is
+  causing issues. This playbook covers safe rollback procedures.
+
+gameplan:
+  step_1:
+    name: "Assess current state"
+    commands:
+      - "kubectl rollout history deployment/{deployment} -n {ns}"
+      - "kubectl get deployment {deployment} -n {ns}"
+      - "kubectl get rs -n {ns} -l app={app} --sort-by='.metadata.creationTimestamp'"
+
+    extract:
+      - "Current revision number"
+      - "Previous revision number"
+      - "Which ReplicaSet is current"
+      - "Is previous RS still available"
+
+  step_2_verify_rollback_target:
+    name: "Ensure rollback target is healthy"
+    commands:
+      - "kubectl rollout history deployment/{deployment} -n {ns} --revision={previous}"
+      - "kubectl get rs -n {ns} | grep {previous-rs}"
+
+    checks:
+      - name: "Previous RS still exists"
+        fail_action: "Check revisionHistoryLimit, may need to redeploy specific version"
+
+      - name: "Previous image is still available in registry"
+        command: "crane manifest {previous-image}"
+
+      - name: "Previous version was actually healthy"
+        ask: "Was the previous version working correctly?"
+
+  step_3_execute_rollback:
+    name: "Perform the rollback"
+
+    to_previous:
+      description: "Roll back to immediately previous version"
+      command: "kubectl rollout undo deployment/{deployment} -n {ns}"
+      rank: "D"
+
+    to_specific:
+      description: "Roll back to specific revision"
+      command: "kubectl rollout undo deployment/{deployment} -n {ns} --to-revision={revision}"
+      rank: "D"
+
+    verify:
+      - "kubectl rollout status deployment/{deployment} -n {ns}"
+      - "kubectl get pods -n {ns} -l app={app}"
+      - "Check application health endpoints"
+
+  step_4_post_rollback:
+    name: "Verify rollback success"
+    commands:
+      - "kubectl rollout status deployment/{deployment} -n {ns}"
+      - "kubectl get deployment {deployment} -n {ns}"
+      - "kubectl get endpoints {service} -n {ns}"
+
+    success_criteria:
+      - "All replicas ready"
+      - "Endpoints populated"
+      - "Health checks passing"
+      - "No new errors in logs"
+
+  step_5_prevent_redeployment:
+    name: "Prevent bad version from being deployed again"
+
+    if_using_gitops:
+      action: "Revert the git commit or update manifest to previous image"
+
+    if_using_ci:
+      action: "Mark build as failed, prevent auto-deploy"
+
+    document:
+      - "Why rollback was needed"
+      - "What was wrong with new version"
+      - "What fix is needed before re-deploy"
+
+rollback_scenarios:
+  immediate_rollback:
+    condition: "Production incident, service down"
+    procedure:
+      - "Execute rollback immediately"
+      - "Verify service restored"
+      - "Post-mortem after"
+    rank: "D"
+
+  cautious_rollback:
+    condition: "Issues detected but service not down"
+    procedure:
+      - "Gather evidence first"
+      - "Notify stakeholders"
+      - "Execute rollback"
+      - "Verify"
+    rank: "C"
+
+  canary_rollback:
+    condition: "Canary deployment showing issues"
+    procedure:
+      - "Route all traffic to stable"
+      - "Scale down canary"
+      - "Delete canary deployment"
+    rank: "D"
+
+special_cases:
+  database_migrations:
+    warning: "If new version ran migrations, rollback may not be safe"
+    check: "Are migrations backward compatible?"
+    action: "May need to run reverse migrations first"
+
+  stateful_applications:
+    warning: "State may be incompatible with old version"
+    check: "Does old version support current data format?"
+    action: "May need data migration"
+
+  config_changes:
+    warning: "ConfigMaps/Secrets may have changed"
+    check: "Does old version work with current config?"
+    action: "May need to rollback config too"
+
+common_auto_fixes:
+  - id: "rb-undo-simple"
+    trigger: "rollback requested AND no migrations AND no state concerns"
+    rank: "D"
+    action: "rollout_undo"
+    command: "kubectl rollout undo deployment/{deployment} -n {ns}"
+
+  - id: "rb-with-config"
+    trigger: "rollback needed AND config changed"
+    rank: "C"
+    action: "rollback_with_config"
+    steps:
+      - "Restore previous ConfigMap"
+      - "Rollback deployment"
+
+escalation_triggers:
+  - condition: "Rollback target has database migration concerns"
+    escalate_to: "JADE"
+    reason: "Need human decision on data compatibility"
+
+  - condition: "Rollback fails"
+    escalate_to: "JADE"
+    reason: "Critical - need manual intervention"
+
+  - condition: "Previous version also broken"
+    escalate_to: "JADE"
+    reason: "Need to find known-good version"
+
+related_playbooks:
+  - progressdeadlineexceeded
+  - minimumreplicasunavailable
+  - crashloopbackoff

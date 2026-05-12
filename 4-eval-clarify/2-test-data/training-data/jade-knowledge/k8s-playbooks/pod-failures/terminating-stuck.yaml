@@ -1,0 +1,181 @@
+# JADE Operational Playbook: Terminating Stuck
+# Pod stuck in Terminating state
+
+name: Terminating-Stuck
+category: pod-failures
+severity: MEDIUM
+frequency: COMMON
+
+trigger_patterns:
+  - "Terminating"
+  - "stuck in Terminating"
+  - "pod won't delete"
+  - "deletionTimestamp set but pod still running"
+
+description: |
+  Pod is stuck in Terminating state and won't complete deletion.
+  Usually caused by finalizers, stuck volumes, or unresponsive processes.
+
+gameplan:
+  step_1:
+    name: "Check why pod is stuck terminating"
+    commands:
+      - "kubectl describe pod {pod} -n {ns} | grep -E 'Terminating|Finalizers|deletionGracePeriodSeconds'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.metadata.finalizers}'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.metadata.deletionGracePeriodSeconds}'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.status.phase}'"
+
+    branches:
+      has_finalizers:
+        condition: "metadata.finalizers is not empty"
+        meaning: "Something is blocking deletion waiting for cleanup"
+        fix_rank: "C"
+        next_step: "step_2_handle_finalizers"
+
+      grace_period_active:
+        condition: "Within deletionGracePeriodSeconds"
+        meaning: "Still in graceful termination period"
+        fix_rank: "D"
+        fixes:
+          - action: "Wait for grace period to complete"
+          - action: "Force delete if waiting too long"
+            command: "kubectl delete pod {pod} -n {ns} --force --grace-period=0"
+
+      volume_unmount_stuck:
+        patterns:
+          - "UnmountVolume"
+          - "VolumeDetach"
+        meaning: "Volume unmount/detach is stuck"
+        fix_rank: "C"
+        next_step: "step_3_handle_volume"
+
+      process_not_dying:
+        condition: "Container still running after SIGTERM"
+        meaning: "Application not handling shutdown signal"
+        fix_rank: "D"
+        fixes:
+          - action: "Wait for SIGKILL (after grace period)"
+          - action: "Check if app handles SIGTERM"
+          - action: "Add preStop hook for graceful shutdown"
+
+  step_2_handle_finalizers:
+    name: "Deal with finalizers blocking deletion"
+    commands:
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.metadata.finalizers}'"
+
+    common_finalizers:
+      kubernetes_io_pv_protection:
+        meaning: "Volume protection finalizer"
+        safe_to_remove: false
+        action: "Wait for volume cleanup or investigate stuck PVC"
+
+      foregroundDeletion:
+        meaning: "Kubernetes cascade deletion"
+        safe_to_remove: false
+        action: "Check for owned resources that haven't been deleted"
+
+      custom_finalizer:
+        meaning: "Custom controller managing cleanup"
+        safe_to_remove: "depends"
+        action: "Check if controller is running and healthy"
+
+    force_remove_finalizer:
+      description: "Remove finalizer to unblock deletion (USE WITH CAUTION)"
+      rank: "C"
+      command: |
+        kubectl patch pod {pod} -n {ns} --type=json -p='[{"op": "remove", "path": "/metadata/finalizers"}]'
+      warning: "May leave orphaned resources - only use if you understand the consequences"
+
+  step_3_handle_volume:
+    name: "Handle stuck volume unmount"
+    commands:
+      - "kubectl get pvc -n {ns}"
+      - "kubectl get volumeattachment | grep {node}"
+      - "kubectl describe node {node} | grep -A10 'Volumes In Use'"
+
+    fixes:
+      wait_for_unmount:
+        action: "Give kubelet time to unmount (up to 6 minutes default)"
+        note: "kubelet has internal timeouts for unmount"
+
+      check_csi_driver:
+        action: "Verify CSI driver is running"
+        command: "kubectl get pods -n kube-system -l app=csi-driver"
+
+      force_detach:
+        condition: "Volume truly stuck and pod on different node"
+        rank: "B"
+        action: "Delete VolumeAttachment (dangerous)"
+        warning: "May cause data corruption if volume still in use"
+        command: "kubectl delete volumeattachment {va-name}"
+
+  step_4_force_delete:
+    name: "Force delete as last resort"
+
+    safe_force_delete:
+      condition: "No persistent volumes, no important state"
+      rank: "D"
+      command: "kubectl delete pod {pod} -n {ns} --force --grace-period=0"
+
+    unsafe_force_delete:
+      condition: "Has PVCs or critical state"
+      rank: "B"
+      steps:
+        - "Verify no data corruption risk"
+        - "Backup any critical data"
+        - "Document the action"
+        - "Force delete"
+        - "Verify volumes cleaned up"
+
+  step_5_prevent_future_issues:
+    name: "Prevent pods from getting stuck"
+
+    preStop_hook:
+      description: "Add preStop hook for graceful shutdown"
+      template: |
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 5 && kill -SIGTERM 1"]
+
+    handle_sigterm:
+      description: "Ensure app handles SIGTERM"
+      languages:
+        python: "signal.signal(signal.SIGTERM, handler)"
+        nodejs: "process.on('SIGTERM', handler)"
+        go: "signal.Notify(sigCh, syscall.SIGTERM)"
+
+    reasonable_grace_period:
+      description: "Set appropriate terminationGracePeriodSeconds"
+      default: 30
+      recommendation: "Set based on actual shutdown time + buffer"
+
+common_auto_fixes:
+  - id: "term-stuck-force"
+    trigger: "terminating > 10 minutes AND no PVC AND no finalizers"
+    rank: "D"
+    action: "force_delete"
+
+  - id: "term-stuck-patch-finalizers"
+    trigger: "terminating > 30 minutes AND has custom finalizer AND controller not running"
+    rank: "C"
+    action: "remove_custom_finalizers"
+    warning: "May leave orphaned resources"
+
+escalation_triggers:
+  - condition: "Pod has PVC and stuck terminating > 10 minutes"
+    escalate_to: "JADE"
+    reason: "Volume detach may need investigation - data corruption risk"
+
+  - condition: "Multiple pods stuck terminating on same node"
+    escalate_to: "JADE"
+    reason: "Node-level issue (kubelet, CSI driver)"
+
+  - condition: "kubernetes.io finalizer stuck"
+    escalate_to: "JADE"
+    reason: "May indicate deeper Kubernetes issue"
+
+related_playbooks:
+  - evicted
+  - crashloopbackoff
+  - pending

@@ -1,0 +1,72 @@
+# FAULTY DOCKER-COMPOSE EXAMPLE #1
+# Common Mistakes: Insecure Local Development Setup
+# Issues:
+#   1. Privileged containers
+#   2. Hardcoded secrets in compose file
+#   3. Bind mounts to sensitive paths
+#   4. No resource limits
+#   5. Network mode: host
+#   6. Running as root
+#   7. No health checks
+#   8. Exposed ports to 0.0.0.0
+#
+# Severity: HIGH (container escape, credential theft)
+# Even for dev, bad habits transfer to prod
+
+version: '3.8'
+
+services:
+  api:
+    image: myapp:latest  # BUG: :latest is unpredictable
+    # BUG #1: Privileged mode - can escape container
+    privileged: true
+    # BUG #5: Host network bypasses isolation
+    network_mode: host
+
+    # BUG #2: Hardcoded secrets
+    environment:
+      - DATABASE_URL=postgres://admin:password123@db:5432/myapp
+      - AWS_SECRET_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
+      - API_KEY=sk-live-secret123
+      - DEBUG=true  # BUG: Debug mode in compose
+
+    # BUG #3: Dangerous bind mounts
+    volumes:
+      - /:/host  # CRITICAL: Host root filesystem!
+      - /var/run/docker.sock:/var/run/docker.sock  # CRITICAL: Docker socket!
+      - /etc:/etc:rw  # CRITICAL: Host /etc writable!
+      - .:/app  # Code mount is fine for dev
+
+    # BUG #8: Exposed to all interfaces
+    ports:
+      - "0.0.0.0:8080:8080"
+      - "0.0.0.0:9229:9229"  # Debug port exposed!
+
+    # BUG #4: No resource limits
+    # BUG #7: No health checks
+    # BUG #6: No user specified (runs as root)
+
+  db:
+    image: postgres:latest
+    # BUG #2: Hardcoded credentials
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password123
+      - POSTGRES_DB=myapp
+
+    # BUG #8: Database port exposed externally!
+    ports:
+      - "0.0.0.0:5432:5432"
+
+    # BUG #4: No memory limits - can OOM host
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:latest
+    # BUG: No password, no TLS
+    ports:
+      - "0.0.0.0:6379:6379"  # Redis exposed!
+
+volumes:
+  postgres_data:

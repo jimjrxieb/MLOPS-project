@@ -1,0 +1,60 @@
+name: Weekly Model Evaluation
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday at 6 AM UTC
+  workflow_dispatch:
+
+jobs:
+  eval:
+    runs-on: [self-hosted]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run evaluation against production model
+        id: eval
+        run: |
+          python3 1-data-pipeline/eval_bridge.py \
+            --model katie:latest \
+            --output weekly-eval-$(date +%Y%m%d).json
+          SCORE=$(python3 -c "import json; r=json.load(open('weekly-eval-$(date +%Y%m%d).json')); print(r.get('weighted_score', 0))")
+          echo "score=$SCORE" >> $GITHUB_OUTPUT
+
+      - name: Compare against baseline
+        run: |
+          python3 -c "
+          import json
+          baseline = json.load(open('4-eval-clarify/3-results/promotion-baseline.json', 'r'))
+          current = json.load(open('weekly-eval-$(date +%Y%m%d).json', 'r'))
+          bl_score = baseline.get('weighted_score', 0)
+          cur_score = current.get('weighted_score', 0)
+          drift = cur_score - bl_score
+          print(f'Baseline: {bl_score}%, Current: {cur_score}%, Drift: {drift:+.1f}%')
+          if drift < -10:
+              print('WARNING: Significant model degradation detected!')
+              exit(1)
+          "
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-eval-${{ github.run_number }}
+          path: weekly-eval-*.json
+
+      - name: Alert on degradation
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Model degradation detected: ${{ steps.eval.outputs.score }}%`,
+              body: `Weekly eval shows significant score drop. Consider retraining.`,
+              labels: ['mlops', 'drift-alert', 'urgent']
+            })

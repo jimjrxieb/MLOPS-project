@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Eval Question",
+  "description": "Benchmark question for model evaluation. Used in 4-eval-clarify/2-test-data/evaluation/*-benchmark/",
+  "type": "object",
+  "required": ["id", "category", "question", "expected_keywords", "grading"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z]+-[a-z]+-[0-9]+$",
+      "description": "Unique ID: {category}-{subcategory}-{number} (e.g., cks-pod-001)"
+    },
+    "category": {
+      "type": "string",
+      "description": "Primary domain (python, bash, kubernetes, aws, terraform, etc.)"
+    },
+    "subcategory": {
+      "type": "string",
+      "description": "Specific topic within the domain (e.g., bandit, pip-audit, iam)"
+    },
+    "rank": {
+      "type": "string",
+      "enum": ["E", "D", "C", "B", "S"],
+      "description": "Expected difficulty/complexity rank"
+    },
+    "question": {
+      "type": "string",
+      "minLength": 20,
+      "description": "The question to ask the model"
+    },
+    "expected_keywords": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 2,
+      "description": "Keywords that should appear in a correct response"
+    },
+    "expected_fix_contains": {
+      "type": "string",
+      "description": "Specific string the fix must contain (optional, for fix-required questions)"
+    },
+    "grading": {
+      "type": "object",
+      "required": ["keywords_required", "fix_required"],
+      "properties": {
+        "keywords_required": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Minimum keywords to match for a pass"
+        },
+        "fix_required": {
+          "type": "boolean",
+          "description": "Whether expected_fix_contains must be present"
+        },
+        "workflow_required": {
+          "type": "boolean",
+          "description": "Whether a multi-step workflow must be present"
+        }
+      }
+    }
+  }
+}

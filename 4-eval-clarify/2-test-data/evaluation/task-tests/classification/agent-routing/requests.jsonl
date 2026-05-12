@@ -1,0 +1,8 @@
+{"id": "route-001", "request": "Scan my Python code for security vulnerabilities", "expected_agent": "jsa-devsec", "expected_tools": ["semgrep", "bandit"], "rationale": "Code scanning is DevSecOps domain"}
+{"id": "route-002", "request": "Check if my Kubernetes cluster is CIS compliant", "expected_agent": "jsa-infrasec", "expected_tools": ["kube-bench", "kubescape"], "rationale": "Kubernetes security is InfraSec domain"}
+{"id": "route-003", "request": "Set up continuous monitoring for suspicious container activity", "expected_agent": "jsa-monitor", "expected_tools": ["falco", "prometheus"], "rationale": "Continuous monitoring is Monitor domain"}
+{"id": "route-004", "request": "Fix the Checkov findings in my Terraform code", "expected_agent": "jsa-devsec", "expected_tools": ["checkov", "tfsec"], "rationale": "IaC scanning in CI is DevSecOps domain"}
+{"id": "route-005", "request": "Investigate the GuardDuty alert about malicious IP access", "expected_agent": "jsa-monitor", "expected_tools": ["guardduty", "cloudtrail"], "rationale": "Alert investigation is Monitor domain"}
+{"id": "route-006", "request": "Deploy a Gatekeeper policy to block privileged containers", "expected_agent": "jsa-infrasec", "expected_tools": ["gatekeeper", "kubectl"], "rationale": "Admission control is InfraSec domain"}
+{"id": "route-007", "request": "Scan container images for CVEs before deployment", "expected_agent": "jsa-devsec", "expected_tools": ["trivy", "grype"], "rationale": "Image scanning in CI is DevSecOps domain"}
+{"id": "route-008", "request": "Set up VPC flow log analysis for anomaly detection", "expected_agent": "jsa-monitor", "expected_tools": ["vpc-flow-logs", "athena"], "rationale": "Network monitoring is Monitor domain"}

@@ -1,0 +1,267 @@
+# FIXED VERSION OF KYVERNO POLICY EXAMPLE #1
+# Fixes Applied:
+#   1. validationFailureAction: Enforce
+#   2. Excludes system namespaces
+#   3. Complete pattern matching with anyPattern
+#   4. Background scan enabled
+#   5. Clear violation messages
+#   6. Targeted resource matching
+#
+# Compliance: CIS K8s 5.2, PSS Restricted
+
+---
+# FIXED: Comprehensive resource limits policy
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-resource-limits
+  annotations:
+    policies.kyverno.io/title: Require Resource Limits
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Requires all containers to have CPU and memory limits defined.
+      This prevents resource exhaustion and ensures fair scheduling.
+    compliance: CIS-K8s-5.4.3
+spec:
+  # FIXED #1: Enforce blocks violations
+  validationFailureAction: Enforce
+  failurePolicy: Fail
+
+  # FIXED #4: Scan existing resources
+  background: true
+
+  rules:
+    - name: validate-resource-limits
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              # FIXED #6: Only production namespaces
+              namespaceSelector:
+                matchExpressions:
+                  - key: environment
+                    operator: In
+                    values:
+                      - production
+                      - staging
+
+      # FIXED #2: Exclude system namespaces
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - kyverno
+                - cert-manager
+                - ingress-nginx
+                - monitoring
+
+      validate:
+        # FIXED #5: Clear violation message
+        message: >-
+          All containers must have CPU and memory limits defined.
+          Current container {{request.object.spec.containers[].name}} is missing limits.
+          Add: resources.limits.cpu and resources.limits.memory
+
+        # FIXED #3: foreach validates ALL containers
+        foreach:
+          - list: "request.object.spec.containers[]"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.resources.limits.cpu || '' }}"
+                    operator: Equals
+                    value: ""
+                  - key: "{{ element.resources.limits.memory || '' }}"
+                    operator: Equals
+                    value: ""
+
+    # FIXED: Also check init containers
+    - name: validate-init-container-limits
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kube-public
+                - kyverno
+      validate:
+        message: "Init containers must also have resource limits"
+        foreach:
+          - list: "request.object.spec.initContainers[] || []"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.resources.limits.cpu || '' }}"
+                    operator: Equals
+                    value: ""
+
+---
+# FIXED: Comprehensive pod security policy
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: pod-security-restricted
+  annotations:
+    policies.kyverno.io/title: Pod Security Restricted
+    policies.kyverno.io/category: Pod Security Standards
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Implements Pod Security Standards (PSS) Restricted profile.
+      Blocks privileged containers, host access, and dangerous capabilities.
+    compliance: CIS-K8s-5.2, PSS-Restricted
+spec:
+  validationFailureAction: Enforce
+  background: true
+  failurePolicy: Fail
+
+  rules:
+    # FIXED: Deny privileged containers
+    - name: deny-privileged-containers
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+      validate:
+        message: "Privileged containers are not allowed. Set securityContext.privileged=false"
+        pattern:
+          spec:
+            =(ephemeralContainers):
+              - =(securityContext):
+                  =(privileged): false
+            =(initContainers):
+              - =(securityContext):
+                  =(privileged): false
+            containers:
+              - =(securityContext):
+                  =(privileged): false
+
+    # FIXED: Deny privilege escalation
+    - name: deny-privilege-escalation
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Privilege escalation is not allowed. Set allowPrivilegeEscalation=false"
+        pattern:
+          spec:
+            =(ephemeralContainers):
+              - securityContext:
+                  allowPrivilegeEscalation: false
+            =(initContainers):
+              - securityContext:
+                  allowPrivilegeEscalation: false
+            containers:
+              - securityContext:
+                  allowPrivilegeEscalation: false
+
+    # FIXED: Require non-root
+    - name: require-run-as-non-root
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Containers must run as non-root. Set runAsNonRoot=true"
+        anyPattern:
+          - spec:
+              securityContext:
+                runAsNonRoot: true
+          - spec:
+              containers:
+                - securityContext:
+                    runAsNonRoot: true
+
+    # FIXED: Drop all capabilities
+    - name: require-drop-all-capabilities
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Containers must drop ALL capabilities. Set capabilities.drop=['ALL']"
+        foreach:
+          - list: "request.object.spec.containers[]"
+            deny:
+              conditions:
+                all:
+                  - key: "ALL"
+                    operator: AnyNotIn
+                    value: "{{ element.securityContext.capabilities.drop || [] }}"
+
+    # FIXED: Require seccomp profile
+    - name: require-seccomp-profile
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Pods must use RuntimeDefault or Localhost seccomp profile"
+        anyPattern:
+          - spec:
+              securityContext:
+                seccompProfile:
+                  type: RuntimeDefault
+          - spec:
+              securityContext:
+                seccompProfile:
+                  type: Localhost
+
+---
+# FIXED: Mutation policy to add defaults
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: add-security-defaults
+  annotations:
+    policies.kyverno.io/title: Add Security Defaults
+    policies.kyverno.io/category: Best Practices
+spec:
+  background: false
+  rules:
+    - name: add-seccomp-profile
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      mutate:
+        patchStrategicMerge:
+          spec:
+            securityContext:
+              +(seccompProfile):
+                type: RuntimeDefault
+
+    - name: add-run-as-non-root
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      mutate:
+        patchStrategicMerge:
+          spec:
+            securityContext:
+              +(runAsNonRoot): true

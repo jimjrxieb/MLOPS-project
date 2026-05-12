@@ -1,0 +1,218 @@
+# JADE Operational Playbook: PV Released/Failed
+# PersistentVolume stuck in Released or Failed state
+
+name: PV-Released-Failed
+category: resource-failures
+severity: MEDIUM
+frequency: MODERATE
+
+trigger_patterns:
+  - "PersistentVolume.*Released"
+  - "PersistentVolume.*Failed"
+  - "claimRef"
+  - "cannot reclaim"
+  - "volume is already exclusively attached"
+
+description: |
+  PersistentVolume is in Released or Failed state and cannot be reused.
+  Released = PVC was deleted but PV has data and claimRef.
+  Failed = Reclaim failed (e.g., can't delete cloud volume).
+
+gameplan:
+  step_1:
+    name: "Check PV status"
+    commands:
+      - "kubectl get pv"
+      - "kubectl describe pv {pv}"
+      - "kubectl get pv {pv} -o yaml"
+
+    extract:
+      - "PV status phase (Released/Failed)"
+      - "claimRef (which PVC it was bound to)"
+      - "reclaimPolicy (Delete/Retain/Recycle)"
+      - "persistentVolumeReclaimPolicy"
+      - "Underlying volume ID/path"
+
+  step_2_understand_state:
+    name: "Understand PV lifecycle states"
+
+    pv_phases:
+      Available:
+        meaning: "Free, can be bound to PVC"
+        action: "None needed"
+
+      Bound:
+        meaning: "Claimed by a PVC"
+        action: "None needed"
+
+      Released:
+        meaning: "PVC deleted, but PV still has claimRef"
+        problem: "Cannot be bound to new PVC"
+        fix_rank: "C"
+
+      Failed:
+        meaning: "Automatic reclaim failed"
+        problem: "Usually cloud API error"
+        fix_rank: "C"
+
+  step_3_diagnose_released:
+    name: "Handle Released PV"
+
+    why_released:
+      - "PVC was deleted"
+      - "PV has Retain policy (data preserved)"
+      - "claimRef still references old PVC"
+
+    options:
+      reuse_with_same_pvc:
+        description: "Recreate PVC with same name"
+        rank: "D"
+        warning: "Only works if claimRef matches exactly"
+        template: |
+          # Get original PVC name from claimRef
+          kubectl get pv {pv} -o jsonpath='{.spec.claimRef}'
+
+          # Recreate PVC with same name/namespace
+          apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: {original-pvc-name}
+            namespace: {original-namespace}
+          spec:
+            storageClassName: ""  # Empty for static binding
+            volumeName: {pv}
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: {pv-capacity}
+
+      clear_claimref:
+        description: "Remove claimRef to make PV available"
+        rank: "C"
+        warning: "Makes PV available to ANY matching PVC"
+        command: |
+          kubectl patch pv {pv} --type json \
+            -p='[{"op": "remove", "path": "/spec/claimRef"}]'
+
+      delete_and_recreate:
+        description: "Delete PV, recreate fresh"
+        rank: "C"
+        warning: "Only if data is not needed"
+        steps:
+          - "Backup any needed data first"
+          - "kubectl delete pv {pv}"
+          - "Recreate PV manifest"
+          - "kubectl apply -f new-pv.yaml"
+
+  step_4_diagnose_failed:
+    name: "Handle Failed PV"
+
+    common_causes:
+      cloud_api_error:
+        indicator: "failed to delete volume"
+        meaning: "Cloud provider couldn't delete underlying disk"
+        commands:
+          - "kubectl describe pv {pv} | grep -i error"
+        fixes:
+          - "Check cloud console for volume status"
+          - "Manually delete cloud volume"
+          - "Then delete PV from K8s"
+
+      volume_in_use:
+        indicator: "volume is attached\\|in use"
+        meaning: "Volume still attached to a node"
+        commands:
+          - "kubectl describe pv {pv} | grep -i attach"
+        fixes:
+          - "Identify which node has volume attached"
+          - "Force detach from cloud console"
+          - "Or wait for node to release"
+
+      permissions:
+        indicator: "forbidden\\|unauthorized\\|AccessDenied"
+        meaning: "K8s doesn't have cloud permissions to delete"
+        commands:
+          - "kubectl get pods -n kube-system -l app=csi-*"
+          - "kubectl logs -n kube-system {csi-controller}"
+        fixes:
+          - "Check IAM/RBAC for CSI driver"
+          - "Manually delete from cloud"
+
+  step_5_reclaim_policies:
+    name: "Understand reclaim policies"
+
+    policies:
+      Delete:
+        behavior: "PV and underlying storage deleted when PVC deleted"
+        use_case: "Ephemeral data, dev environments"
+        risk: "Data loss on PVC deletion"
+
+      Retain:
+        behavior: "PV kept, marked Released"
+        use_case: "Important data, production"
+        note: "Manual intervention needed to reuse"
+
+      Recycle:
+        behavior: "Basic rm -rf and make available"
+        status: "DEPRECATED - don't use"
+        alternative: "Use dynamic provisioning"
+
+    change_policy:
+      rank: "C"
+      command: |
+        kubectl patch pv {pv} -p \
+          '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
+
+  step_6_fix_and_verify:
+    name: "Apply fix and verify"
+
+    for_released:
+      commands:
+        - "kubectl patch pv {pv} --type json -p='[{\"op\": \"remove\", \"path\": \"/spec/claimRef\"}]'"
+        - "kubectl get pv {pv}"  # Should show Available
+
+    for_failed:
+      commands:
+        - "# After manual cleanup:"
+        - "kubectl delete pv {pv}"
+        - "# Recreate if needed"
+
+    verify:
+      - "kubectl get pv {pv}"
+      - "PV status should be Available or recreated"
+
+common_auto_fixes:
+  - id: "pv-clear-claimref"
+    trigger: "PV Released AND data not needed"
+    rank: "C"
+    action: "patch_remove_claimref"
+    warning: "Requires confirmation data can be lost"
+
+  - id: "pv-rebind-same-pvc"
+    trigger: "PV Released AND want same PVC"
+    rank: "D"
+    action: "recreate_matching_pvc"
+
+escalation_triggers:
+  - condition: "PV has production data"
+    escalate_to: "JADE"
+    reason: "Data safety decision needed"
+
+  - condition: "Cloud volume stuck"
+    escalate_to: "JADE"
+    reason: "May need cloud console access"
+
+  - condition: "Multiple PVs in Failed state"
+    escalate_to: "JADE"
+    reason: "Possible systemic issue"
+
+security_notes:
+  - "Released PVs may contain sensitive data"
+  - "Clear claimRef makes data available to any matching PVC"
+  - "Consider encrypting volumes at rest"
+  - "Audit who can clear claimRef"
+
+related_playbooks:
+  - pvc-pending
+  - quota-exceeded

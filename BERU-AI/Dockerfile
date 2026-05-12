@@ -1,0 +1,51 @@
+# BERU GRC Analyst API — slim FastAPI image.
+#
+# This image contains ONLY the inference path: FastAPI + LangGraph agent +
+# Ollama HTTP client. It does NOT contain torch/transformers/unsloth — those
+# are training-only. The model itself runs in a separate `ollama` container
+# (see docker-compose.yml).
+#
+# Build:   docker build -t beru-api:1.4 .
+# Run:     docker compose up   (preferred — wires ollama + this together)
+
+FROM python:3.11-slim AS base
+
+# Non-root user
+RUN groupadd --gid 1000 beru && useradd --uid 1000 --gid beru --create-home beru
+
+WORKDIR /app
+
+# Deps first (layer cache)
+COPY requirements-api.txt .
+RUN pip install --no-cache-dir -r requirements-api.txt
+
+# App source — agent, api, core, tools, providers, mlops.
+# .dockerignore strips training-data/, mlruns/, *.gguf, caches.
+COPY --chown=beru:beru . /app/
+
+# MLflow file-store dir. In compose this is a bind mount; create it here so
+# standalone `docker run` also gets working tracking instead of degrading.
+RUN mkdir -p /app/mlruns && chown -R beru:beru /app/mlruns
+
+# Where playbooks / crosswalk are mounted in the container (overrides the
+# in-repo relative-path resolution that doesn't apply once BERU-AI is alone).
+ENV BERU_NIST_DIR=/nist \
+    BERU_CROSSWALK_PATH=/crosswalk/800-53-to-ai-rmf.md \
+    BERU_MODEL=beru:v1.4 \
+    OLLAMA_HOST=http://ollama:11434 \
+    MLFLOW_BERU_TRACKING_URI=file:///app/mlruns \
+    PYTHONUNBUFFERED=1
+
+# The OllamaProvider reads base_url from config; we also export OLLAMA_HOST.
+# Bridge it: providers/ollama.py uses config.get("base_url", "http://localhost:11434"),
+# so we set the env the entrypoint script translates. (Simpler: the provider
+# could read OLLAMA_HOST directly — see entrypoint.)
+
+USER beru
+EXPOSE 8088
+
+# Health endpoint the compose healthcheck hits.
+HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=4 \
+    CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8088/api/beru/health').status==200 else 1)" || exit 1
+
+ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8088"]

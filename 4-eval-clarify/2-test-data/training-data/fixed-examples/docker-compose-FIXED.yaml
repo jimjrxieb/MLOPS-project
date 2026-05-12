@@ -1,0 +1,178 @@
+# FIXED VERSION OF DOCKER-COMPOSE EXAMPLE #1
+# Fixes Applied:
+#   1. No privileged mode
+#   2. Secrets via Docker secrets or .env file (not in compose)
+#   3. Minimal, safe bind mounts only
+#   4. Resource limits defined
+#   5. Bridge network with isolation
+#   6. Non-root user
+#   7. Health checks defined
+#   8. Ports bound to 127.0.0.1 only
+#
+# Even for dev, maintain secure defaults
+
+version: '3.8'
+
+services:
+  api:
+    # FIXED: Pinned image version
+    image: myapp:1.2.3
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - BUILD_DATE=${BUILD_DATE}
+        - VERSION=${VERSION}
+
+    # FIXED: No privileged, no host network
+    # FIXED: Non-root user
+    user: "1000:1000"
+
+    # FIXED: Security options
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+
+    # FIXED: Secrets from file, not hardcoded
+    env_file:
+      - .env.development  # Git-ignored file
+    environment:
+      - LOG_LEVEL=debug  # Only non-sensitive config here
+
+    # FIXED: Safe volume mounts only
+    volumes:
+      - ./src:/app/src:ro  # Code mount read-only
+      - api_tmp:/tmp  # Writable temp
+      - api_cache:/app/.cache
+
+    # FIXED: Localhost only - not exposed to network
+    ports:
+      - "127.0.0.1:8080:8080"
+
+    # FIXED: Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+    # FIXED: Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # FIXED: Isolated network
+    networks:
+      - backend
+
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  db:
+    image: postgres:15-alpine  # FIXED: Pinned version
+    user: "999:999"  # postgres user
+
+    # FIXED: Secrets from Docker secrets
+    environment:
+      - POSTGRES_USER_FILE=/run/secrets/db_user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
+      - POSTGRES_DB=myapp
+    secrets:
+      - db_user
+      - db_password
+
+    # FIXED: NOT exposed externally - internal network only
+    expose:
+      - "5432"
+    # ports: # Commented - only accessible via backend network
+
+    # FIXED: Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+    # FIXED: Health check
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$(cat /run/secrets/db_user)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    networks:
+      - backend
+
+  redis:
+    image: redis:7-alpine  # FIXED: Pinned version
+    user: "999:999"
+
+    # FIXED: Redis with password and TLS
+    command: >
+      redis-server
+      --requirepass $${REDIS_PASSWORD}
+      --appendonly yes
+      --maxmemory 128mb
+      --maxmemory-policy allkeys-lru
+    environment:
+      - REDIS_PASSWORD_FILE=/run/secrets/redis_password
+    secrets:
+      - redis_password
+
+    # FIXED: NOT exposed externally
+    expose:
+      - "6379"
+
+    # FIXED: Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+    volumes:
+      - redis_data:/data
+
+    networks:
+      - backend
+
+# FIXED: Docker secrets (create with docker secret create or from file)
+secrets:
+  db_user:
+    file: ./secrets/db_user.txt
+  db_password:
+    file: ./secrets/db_password.txt
+  redis_password:
+    file: ./secrets/redis_password.txt
+
+# FIXED: Isolated network
+networks:
+  backend:
+    driver: bridge
+    internal: false  # Set true for full isolation
+
+volumes:
+  postgres_data:
+  redis_data:
+  api_tmp:
+  api_cache:

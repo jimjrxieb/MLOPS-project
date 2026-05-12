@@ -1,0 +1,42 @@
+# Expected Kyverno policy for requiring resource limits
+# JADE should generate something similar to this
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-resource-limits
+  annotations:
+    policies.kyverno.io/title: Require Resource Limits
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: validate-resources
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+      validate:
+        message: "CPU and memory limits are required for all containers."
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  limits:
+                    cpu: "?*"
+                    memory: "?*"
+
+# Validation criteria:
+# - Must be valid ClusterPolicy kind
+# - Must check for cpu and memory limits
+# - Must exclude kube-system namespace
+# - Must use validationFailureAction: Enforce
+# - YAML must be syntactically valid

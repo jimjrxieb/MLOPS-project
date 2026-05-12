@@ -1,0 +1,199 @@
+# JADE Operational Playbook: DNS Resolution Failed
+# Pod can't resolve DNS names
+
+name: DNS-Resolution-Failed
+category: networking-failures
+severity: HIGH
+frequency: COMMON
+
+trigger_patterns:
+  - "could not resolve host"
+  - "Name or service not known"
+  - "NXDOMAIN"
+  - "DNS lookup failed"
+  - "getaddrinfo"
+  - "no such host"
+
+description: |
+  Pod cannot resolve DNS names - either cluster DNS (service names) or
+  external DNS (internet hostnames). CoreDNS issues or network problems.
+
+gameplan:
+  step_1:
+    name: "Determine what's failing to resolve"
+    commands:
+      - "kubectl exec {pod} -n {ns} -- cat /etc/resolv.conf"
+      - "kubectl exec {pod} -n {ns} -- nslookup kubernetes.default"
+      - "kubectl exec {pod} -n {ns} -- nslookup google.com"
+
+    branches:
+      all_dns_fails:
+        meaning: "CoreDNS completely unreachable"
+        next_step: "step_2_check_coredns"
+
+      cluster_dns_fails:
+        meaning: "Can't resolve service names"
+        next_step: "step_3_check_service_dns"
+
+      external_dns_fails:
+        meaning: "Can't resolve external names"
+        next_step: "step_4_check_external_dns"
+
+  step_2_check_coredns:
+    name: "Verify CoreDNS health"
+    commands:
+      - "kubectl get pods -n kube-system -l k8s-app=kube-dns"
+      - "kubectl logs -n kube-system -l k8s-app=kube-dns --tail=50"
+      - "kubectl get svc -n kube-system kube-dns"
+      - "kubectl get endpoints -n kube-system kube-dns"
+
+    issues:
+      coredns_not_running:
+        fix_rank: "C"
+        fixes:
+          - "Check why CoreDNS pods aren't running"
+          - "kubectl describe pod -n kube-system -l k8s-app=kube-dns"
+          - "May need to restart CoreDNS deployment"
+
+      coredns_crashloopbackoff:
+        fix_rank: "C"
+        causes:
+          - "ConfigMap issues"
+          - "OOM killed"
+          - "Unable to access kube-apiserver"
+        fixes:
+          - "Check CoreDNS ConfigMap"
+          - "Increase memory limits"
+          - "Check apiserver connectivity"
+
+      coredns_no_endpoints:
+        fix_rank: "C"
+        fix: "Check if CoreDNS pods exist and are Ready"
+
+  step_3_check_service_dns:
+    name: "Debug cluster service DNS"
+    commands:
+      - "kubectl exec {pod} -n {ns} -- nslookup {service-name}"
+      - "kubectl exec {pod} -n {ns} -- nslookup {service}.{namespace}.svc.cluster.local"
+      - "kubectl get svc {service} -n {namespace}"
+
+    issues:
+      service_not_found:
+        meaning: "Service doesn't exist in that namespace"
+        fix_rank: "D"
+        fix: "Use correct namespace or create service"
+
+      wrong_namespace:
+        meaning: "Service exists in different namespace"
+        fix_rank: "D"
+        fix: "Use fully qualified name: {service}.{namespace}.svc.cluster.local"
+
+      ndots_too_low:
+        meaning: "DNS suffix not being added"
+        condition: "Short name not resolving but FQDN works"
+        fix_rank: "D"
+        fix: |
+          # Use FQDN or add to dnsConfig
+          dnsConfig:
+            options:
+            - name: ndots
+              value: "5"
+
+  step_4_check_external_dns:
+    name: "Debug external DNS resolution"
+    commands:
+      - "kubectl exec {pod} -n {ns} -- nslookup google.com"
+      - "kubectl exec {pod} -n {ns} -- nslookup google.com 8.8.8.8"
+
+    issues:
+      upstream_dns_blocked:
+        meaning: "CoreDNS can't reach upstream DNS"
+        fix_rank: "C"
+        causes:
+          - "NetworkPolicy blocking egress to DNS"
+          - "Firewall blocking UDP 53"
+          - "Corporate proxy/firewall"
+        fixes:
+          - "Check NetworkPolicy allows DNS egress"
+          - "Check node-level firewall"
+
+      coredns_upstream_config:
+        command: "kubectl get configmap coredns -n kube-system -o yaml"
+        check: "Verify forward clause points to valid upstream"
+        fix: |
+          forward . /etc/resolv.conf {
+            prefer_udp
+          }
+
+  step_5_check_pod_dns_config:
+    name: "Verify pod DNS configuration"
+    commands:
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.dnsPolicy}'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.dnsConfig}'"
+      - "kubectl exec {pod} -n {ns} -- cat /etc/resolv.conf"
+
+    dns_policies:
+      ClusterFirst:
+        meaning: "Default - use cluster DNS, fall back to node"
+        expected_resolv_conf: "nameserver {cluster-dns-ip}"
+
+      Default:
+        meaning: "Use node's DNS settings"
+        note: "Won't resolve cluster services"
+
+      None:
+        meaning: "No DNS configured"
+        note: "Must provide dnsConfig"
+
+      ClusterFirstWithHostNet:
+        meaning: "For hostNetwork pods"
+
+  step_6_test_coredns_directly:
+    name: "Test CoreDNS directly"
+    commands:
+      - "kubectl get svc kube-dns -n kube-system -o jsonpath='{.spec.clusterIP}'"
+      - "kubectl exec {pod} -n {ns} -- nslookup kubernetes.default {coredns-ip}"
+
+common_auto_fixes:
+  - id: "dns-restart-coredns"
+    trigger: "CoreDNS pods unhealthy"
+    rank: "D"
+    action: "restart_coredns"
+    command: "kubectl rollout restart deployment/coredns -n kube-system"
+
+  - id: "dns-fix-policy"
+    trigger: "dnsPolicy: Default AND needs cluster DNS"
+    rank: "D"
+    action: "set_dns_policy_cluster_first"
+
+  - id: "dns-allow-egress"
+    trigger: "NetworkPolicy blocking DNS egress"
+    rank: "C"
+    action: "add_dns_egress_rule"
+    template: |
+      egress:
+      - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+        ports:
+        - protocol: UDP
+          port: 53
+
+escalation_triggers:
+  - condition: "CoreDNS consistently crashing"
+    escalate_to: "JADE"
+    reason: "Cluster component issue"
+
+  - condition: "Network-level DNS blocking"
+    escalate_to: "JADE"
+    reason: "May need network team involvement"
+
+  - condition: "Corporate proxy/firewall blocking"
+    escalate_to: "JADE"
+    reason: "Infrastructure team involvement needed"
+
+related_playbooks:
+  - connection-refused
+  - networkpolicy-blocking
+  - service-no-endpoints

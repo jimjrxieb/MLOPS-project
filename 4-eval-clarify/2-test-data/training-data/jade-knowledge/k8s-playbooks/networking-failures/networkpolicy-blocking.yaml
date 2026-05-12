@@ -1,0 +1,218 @@
+# JADE Operational Playbook: NetworkPolicy Blocking
+# Traffic blocked by Kubernetes NetworkPolicy
+
+name: NetworkPolicy-Blocking
+category: networking-failures
+severity: MEDIUM
+frequency: COMMON
+
+trigger_patterns:
+  - "networkpolicy"
+  - "network policy"
+  - "traffic blocked"
+  - "connection timed out"
+  - "no route to host"
+
+description: |
+  Traffic is being blocked by Kubernetes NetworkPolicy. This is often
+  intentional (security) but sometimes misconfigured. Need to determine
+  if the block is correct or needs adjustment.
+
+gameplan:
+  step_1:
+    name: "Identify affected pods and policies"
+    commands:
+      - "kubectl get networkpolicy -n {ns}"
+      - "kubectl get networkpolicy -n {target-ns}"
+      - "kubectl describe networkpolicy -n {ns}"
+
+    extract:
+      - "What policies apply to source pod"
+      - "What policies apply to target pod"
+      - "Ingress and egress rules"
+
+  step_2_understand_policy_effect:
+    name: "Understand what the policies are doing"
+
+    policy_logic:
+      no_policy:
+        meaning: "No NetworkPolicy = all traffic allowed"
+
+      empty_pod_selector:
+        meaning: "Policy applies to ALL pods in namespace"
+        template: |
+          spec:
+            podSelector: {}  # Matches all pods
+
+      ingress_policy_exists:
+        meaning: "Only explicitly allowed ingress is permitted"
+        note: "If ingress policy exists, default deny for ingress"
+
+      egress_policy_exists:
+        meaning: "Only explicitly allowed egress is permitted"
+        note: "If egress policy exists, default deny for egress"
+
+  step_3_analyze_source_egress:
+    name: "Check if source can send traffic"
+    commands:
+      - "kubectl get networkpolicy -n {source-ns} -o yaml"
+      - "kubectl get pods {source-pod} -n {source-ns} --show-labels"
+
+    checks:
+      - name: "Does egress policy apply to source pod?"
+        method: "Match pod labels against policy podSelector"
+
+      - name: "Is target allowed in egress rules?"
+        method: "Check egress to: rules"
+
+    egress_rule_examples:
+      allow_all:
+        template: |
+          egress:
+          - {}  # Allow all egress
+
+      allow_namespace:
+        template: |
+          egress:
+          - to:
+            - namespaceSelector:
+                matchLabels:
+                  name: target-namespace
+
+      allow_specific_pod:
+        template: |
+          egress:
+          - to:
+            - podSelector:
+                matchLabels:
+                  app: target-app
+            ports:
+            - port: 8080
+
+  step_4_analyze_target_ingress:
+    name: "Check if target accepts traffic"
+    commands:
+      - "kubectl get networkpolicy -n {target-ns} -o yaml"
+      - "kubectl get pods {target-pod} -n {target-ns} --show-labels"
+
+    checks:
+      - name: "Does ingress policy apply to target pod?"
+        method: "Match pod labels against policy podSelector"
+
+      - name: "Is source allowed in ingress rules?"
+        method: "Check ingress from: rules"
+
+    ingress_rule_examples:
+      allow_same_namespace:
+        template: |
+          ingress:
+          - from:
+            - podSelector: {}  # All pods in same namespace
+
+      allow_from_namespace:
+        template: |
+          ingress:
+          - from:
+            - namespaceSelector:
+                matchLabels:
+                  name: source-namespace
+
+      allow_specific_port:
+        template: |
+          ingress:
+          - from:
+            - podSelector:
+                matchLabels:
+                  app: source-app
+            ports:
+            - port: 8080
+              protocol: TCP
+
+  step_5_fix_policy:
+    name: "Create or modify policy"
+
+    add_allow_rule:
+      description: "Add rule to allow specific traffic"
+      rank: "C"
+      template: |
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: allow-from-{source}
+          namespace: {target-ns}
+        spec:
+          podSelector:
+            matchLabels:
+              app: {target-app}
+          ingress:
+          - from:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: {source-ns}
+              podSelector:
+                matchLabels:
+                  app: {source-app}
+            ports:
+            - port: {port}
+              protocol: TCP
+
+    ensure_dns_allowed:
+      description: "DNS egress often forgotten"
+      template: |
+        egress:
+        # Allow DNS
+        - to:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: kube-system
+          ports:
+          - protocol: UDP
+            port: 53
+          - protocol: TCP
+            port: 53
+
+  step_6_test_after_change:
+    name: "Verify connectivity after policy change"
+    commands:
+      - "kubectl exec {source-pod} -n {source-ns} -- nc -zv {target-ip} {port}"
+      - "kubectl exec {source-pod} -n {source-ns} -- curl -v http://{target}:{port}/"
+
+    if_still_blocked:
+      - "Check CNI plugin is properly applying policies"
+      - "Verify namespace labels are correct"
+      - "Check for multiple conflicting policies"
+
+common_auto_fixes:
+  - id: "np-add-dns-egress"
+    trigger: "egress policy exists AND DNS not allowed"
+    rank: "D"
+    action: "add_dns_egress_rule"
+
+  - id: "np-add-ingress-allow"
+    trigger: "ingress blocked AND source should be allowed"
+    rank: "C"
+    action: "add_ingress_allow_rule"
+    requires: "confirmation that traffic should be allowed"
+
+  - id: "np-label-namespace"
+    trigger: "namespaceSelector uses label that namespace doesn't have"
+    rank: "D"
+    action: "label_namespace"
+
+escalation_triggers:
+  - condition: "Unsure if traffic should be allowed"
+    escalate_to: "JADE"
+    reason: "Security decision needed"
+
+  - condition: "Policy change would affect production security"
+    escalate_to: "JADE"
+    reason: "Change needs security review"
+
+  - condition: "CNI not enforcing policies correctly"
+    escalate_to: "JADE"
+    reason: "Cluster infrastructure issue"
+
+related_playbooks:
+  - connection-refused
+  - dns-resolution-failed
+  - service-no-endpoints

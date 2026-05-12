@@ -1,0 +1,209 @@
+## NGINX Production Configuration
+## Security-hardened, production-ready defaults
+
+replicaCount: 3
+
+image:
+  repository: nginx
+  tag: 1.21.6-alpine
+  pullPolicy: IfNotPresent
+
+## Security Context - Non-root, read-only filesystem
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 101
+  runAsGroup: 101
+  fsGroup: 101
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - NET_BIND_SERVICE
+  seccompProfile:
+    type: RuntimeDefault
+
+## Service Configuration
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+  annotations: {}
+
+## Ingress Configuration
+ingress:
+  enabled: false
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: nginx-tls
+      hosts:
+        - example.com
+
+## Resource Limits - Production values
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+## Health Checks
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /ready
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+## Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+## Horizontal Pod Autoscaler
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+## Network Policy
+networkPolicy:
+  enabled: true
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    - to:
+      - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 53  # DNS
+
+## Pod Security Standards
+podSecurityPolicy:
+  enabled: false
+
+podSecurityContext:
+  fsGroup: 101
+  runAsUser: 101
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+## Affinity Rules - Spread across nodes
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - nginx
+          topologyKey: kubernetes.io/hostname
+
+## Labels
+labels:
+  app.kubernetes.io/name: nginx
+  app.kubernetes.io/component: webserver
+  app.kubernetes.io/part-of: web-stack
+
+## Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+## ConfigMap for custom NGINX config
+configMap:
+  enabled: true
+  data:
+    nginx.conf: |
+      user  nginx;
+      worker_processes  auto;
+      error_log  /var/log/nginx/error.log warn;
+      pid        /tmp/nginx.pid;
+
+      events {
+          worker_connections  1024;
+      }
+
+      http {
+          include       /etc/nginx/mime.types;
+          default_type  application/octet-stream;
+
+          # Security headers
+          add_header X-Frame-Options "SAMEORIGIN" always;
+          add_header X-Content-Type-Options "nosniff" always;
+          add_header X-XSS-Protection "1; mode=block" always;
+          add_header Referrer-Policy "no-referrer-when-downgrade" always;
+
+          # Logging
+          log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                            '$status $body_bytes_sent "$http_referer" '
+                            '"$http_user_agent" "$http_x_forwarded_for"';
+          access_log  /var/log/nginx/access.log  main;
+
+          sendfile        on;
+          keepalive_timeout  65;
+
+          server {
+              listen       8080;
+              server_name  localhost;
+
+              location / {
+                  root   /usr/share/nginx/html;
+                  index  index.html index.htm;
+              }
+
+              location /healthz {
+                  access_log off;
+                  return 200 "healthy\n";
+                  add_header Content-Type text/plain;
+              }
+
+              location /ready {
+                  access_log off;
+                  return 200 "ready\n";
+                  add_header Content-Type text/plain;
+              }
+
+              error_page   500 502 503 504  /50x.html;
+              location = /50x.html {
+                  root   /usr/share/nginx/html;
+              }
+          }
+      }

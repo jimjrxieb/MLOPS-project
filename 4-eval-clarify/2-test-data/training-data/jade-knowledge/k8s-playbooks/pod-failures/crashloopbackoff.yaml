@@ -1,0 +1,307 @@
+# JADE Operational Playbook: CrashLoopBackOff
+# The most common K8s failure - container keeps restarting
+
+name: CrashLoopBackOff
+category: pod-failures
+severity: HIGH
+frequency: VERY_COMMON
+
+trigger_patterns:
+  - "CrashLoopBackOff"
+  - "Back-off restarting failed container"
+  - "restarting failed container"
+  - "RestartCount: [5-9]|[1-9][0-9]+"
+
+description: |
+  Container repeatedly crashes after starting. Kubernetes keeps trying to restart it
+  with exponential backoff (10s, 20s, 40s... up to 5 minutes).
+
+gameplan:
+  step_1:
+    name: "Get pod status and exit code"
+    commands:
+      - "kubectl describe pod {pod} -n {ns} | grep -A10 'Last State'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.status.containerStatuses[0].lastState.terminated.exitCode}'"
+    parse_exit_code: true
+
+    branches:
+      exit_0:
+        meaning: "Container completed successfully but shouldn't have"
+        likely_causes:
+          - "Application exits after completing task (should be Job, not Deployment)"
+          - "Main process exits, leaving only sidecar"
+          - "Script completes without infinite loop"
+        fix_rank: "D"
+        fixes:
+          - condition: "Workload should be Job"
+            action: "Convert Deployment to Job"
+            template: |
+              apiVersion: batch/v1
+              kind: Job
+              metadata:
+                name: {name}
+              spec:
+                template:
+                  spec:
+                    restartPolicy: Never
+                    containers:
+                    - name: {container}
+                      image: {image}
+          - condition: "App needs to stay running"
+            action: "Add infinite loop or proper entrypoint"
+
+      exit_1:
+        meaning: "General application error"
+        next_step: "step_2_check_logs"
+
+      exit_2:
+        meaning: "Misuse of shell command (wrong arguments)"
+        likely_causes:
+          - "Incorrect command/args in pod spec"
+          - "Missing environment variable in script"
+        fix_rank: "D"
+        next_step: "step_2_check_logs"
+
+      exit_126:
+        meaning: "Command invoked cannot execute"
+        likely_causes:
+          - "Permission denied on entrypoint script"
+          - "Script not marked executable"
+        fix_rank: "D"
+        fixes:
+          - action: "Check entrypoint permissions"
+            command: "kubectl exec {pod} -n {ns} -- ls -la /entrypoint.sh"
+          - action: "Fix in Dockerfile"
+            template: "RUN chmod +x /entrypoint.sh"
+
+      exit_127:
+        meaning: "Command not found"
+        likely_causes:
+          - "Typo in command/entrypoint"
+          - "Binary not installed in image"
+          - "Wrong PATH"
+        fix_rank: "D"
+        fixes:
+          - action: "Verify command exists in image"
+            command: "kubectl run debug --rm -it --image={image} -- which {command}"
+
+      exit_128:
+        meaning: "Invalid exit argument (exit code out of range)"
+        fix_rank: "C"
+        next_step: "step_2_check_logs"
+
+      exit_137:
+        meaning: "OOMKilled (128 + 9 = SIGKILL from kernel)"
+        likely_causes:
+          - "Memory limit too low"
+          - "Memory leak in application"
+          - "Large data processing without streaming"
+        fix_rank: "D"
+        auto_fixable: true
+        fixes:
+          - action: "Increase memory limit by 50%"
+            command: "kubectl patch deployment {deployment} -n {ns} --type=json -p='[{\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/limits/memory\", \"value\": \"{new_memory}\"}]'"
+            calculate: "new_memory = current_memory * 1.5"
+          - action: "Check for memory leak if keeps happening"
+            escalate_if: "OOMKilled 3+ times after increase"
+
+      exit_139:
+        meaning: "Segmentation fault (128 + 11 = SIGSEGV)"
+        likely_causes:
+          - "Bug in application code"
+          - "Incompatible binary (glibc vs musl)"
+          - "Corrupted memory"
+        fix_rank: "C"
+        fixes:
+          - action: "Check if alpine vs debian base image issue"
+            note: "Go binaries compiled with CGO need glibc"
+          - action: "Escalate to development team"
+
+      exit_143:
+        meaning: "Graceful shutdown failed (128 + 15 = SIGTERM)"
+        likely_causes:
+          - "App doesn't handle SIGTERM"
+          - "terminationGracePeriodSeconds too short"
+          - "App takes too long to shutdown"
+        fix_rank: "D"
+        auto_fixable: true
+        fixes:
+          - action: "Increase grace period"
+            template: |
+              spec:
+                terminationGracePeriodSeconds: 60
+          - action: "Add SIGTERM handler to application"
+
+      exit_255:
+        meaning: "Exit status out of range or SSH error"
+        likely_causes:
+          - "Exit code > 255 wrapped"
+          - "SSH connection issue if using SSH-based operations"
+        fix_rank: "C"
+        next_step: "step_2_check_logs"
+
+  step_2_check_logs:
+    name: "Check application logs for error details"
+    commands:
+      - "kubectl logs {pod} -n {ns} --previous --tail=200"
+      - "kubectl logs {pod} -n {ns} --previous | grep -i 'error\\|fatal\\|panic\\|exception'"
+
+    look_for:
+      connection_refused:
+        patterns:
+          - "connection refused"
+          - "ECONNREFUSED"
+          - "dial tcp.*connection refused"
+        meaning: "Dependency service not available"
+        fix_rank: "D"
+        fixes:
+          - action: "Check if dependency service exists"
+            command: "kubectl get svc -n {ns}"
+          - action: "Add init container to wait for dependency"
+            template: |
+              initContainers:
+              - name: wait-for-{dependency}
+                image: busybox:1.36
+                command: ['sh', '-c', 'until nc -z {service} {port}; do echo waiting for {service}; sleep 2; done']
+
+      connection_timeout:
+        patterns:
+          - "connection timed out"
+          - "timeout"
+          - "deadline exceeded"
+        meaning: "Network connectivity issue"
+        fix_rank: "C"
+        next_step: "step_3_check_networking"
+
+      permission_denied:
+        patterns:
+          - "permission denied"
+          - "EACCES"
+          - "Operation not permitted"
+        meaning: "Filesystem or capability issue"
+        fix_rank: "D"
+        fixes:
+          - action: "Check if running as wrong user"
+            command: "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.securityContext}'"
+          - action: "Add fsGroup for volume permissions"
+            template: |
+              securityContext:
+                fsGroup: 1000
+          - action: "Check if readOnlyRootFilesystem blocking writes"
+
+      file_not_found:
+        patterns:
+          - "no such file"
+          - "ENOENT"
+          - "FileNotFoundError"
+          - "cannot find"
+        meaning: "Missing file or misconfigured mount"
+        fix_rank: "D"
+        fixes:
+          - action: "Check volume mounts"
+            command: "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.volumes}'"
+          - action: "Check if ConfigMap/Secret exists"
+            command: "kubectl get configmap,secret -n {ns}"
+
+      oom_error:
+        patterns:
+          - "OutOfMemory"
+          - "Cannot allocate memory"
+          - "MemoryError"
+          - "heap out of memory"
+        meaning: "Memory exhaustion (may not trigger OOMKill)"
+        fix_rank: "D"
+        fixes:
+          - action: "Increase memory limit"
+          - action: "Check for memory leaks"
+          - action: "Add JVM heap settings if Java"
+            template: |
+              env:
+              - name: JAVA_OPTS
+                value: "-Xmx512m -Xms256m"
+
+      database_error:
+        patterns:
+          - "database.*error"
+          - "connection.*database"
+          - "authentication failed"
+          - "password authentication failed"
+        meaning: "Database connectivity or auth issue"
+        fix_rank: "D"
+        fixes:
+          - action: "Verify database credentials in secret"
+          - action: "Check database service reachability"
+          - action: "Verify database user has correct permissions"
+
+  step_3_check_networking:
+    name: "Check network connectivity"
+    commands:
+      - "kubectl get svc -n {ns}"
+      - "kubectl get endpoints -n {ns}"
+      - "kubectl get networkpolicy -n {ns}"
+
+    checks:
+      - name: "Service has endpoints"
+        command: "kubectl get endpoints {service} -n {ns} -o jsonpath='{.subsets[0].addresses}'"
+        fail_if: "empty or null"
+        fix: "Check if backend pods are running and have matching labels"
+
+      - name: "NetworkPolicy not blocking"
+        command: "kubectl get networkpolicy -n {ns} -o yaml"
+        check: "Ingress/Egress rules allow traffic"
+
+  step_4_check_events:
+    name: "Check cluster events for context"
+    commands:
+      - "kubectl get events -n {ns} --sort-by='.lastTimestamp' | grep {pod}"
+      - "kubectl get events -n {ns} --field-selector involvedObject.name={pod}"
+
+    look_for:
+      - "FailedScheduling"
+      - "FailedMount"
+      - "FailedAttachVolume"
+      - "Unhealthy"
+      - "BackOff"
+
+common_auto_fixes:
+  - id: "clb-oom-increase"
+    trigger: "exit_137 OR logs contain OOM"
+    rank: "D"
+    action: "increase_memory_limit"
+    params:
+      multiplier: 1.5
+      max_limit: "4Gi"
+    rollback_if: "still OOMKilled after 3 restarts"
+
+  - id: "clb-add-init-wait"
+    trigger: "logs contain 'connection refused' AND service exists"
+    rank: "D"
+    action: "add_init_container"
+    params:
+      type: "wait-for-service"
+      timeout: 120
+
+  - id: "clb-increase-grace"
+    trigger: "exit_143"
+    rank: "D"
+    action: "increase_termination_grace"
+    params:
+      seconds: 60
+
+escalation_triggers:
+  - condition: "exit_139 (segfault)"
+    escalate_to: "JADE"
+    reason: "Likely application bug requiring code fix"
+
+  - condition: "OOMKilled 3+ times after memory increase"
+    escalate_to: "JADE"
+    reason: "Possible memory leak requiring application investigation"
+
+  - condition: "Unknown exit code with unclear logs"
+    escalate_to: "JADE"
+    reason: "Manual investigation required"
+
+related_playbooks:
+  - imagepullbackoff
+  - oomkilled
+  - createcontainererror

@@ -1,0 +1,220 @@
+{
+  "name": "GP-OPENSEARCH",
+  "description": "JADE RAG Knowledge Pipeline - Hybrid vector + graph retrieval for DevSecOps AI supervisor",
+  "version": "2.0.0",
+  "last_updated": "2026-01-27",
+  "embedding_model": "nomic-embed-text:latest",
+  "embedding_dimensions": 768,
+  "embedding_provider": "Ollama (GPU-accelerated via RTX 5080)",
+  "similarity": {
+    "distance_metric": "squared_l2",
+    "scoring_formula": "1 / (1 + distance)",
+    "notes": "Proper spread: d=0→1.0, d=100→0.01, d=10000→0.0001"
+  },
+  "database": {
+    "type": "ChromaDB",
+    "path": "05-ragged-data/chroma",
+    "total_documents": 24768,
+    "collections": {
+      "jade-general": {
+        "count": 20480,
+        "description": "Default collection for general security knowledge"
+      },
+      "jade-kubernetes": {
+        "count": 1064,
+        "description": "Kubernetes-specific security knowledge"
+      },
+      "jade-dev-tools": {
+        "count": 1507,
+        "description": "Development tools and CI/CD security"
+      },
+      "jade-cloud-security": {
+        "count": 1330,
+        "description": "Cloud security patterns (AWS, GCP, Azure)"
+      },
+      "jade-policy-as-code": {
+        "count": 217,
+        "description": "OPA/Rego/Gatekeeper policies"
+      },
+      "jade-terraform-iac": {
+        "count": 170,
+        "description": "Infrastructure-as-code security"
+      },
+      "concept-links": {
+        "count": null,
+        "description": "Error-to-fix and scanner-to-agent concept links"
+      }
+    }
+  },
+  "knowledge_graph": {
+    "type": "NetworkX DiGraph",
+    "path": "../GP-S3/knowledge-base/security_graph.pkl",
+    "nodes": 16945,
+    "edges": 148229,
+    "node_types": ["document", "domain", "doc_type", "tag", "concept"],
+    "edge_relations": ["has_domain", "has_type", "tagged", "concept_link"]
+  },
+  "chunking": {
+    "strategy": "token-aware overlap",
+    "target_tokens": 512,
+    "target_chars": 2048,
+    "overlap_tokens": 64,
+    "overlap_chars": 256,
+    "overlap_percent": "12.5%",
+    "boundary_detection": "sentence (. ! ? followed by whitespace)",
+    "markdown_strategy": "split by headers first, sub-split long sections with overlap",
+    "text_strategy": "overlap chunking with sentence boundary preference"
+  },
+  "ingestion": {
+    "embedding_retry": {
+      "max_retries": 2,
+      "retry_delay_seconds": 1.0,
+      "on_failure": "skip and quarantine (never insert zero-vectors)",
+      "quarantine_file": "05-ragged-data/embedding_quarantine.jsonl"
+    },
+    "deduplication": {
+      "id_formula": "md5(content|source_file|chunk_idx)[:16]",
+      "method": "deterministic ID + ChromaDB upsert",
+      "batch_dedup": "in-memory seen_ids set per collection"
+    },
+    "graph_integration": {
+      "document_nodes": true,
+      "domain_edges": true,
+      "type_edges": true,
+      "tag_edges": true,
+      "security_ontology": true,
+      "max_tags_per_doc": 5
+    }
+  },
+  "query": {
+    "engine": "RAGGraph (hybrid vector + graph)",
+    "modes": ["hybrid", "vector", "graph"],
+    "default_mode": "hybrid",
+    "query_expansion": "SecurityOntology (adds related concepts, depth=1)",
+    "graph_search": "entity extraction → graph traversal → ChromaDB content lookup",
+    "reranking": {
+      "deduplication": "hash(content[:200])",
+      "dual_source_boost": 1.2,
+      "sort": "score descending"
+    }
+  },
+  "supported_formats": [
+    {
+      "extension": ".jsonl",
+      "parser": "parse_jsonl",
+      "description": "Training data, knowledge bases"
+    },
+    {
+      "extension": ".json",
+      "parser": "parse_json",
+      "description": "Scan results, configs"
+    },
+    {
+      "extension": ".md",
+      "parser": "parse_text",
+      "description": "Documentation, guides"
+    },
+    {
+      "extension": ".txt",
+      "parser": "parse_text",
+      "description": "Plain text documentation"
+    },
+    {
+      "extension": ".rego",
+      "parser": "parse_rego",
+      "description": "OPA/Gatekeeper/Conftest policies"
+    },
+    {
+      "extension": ".yaml",
+      "parser": "parse_yaml",
+      "description": "K8s manifests, Helm charts"
+    },
+    {
+      "extension": ".yml",
+      "parser": "parse_yaml",
+      "description": "YAML configuration files"
+    }
+  ],
+  "data_categories": [
+    "domain-SME",
+    "projects-docs",
+    "sessions",
+    "troubleshooting",
+    "sync",
+    "jsa-logs",
+    "opa-policies",
+    "webscraper",
+    "night-learning",
+    "operational-training-data"
+  ],
+  "pipeline": {
+    "stages": [
+      {
+        "number": 1,
+        "name": "Discovery",
+        "file": "02-preperation-factory/stages/discover.py",
+        "description": "Scan 01-unprocessed/ for files across 22 categories"
+      },
+      {
+        "number": 2,
+        "name": "Preprocessing",
+        "file": "02-preperation-factory/stages/preprocess.py",
+        "description": "Format-specific parsers (JSONL, JSON, Markdown, Rego, YAML)"
+      },
+      {
+        "number": 3,
+        "name": "Sanitization",
+        "file": "02-preperation-factory/stages/sanitize_npc.py",
+        "description": "Quality gates (PASS/REPAIR/FAIL), PII redaction, dedup, JSON repair"
+      },
+      {
+        "number": 4,
+        "name": "Format Conversion",
+        "file": "02-preperation-factory/stages/format_conversion_npc.py",
+        "description": "Normalize to JSONL with token-aware overlap chunking (512 tokens, 64 overlap)"
+      },
+      {
+        "number": 5,
+        "name": "Labeling",
+        "file": "02-preperation-factory/stages/labeling_npc.py",
+        "description": "3-tier labeling: SecurityOntology → pattern matching → Claude API"
+      },
+      {
+        "number": 6,
+        "name": "Validation",
+        "file": "02-preperation-factory/stages/validators.py",
+        "description": "Format validation, token estimation, _embedding_text construction"
+      },
+      {
+        "number": 7,
+        "name": "Routing",
+        "file": "02-preperation-factory/stages/route.py",
+        "description": "Route items to RAG collections based on category"
+      }
+    ],
+    "labeling_tiers": [
+      "Tier 1: SecurityOntology (CVE, CWE, scanner codes — fast regex)",
+      "Tier 2: Pattern Matching (filename/content patterns — domain, type, difficulty)",
+      "Tier 3: Claude API (semantic classification — optional fallback)"
+    ]
+  },
+  "ontology_patterns": {
+    "cve": "CVE-\\d{4}-\\d+",
+    "cwe": "CWE-\\d+",
+    "bandit": "B\\d{3}",
+    "checkov": "CKV_(K8S|AWS|GCP|AZURE)_\\d+",
+    "trivy": "AVD-[A-Z]+-\\d+",
+    "kubescape": "C-\\d{4}",
+    "cis": "CIS \\d+\\.\\d+",
+    "nist": "NIST [A-Z]{2}-\\d+"
+  },
+  "tier1_fixes_applied": {
+    "date": "2026-01-27",
+    "changes": [
+      "Replaced zero-vector fallback with retry + skip + quarantine (ingest_to_chromadb.py)",
+      "Added overlap chunking with token-aware splitting (format_conversion_npc.py)",
+      "Fixed graph search to return real document content from ChromaDB (raggraph_engine.py)",
+      "Fixed similarity scoring from exp(-d/50000) to 1/(1+d) for 81x better differentiation (rag_engine.py)"
+    ]
+  }
+}

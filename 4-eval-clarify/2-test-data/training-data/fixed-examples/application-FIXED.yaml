@@ -1,0 +1,137 @@
+# FIXED VERSION OF ARGOCD APPLICATION EXAMPLE #1
+# Fixes Applied:
+#   1. Prune disabled by default (explicit prune via sync)
+#   2. Self-heal disabled for production
+#   3. Sync windows restrict deployment times
+#   4. allowEmpty: false prevents namespace wipe
+#   5. HTTPS git URL with SSH key auth
+#   6. Health checks and retry backoff
+#   7. Server-side apply instead of replace
+#   8. Dedicated AppProject with restrictions
+#
+# Compliance: GitOps Security Best Practices, CIS Kubernetes
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: production-app
+  namespace: argocd
+  labels:
+    environment: production
+    team: platform
+  # FIXED: Finalizer prevents accidental deletion
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  # FIXED: Dedicated project with restrictions
+  project: production-restricted
+
+  source:
+    # FIXED: HTTPS with proper auth (or SSH)
+    repoURL: https://github.com/company/app-manifests.git
+    # FIXED: Pinned to tag, not HEAD
+    targetRevision: v1.2.3
+    path: kubernetes/production
+
+    # FIXED: Helm values override if using Helm
+    helm:
+      valueFiles:
+        - values-production.yaml
+      # FIXED: Fail on missing values
+      ignoreMissingValueFiles: false
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+
+  syncPolicy:
+    automated:
+      # FIXED: Prune disabled - use manual prune when needed
+      prune: false
+      # FIXED: Self-heal disabled for production
+      selfHeal: false
+      # FIXED: Never allow empty to prevent namespace wipe
+      allowEmpty: false
+
+    syncOptions:
+      # FIXED: Server-side apply is non-destructive
+      - ServerSideApply=true
+      - CreateNamespace=false  # Namespace should exist
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - RespectIgnoreDifferences=true
+      # FIXED: Fail on shared resource conflicts
+      - FailOnSharedResource=true
+
+    # FIXED: Retry with backoff
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  # FIXED: Resource tracking
+  revisionHistoryLimit: 10
+
+  # FIXED: Health checks
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas  # Allow HPA to manage replicas
+
+---
+# FIXED: AppProject with restrictions
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: production-restricted
+  namespace: argocd
+spec:
+  description: Production applications with restrictions
+
+  # FIXED: Only allow specific repo
+  sourceRepos:
+    - https://github.com/company/app-manifests.git
+
+  # FIXED: Only production namespace and cluster
+  destinations:
+    - namespace: production
+      server: https://kubernetes.default.svc
+
+  # FIXED: Deny dangerous resource types
+  clusterResourceBlacklist:
+    - group: ''
+      kind: Namespace
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+
+  # FIXED: Namespace resource whitelist
+  namespaceResourceWhitelist:
+    - group: apps
+      kind: Deployment
+    - group: ''
+      kind: Service
+    - group: ''
+      kind: ConfigMap
+    - group: ''
+      kind: Secret
+    - group: networking.k8s.io
+      kind: Ingress
+
+  # FIXED: Sync windows for change control
+  syncWindows:
+    - kind: allow
+      schedule: '0 6-18 * * 1-5'  # Weekdays 6 AM - 6 PM
+      duration: 12h
+      applications:
+        - '*'
+      manualSync: true
+    - kind: deny
+      schedule: '0 0 * * 0,6'  # Weekends
+      duration: 48h
+      applications:
+        - '*'

@@ -1,0 +1,81 @@
+# Kubeflow Pipelines (standalone) Helm values
+# Deployed by: tools/deploy-kubeflow.sh
+# Docs: https://www.kubeflow.org/docs/components/pipelines/
+
+# Standalone mode — no full Kubeflow platform, no Istio required
+standalone: true
+
+# Metadata store (pipeline runs, experiments, artifacts)
+mysql:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: ""  # Use default
+
+# For production: use RDS instead of in-cluster MySQL
+# mysql:
+#   enabled: false
+#   externalHost: kfp-db.xxxx.us-east-1.rds.amazonaws.com
+#   externalPort: 3306
+#   existingSecret: kfp-db-credentials
+#   existingSecretKey: password
+
+# Artifact store — S3 for pipeline artifacts, model weights, logs
+artifactRepository:
+  s3:
+    bucket: ml-artifacts
+    region: us-east-1
+    endpoint: s3.amazonaws.com
+    # keyPrefix: kfp-artifacts/
+    # Use IRSA (IAM Roles for Service Accounts) — no static creds
+    # existingSecret: ""
+
+# Pipeline runner
+pipelineRunner:
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "512Mi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+
+# API server
+apiServer:
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+# UI
+ui:
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "250m"
+      memory: "256Mi"
+
+# Workflow controller (Argo)
+workflowController:
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+# Security defaults
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Cache — skip re-execution of identical pipeline steps
+cache:
+  enabled: true

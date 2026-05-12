@@ -1,0 +1,41 @@
+# FAULTY NETWORKPOLICY EXAMPLE #1
+# Common Mistakes: Ineffective Network Segmentation
+# Issues:
+#   1. Empty spec allows ALL traffic (worse than no policy)
+#   2. Missing egress restrictions
+#   3. No namespace selector (cross-namespace access)
+#   4. Wide open pod selector
+#   5. No port restrictions
+#
+# Severity: HIGH (lateral movement, data exfiltration)
+# Compliance: CIS K8s 5.3.2, NIST SC-7
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: app-network-policy
+  namespace: production
+spec:
+  # BUG #4: Empty selector matches ALL pods in namespace
+  podSelector: {}
+
+  policyTypes:
+    - Ingress
+    # BUG #2: No Egress type means all egress allowed
+
+  ingress:
+    # BUG #1: Empty ingress rule allows ALL incoming traffic
+    - {}
+
+    # BUG #3: No namespaceSelector - allows cross-namespace
+    - from:
+        - podSelector:
+            matchLabels:
+              app: frontend
+
+    # BUG #5: No port restrictions
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0  # BUG: World open
+
+  # BUG #2: Missing egress section = all egress allowed

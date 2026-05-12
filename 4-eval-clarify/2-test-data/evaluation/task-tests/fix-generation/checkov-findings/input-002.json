@@ -1,0 +1,12 @@
+{
+  "id": "fix-checkov-002",
+  "scanner": "checkov",
+  "check_id": "CKV_AWS_23",
+  "finding": "Security group allows ingress from 0.0.0.0/0 to port 22",
+  "resource": "aws_security_group.web",
+  "file": "security.tf",
+  "severity": "CRITICAL",
+  "expected_rank": "D",
+  "context": "resource \"aws_security_group\" \"web\" {\n  name = \"web-sg\"\n  ingress {\n    from_port   = 22\n    to_port     = 22\n    protocol    = \"tcp\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n}",
+  "instructions": "Fix the security group to restrict SSH access. Suggest using a specific CIDR or removing public access."
+}

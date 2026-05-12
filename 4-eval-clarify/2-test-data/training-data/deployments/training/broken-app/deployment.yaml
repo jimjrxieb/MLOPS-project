@@ -1,0 +1,236 @@
+# INTENTIONALLY VULNERABLE DEPLOYMENT
+# Contains 15+ security anti-patterns for JADE training data collection
+#
+# DO NOT USE IN PRODUCTION - THIS IS A SECURITY HONEYPOT FOR TRAINING
+#
+# Vulnerabilities included:
+#  1. No resource limits or requests
+#  2. No liveness/readiness probes
+#  3. Running as root (runAsUser: 0)
+#  4. Privileged container
+#  5. Using :latest tag
+#  6. Hardcoded secrets in environment variables
+#  7. hostPath volume mount to /
+#  8. No readOnlyRootFilesystem
+#  9. Default service account with no restrictions
+# 10. allowPrivilegeEscalation: true
+# 11. Missing seccomp profile
+# 12. hostNetwork enabled
+# 13. hostPID enabled
+# 14. No capabilities dropped
+# 15. Dangerous capabilities added
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vulnerable-app
+  namespace: broken-app
+  labels:
+    app: vulnerable-app
+    security-training: "true"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vulnerable-app
+  template:
+    metadata:
+      labels:
+        app: vulnerable-app
+        # Missing required labels that Gatekeeper might enforce:
+        # - team
+        # - cost-center
+        # - environment
+    spec:
+      # VULN-9: Using default service account (no restrictions)
+      serviceAccountName: default
+
+      # VULN-12: hostNetwork - shares host's network namespace
+      hostNetwork: true
+
+      # VULN-13: hostPID - can see all processes on node
+      hostPID: true
+
+      # VULN: hostIPC - can access host IPC namespace
+      hostIPC: true
+
+      containers:
+      - name: vulnerable-container
+        # VULN-5: Using :latest tag (unpinned, mutable)
+        image: nginx:latest
+
+        # VULN-1: No resource limits or requests
+        # resources: {} <- intentionally missing
+
+        # VULN-2: No liveness/readiness probes
+        # livenessProbe: {} <- intentionally missing
+        # readinessProbe: {} <- intentionally missing
+
+        ports:
+        - containerPort: 80
+          # VULN: Using hostPort
+          hostPort: 8080
+
+        # VULN-6: Hardcoded secrets in environment variables
+        env:
+        - name: DB_PASSWORD
+          value: "plaintext-secret-123"
+        - name: AWS_ACCESS_KEY_ID
+          value: "AKIAIOSFODNN7EXAMPLE"
+        - name: AWS_SECRET_ACCESS_KEY
+          value: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+        - name: GITHUB_TOKEN
+          value: "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        - name: DATABASE_URL
+          value: "postgresql://admin:password123@db.internal:5432/prod"
+        - name: API_KEY
+          value: "sk-proj-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        - name: JWT_SECRET
+          value: "super-secret-jwt-signing-key-do-not-share"
+
+        securityContext:
+          # VULN-4: Privileged container (full node access)
+          privileged: true
+
+          # VULN-3: Running as root
+          runAsUser: 0
+          runAsGroup: 0
+
+          # VULN-10: allowPrivilegeEscalation enabled
+          allowPrivilegeEscalation: true
+
+          # VULN-8: Writable root filesystem
+          readOnlyRootFilesystem: false
+
+          # VULN-11: No seccomp profile (missing entirely)
+          # seccompProfile: {} <- intentionally missing
+
+          # VULN-14 & 15: No capabilities dropped, dangerous ones added
+          capabilities:
+            add:
+            - NET_ADMIN
+            - SYS_ADMIN
+            - SYS_PTRACE
+            - NET_RAW
+            - AUDIT_WRITE
+            - MKNOD
+            - SETUID
+            - SETGID
+            # drop: ["ALL"] <- intentionally missing
+
+        volumeMounts:
+        # VULN-7: hostPath mount to root filesystem
+        - name: host-root
+          mountPath: /host
+        - name: docker-socket
+          mountPath: /var/run/docker.sock
+        - name: etc-shadow
+          mountPath: /etc/shadow-host
+          readOnly: false
+
+      volumes:
+      # VULN-7: hostPath to root (can access entire node filesystem)
+      - name: host-root
+        hostPath:
+          path: /
+          type: Directory
+      # VULN: Docker socket mount (container escape vector)
+      - name: docker-socket
+        hostPath:
+          path: /var/run/docker.sock
+          type: Socket
+      # VULN: Sensitive file mount
+      - name: etc-shadow
+        hostPath:
+          path: /etc/shadow
+          type: File
+
+      # VULN: No nodeSelector, tolerations, or affinity
+      # Can be scheduled anywhere
+
+      # VULN: No PodDisruptionBudget referenced
+
+      # VULN: No priorityClassName set
+
+---
+# Second deployment with different but equally bad patterns
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: insecure-api
+  namespace: broken-app
+  labels:
+    app: insecure-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: insecure-api
+  template:
+    metadata:
+      labels:
+        app: insecure-api
+    spec:
+      containers:
+      - name: api
+        # VULN: Untrusted registry
+        image: randomuser/suspicious-image:v1.0
+
+        # VULN: Command injection vulnerable command
+        command: ["/bin/sh"]
+        args: ["-c", "echo $USER_INPUT | sh"]
+
+        env:
+        - name: USER_INPUT
+          value: "ls -la"
+        - name: REDIS_PASSWORD
+          value: "redis-secret-password"
+
+        securityContext:
+          runAsNonRoot: false
+          allowPrivilegeEscalation: true
+
+        # VULN: No resource limits
+        # resources: missing
+
+---
+# Third deployment: Init container vulnerabilities
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: init-vuln-app
+  namespace: broken-app
+  labels:
+    app: init-vuln-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: init-vuln-app
+  template:
+    metadata:
+      labels:
+        app: init-vuln-app
+    spec:
+      initContainers:
+      - name: init-privileged
+        image: busybox:latest
+        # VULN: Privileged init container
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        command: ['sh', '-c', 'chmod 777 /data']
+        volumeMounts:
+        - name: shared-data
+          mountPath: /data
+
+      containers:
+      - name: main
+        image: nginx:1.19
+        volumeMounts:
+        - name: shared-data
+          mountPath: /data
+
+      volumes:
+      - name: shared-data
+        emptyDir: {}

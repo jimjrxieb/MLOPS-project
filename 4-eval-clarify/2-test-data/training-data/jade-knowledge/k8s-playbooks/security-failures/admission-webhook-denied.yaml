@@ -1,0 +1,235 @@
+# JADE Operational Playbook: Admission Webhook Denied
+# Request blocked by validating/mutating admission webhook
+
+name: Admission-Webhook-Denied
+category: security-failures
+severity: MEDIUM
+frequency: COMMON
+
+trigger_patterns:
+  - "admission webhook"
+  - "denied the request"
+  - "ValidatingWebhookConfiguration"
+  - "MutatingWebhookConfiguration"
+  - "webhook.*denied"
+  - "gatekeeper"
+  - "kyverno"
+  - "OPA"
+
+description: |
+  An admission webhook (OPA Gatekeeper, Kyverno, or custom) rejected the
+  resource creation/update. Need to identify which policy failed and fix
+  the resource or request exemption.
+
+gameplan:
+  step_1:
+    name: "Identify the blocking webhook"
+    commands:
+      - "kubectl get validatingwebhookconfigurations"
+      - "kubectl get mutatingwebhookconfigurations"
+      - "kubectl describe {resource} {name} -n {ns}"
+
+    extract:
+      - "Webhook name"
+      - "Denial reason"
+      - "What resource was rejected"
+
+  step_2_webhook_specific:
+    name: "Handle based on webhook type"
+
+    gatekeeper:
+      identify: "gatekeeper.sh/webhook"
+      commands:
+        - "kubectl get constraints"
+        - "kubectl get constrainttemplates"
+        - "kubectl describe constraint {constraint-name}"
+      find_violation: |
+        # Get all constraints and check which failed
+        kubectl get constraints -o wide
+
+    kyverno:
+      identify: "kyverno.io/webhook"
+      commands:
+        - "kubectl get clusterpolicy,policy -A"
+        - "kubectl get policyreport -n {ns}"
+        - "kubectl describe clusterpolicy {policy-name}"
+      find_violation: |
+        kubectl get policyreport -n {ns} -o yaml
+
+    custom_webhook:
+      identify: "Neither Gatekeeper nor Kyverno"
+      commands:
+        - "kubectl describe validatingwebhookconfiguration {webhook-name}"
+        - "kubectl logs -n {webhook-ns} -l app={webhook-app}"
+      action: "Check webhook service logs for details"
+
+  step_3_understand_policy:
+    name: "Read and understand the policy"
+
+    gatekeeper_constraint:
+      template: |
+        # Example: require labels
+        apiVersion: constraints.gatekeeper.sh/v1beta1
+        kind: K8sRequiredLabels
+        metadata:
+          name: require-team-label
+        spec:
+          match:
+            kinds:
+            - apiGroups: [""]
+              kinds: ["Pod"]
+          parameters:
+            labels: ["team"]
+
+    kyverno_policy:
+      template: |
+        # Example: require labels
+        apiVersion: kyverno.io/v1
+        kind: ClusterPolicy
+        metadata:
+          name: require-team-label
+        spec:
+          validationFailureAction: Enforce
+          rules:
+          - name: check-labels
+            match:
+              resources:
+                kinds:
+                - Pod
+            validate:
+              message: "Label 'team' is required"
+              pattern:
+                metadata:
+                  labels:
+                    team: "?*"
+
+  step_4_fix_options:
+    name: "Options to resolve the denial"
+
+    fix_resource:
+      description: "Modify resource to comply with policy"
+      rank: "D"
+      action: "Add missing labels/annotations/settings"
+      example: |
+        metadata:
+          labels:
+            team: my-team  # Add required label
+
+    request_exemption:
+      description: "Exempt specific resource from policy"
+      rank: "C"
+
+      gatekeeper_exempt:
+        template: |
+          # Add to constraint excludedNamespaces
+          spec:
+            match:
+              excludedNamespaces: ["{ns}"]
+          # Or add exemption annotation
+          metadata:
+            annotations:
+              policy.gatekeeper.sh/exempt: "true"
+
+      kyverno_exempt:
+        template: |
+          # Add exclusion to policy
+          spec:
+            rules:
+            - name: check-labels
+              exclude:
+                resources:
+                  namespaces: ["{ns}"]
+              # Or by label
+              exclude:
+                resources:
+                  selector:
+                    matchLabels:
+                      exempt: "true"
+
+    disable_webhook:
+      description: "Temporarily disable webhook (emergency only)"
+      rank: "B"
+      warning: "Removes all policy enforcement!"
+      command: "kubectl delete validatingwebhookconfiguration {webhook}"
+
+  step_5_common_policies:
+    name: "Common policy violations and fixes"
+
+    require_labels:
+      violation: "Missing required labels"
+      fix_rank: "D"
+      fix: "Add the required labels"
+
+    require_resource_limits:
+      violation: "Missing resource limits"
+      fix_rank: "D"
+      fix: |
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "128Mi"
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+
+    restrict_image_registry:
+      violation: "Image from unauthorized registry"
+      fix_rank: "C"
+      fix: "Use image from approved registry"
+
+    require_probes:
+      violation: "Missing liveness/readiness probes"
+      fix_rank: "D"
+      fix: "Add probes to container spec"
+
+    block_privileged:
+      violation: "Privileged container blocked"
+      fix_rank: "C"
+      fix: "Remove privileged setting or request exemption"
+
+    require_readonly_root:
+      violation: "Read-only root filesystem required"
+      fix_rank: "D"
+      fix: |
+        securityContext:
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        volumes:
+        - name: tmp
+          emptyDir: {}
+
+common_auto_fixes:
+  - id: "adm-add-labels"
+    trigger: "missing required label"
+    rank: "D"
+    action: "add_labels"
+
+  - id: "adm-add-limits"
+    trigger: "missing resource limits"
+    rank: "D"
+    action: "add_resource_limits"
+
+  - id: "adm-add-probes"
+    trigger: "missing probes AND container exposes port"
+    rank: "D"
+    action: "add_default_probes"
+
+escalation_triggers:
+  - condition: "Policy exemption requested"
+    escalate_to: "JADE"
+    reason: "Security exemption needs approval"
+
+  - condition: "Webhook itself is failing"
+    escalate_to: "JADE"
+    reason: "Infrastructure issue"
+
+  - condition: "Policy seems incorrect"
+    escalate_to: "JADE"
+    reason: "Policy review needed"
+
+related_playbooks:
+  - pss-psa-violation
+  - rbac-denied
+  - createcontainererror

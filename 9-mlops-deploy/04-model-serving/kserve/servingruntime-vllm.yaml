@@ -1,0 +1,62 @@
+# KServe ServingRuntime — vLLM with OpenAI-compatible API
+# This defines HOW models are served. InferenceService references this runtime.
+apiVersion: serving.kserve.io/v1alpha1
+kind: ClusterServingRuntime
+metadata:
+  name: vllm-runtime
+spec:
+  annotations:
+    prometheus.kserve.io/port: "8000"
+    prometheus.kserve.io/path: /metrics
+  supportedModelFormats:
+    - name: vllm
+      version: "1"
+      autoSelect: true
+  protocolVersions:
+    - v2
+    - grpc-v2
+  containers:
+    - name: kserve-container
+      image: vllm/vllm-openai:v0.8.5
+      args:
+        - "--model"
+        - "/mnt/models"
+        - "--host"
+        - "0.0.0.0"
+        - "--port"
+        - "8000"
+        - "--max-model-len"
+        - "4096"
+        - "--dtype"
+        - "auto"
+        - "--trust-remote-code"
+      ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+      resources:
+        requests:
+          cpu: "4"
+          memory: "16Gi"
+        limits:
+          cpu: "8"
+          memory: "24Gi"
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: 8000
+        initialDelaySeconds: 120
+        periodSeconds: 15
+        failureThreshold: 5
+      readinessProbe:
+        httpGet:
+          path: /health
+          port: 8000
+        initialDelaySeconds: 120
+        periodSeconds: 10
+        failureThreshold: 3

@@ -1,0 +1,45 @@
+# Expected Gatekeeper policy for blocking root containers
+# JADE should generate something similar to this
+
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sblockrootcontainers
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sBlockRootContainers
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sblockrootcontainers
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          not container.securityContext.runAsNonRoot
+          msg := sprintf("Container %v must set securityContext.runAsNonRoot to true", [container.name])
+        }
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          container.securityContext.runAsUser == 0
+          msg := sprintf("Container %v must not run as root (UID 0)", [container.name])
+        }
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sBlockRootContainers
+metadata:
+  name: block-root-containers
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+
+# Validation criteria:
+# - Must have valid ConstraintTemplate with Rego
+# - Must check runAsNonRoot or runAsUser
+# - Must have matching Constraint resource
+# - YAML must be syntactically valid
+# - Rego must compile without errors

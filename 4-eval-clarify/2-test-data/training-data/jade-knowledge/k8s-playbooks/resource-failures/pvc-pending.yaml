@@ -1,0 +1,244 @@
+# JADE Operational Playbook: PVC Pending
+# PersistentVolumeClaim stuck in Pending state
+
+name: PVC-Pending
+category: resource-failures
+severity: HIGH
+frequency: COMMON
+
+trigger_patterns:
+  - "PersistentVolumeClaim.*Pending"
+  - "waiting for a volume to be created"
+  - "no persistent volumes available"
+  - "storageclass.*not found"
+  - "ProvisioningFailed"
+
+description: |
+  PVC is stuck in Pending state, which means no PersistentVolume is available
+  to satisfy the claim. This blocks pods that need the storage.
+
+gameplan:
+  step_1:
+    name: "Check PVC status and events"
+    commands:
+      - "kubectl describe pvc {pvc} -n {ns}"
+      - "kubectl get pvc {pvc} -n {ns} -o yaml"
+      - "kubectl get events -n {ns} --field-selector involvedObject.name={pvc}"
+
+    extract:
+      - "StorageClass name"
+      - "Requested storage size"
+      - "Access modes requested"
+      - "Volume mode (Filesystem/Block)"
+      - "Event messages"
+
+  step_2_identify_cause:
+    name: "Determine why PVC is pending"
+
+    branches:
+      no_storageclass:
+        indicator: "storageclass.*not found"
+        meaning: "StorageClass doesn't exist"
+        fix_rank: "D"
+        commands:
+          - "kubectl get storageclass"
+        fixes:
+          - action: "Create StorageClass or use existing one"
+            template: |
+              # Fix PVC to use existing StorageClass
+              kubectl patch pvc {pvc} -n {ns} \
+                --type=json \
+                -p='[{"op": "replace", "path": "/spec/storageClassName", "value": "standard"}]'
+
+      no_provisioner:
+        indicator: "no volume plugin matched\\|provisioner.*not found"
+        meaning: "StorageClass provisioner not installed"
+        fix_rank: "C"
+        commands:
+          - "kubectl get storageclass {sc} -o yaml"
+          - "kubectl get pods -n kube-system | grep -i csi\\|provisioner"
+        fixes:
+          - action: "Install CSI driver or cloud provisioner"
+          - action: "Use different StorageClass"
+
+      no_matching_pv:
+        indicator: "no persistent volumes available"
+        meaning: "No PV matches the PVC requirements"
+        fix_rank: "C"
+        commands:
+          - "kubectl get pv"
+          - "kubectl get pv -o wide"
+        analyze:
+          - "Check if any PV exists"
+          - "Check PV capacity vs PVC request"
+          - "Check access modes match"
+          - "Check if PV is bound to another PVC"
+
+      wrong_access_mode:
+        indicator: "does not support.*access mode\\|ReadWriteMany not supported"
+        meaning: "PV doesn't support requested access mode"
+        fix_rank: "D"
+        common_modes:
+          RWO: "ReadWriteOnce - single node read/write"
+          ROX: "ReadOnlyMany - multi-node read-only"
+          RWX: "ReadWriteMany - multi-node read/write (requires NFS/EFS/etc)"
+        fixes:
+          - action: "Change PVC access mode"
+            template: |
+              # Delete and recreate with correct mode
+              kubectl get pvc {pvc} -n {ns} -o yaml > pvc-backup.yaml
+              # Edit accessModes, then:
+              kubectl delete pvc {pvc} -n {ns}
+              kubectl apply -f pvc-fixed.yaml
+
+      size_too_large:
+        indicator: "insufficient.*capacity\\|no.*capacity"
+        meaning: "Requested size exceeds available capacity"
+        fix_rank: "D"
+        commands:
+          - "kubectl get pv -o custom-columns=NAME:.metadata.name,CAPACITY:.spec.capacity.storage,STATUS:.status.phase"
+        fixes:
+          - action: "Request smaller size or add capacity"
+
+      wrong_zone:
+        indicator: "topology\\|zone\\|region"
+        meaning: "No storage available in pod's zone"
+        fix_rank: "C"
+        commands:
+          - "kubectl get pv -o yaml | grep -A5 nodeAffinity"
+          - "kubectl get nodes -o wide"
+        fixes:
+          - action: "Create PV in correct zone"
+          - action: "Use WaitForFirstConsumer binding mode"
+
+      quota_exceeded:
+        indicator: "exceeded quota\\|ResourceQuota"
+        meaning: "Namespace storage quota exceeded"
+        fix_rank: "C"
+        commands:
+          - "kubectl describe resourcequota -n {ns}"
+          - "kubectl get pvc -n {ns}"
+        fixes:
+          - action: "Increase quota or delete unused PVCs"
+
+  step_3_check_storageclass:
+    name: "Verify StorageClass configuration"
+    commands:
+      - "kubectl get storageclass {sc} -o yaml"
+
+    check:
+      - "provisioner: What CSI driver/provisioner?"
+      - "reclaimPolicy: Delete vs Retain"
+      - "volumeBindingMode: Immediate vs WaitForFirstConsumer"
+      - "allowVolumeExpansion: Can resize?"
+      - "parameters: Provider-specific settings"
+
+    common_storageclasses:
+      aws_ebs:
+        provisioner: "ebs.csi.aws.com"
+        access_modes: ["ReadWriteOnce"]
+        note: "Single-AZ only"
+
+      aws_efs:
+        provisioner: "efs.csi.aws.com"
+        access_modes: ["ReadWriteMany"]
+        note: "Multi-AZ, requires EFS CSI driver"
+
+      gcp_pd:
+        provisioner: "pd.csi.storage.gke.io"
+        access_modes: ["ReadWriteOnce", "ReadOnlyMany"]
+
+      azure_disk:
+        provisioner: "disk.csi.azure.com"
+        access_modes: ["ReadWriteOnce"]
+
+      nfs:
+        provisioner: "nfs.csi.k8s.io"
+        access_modes: ["ReadWriteMany"]
+
+  step_4_fix_options:
+    name: "Resolution options"
+
+    create_pv_manually:
+      description: "Manually provision PV for static binding"
+      rank: "C"
+      template: |
+        apiVersion: v1
+        kind: PersistentVolume
+        metadata:
+          name: {pv-name}
+        spec:
+          capacity:
+            storage: {size}
+          accessModes:
+            - ReadWriteOnce
+          persistentVolumeReclaimPolicy: Retain
+          storageClassName: {storage-class}
+          # For hostPath (dev only):
+          hostPath:
+            path: /data/{pv-name}
+          # Or for cloud:
+          csi:
+            driver: {csi-driver}
+            volumeHandle: {volume-id}
+
+    use_waitforfirstconsumer:
+      description: "Delay binding until pod scheduled"
+      rank: "D"
+      benefit: "Ensures storage in same zone as pod"
+      template: |
+        apiVersion: storage.k8s.io/v1
+        kind: StorageClass
+        metadata:
+          name: delayed-binding
+        provisioner: {provisioner}
+        volumeBindingMode: WaitForFirstConsumer
+
+    fix_dynamic_provisioning:
+      description: "Enable dynamic provisioning"
+      rank: "C"
+      steps:
+        - "Install CSI driver for your storage"
+        - "Create StorageClass with correct provisioner"
+        - "Set as default if needed"
+
+  step_5_verify_fix:
+    name: "Confirm PVC is bound"
+    commands:
+      - "kubectl get pvc {pvc} -n {ns}"
+      - "kubectl describe pvc {pvc} -n {ns}"
+      - "kubectl get pv | grep {pvc}"
+
+    success_criteria:
+      - "PVC status is Bound"
+      - "PV is created and bound"
+      - "Pod using PVC can start"
+
+common_auto_fixes:
+  - id: "pvc-fix-storageclass"
+    trigger: "storageclass not found AND default exists"
+    rank: "D"
+    action: "patch_pvc_storageclass"
+
+  - id: "pvc-reduce-size"
+    trigger: "size too large AND can reduce"
+    rank: "D"
+    action: "recreate_pvc_smaller"
+
+escalation_triggers:
+  - condition: "Need to install CSI driver"
+    escalate_to: "JADE"
+    reason: "Cluster-level infrastructure change"
+
+  - condition: "Need cross-zone storage (RWX)"
+    escalate_to: "JADE"
+    reason: "Architecture decision needed"
+
+  - condition: "Production data at risk"
+    escalate_to: "JADE"
+    reason: "Data safety concern"
+
+related_playbooks:
+  - pending
+  - createcontainererror
+  - pv-released-failed

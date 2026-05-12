@@ -1,0 +1,12 @@
+{
+  "id": "fix-semgrep-001",
+  "scanner": "semgrep",
+  "rule_id": "python.lang.security.audit.dangerous-system-call.dangerous-system-call",
+  "finding": "Detected os.system() with user input, potential command injection",
+  "file": "app.py",
+  "line": 42,
+  "severity": "CRITICAL",
+  "expected_rank": "D",
+  "context": "import os\n\ndef run_command(user_input):\n    os.system(f'echo {user_input}')",
+  "instructions": "Fix this command injection vulnerability. Use subprocess with proper argument handling."
+}

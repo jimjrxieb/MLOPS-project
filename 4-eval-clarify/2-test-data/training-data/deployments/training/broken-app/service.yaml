@@ -1,0 +1,52 @@
+# Service for vulnerable application
+# VULN: No NetworkPolicy restricting access
+apiVersion: v1
+kind: Service
+metadata:
+  name: vulnerable-app
+  namespace: broken-app
+  labels:
+    app: vulnerable-app
+spec:
+  selector:
+    app: vulnerable-app
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+  type: ClusterIP
+
+---
+# VULN: LoadBalancer service exposing to internet without restrictions
+apiVersion: v1
+kind: Service
+metadata:
+  name: vulnerable-app-external
+  namespace: broken-app
+  labels:
+    app: vulnerable-app
+spec:
+  selector:
+    app: vulnerable-app
+  ports:
+  - port: 80
+    targetPort: 80
+  type: LoadBalancer
+  # VULN: No loadBalancerSourceRanges to restrict access
+  # loadBalancerSourceRanges: ["0.0.0.0/0"] <- would allow all
+
+---
+# VULN: NodePort service (exposes on all nodes)
+apiVersion: v1
+kind: Service
+metadata:
+  name: vulnerable-app-nodeport
+  namespace: broken-app
+spec:
+  selector:
+    app: vulnerable-app
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30080
+  type: NodePort

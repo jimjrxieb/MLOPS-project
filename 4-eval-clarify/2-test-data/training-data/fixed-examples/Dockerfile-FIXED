@@ -1,0 +1,79 @@
+# FIXED VERSION OF DOCKERFILE EXAMPLE #1
+# Fixes Applied:
+#   1. Running as non-root user (uid 1000)
+#   2. Pinned base image with digest
+#   3. Multi-stage build for smaller image
+#   4. Secrets via runtime env (never in image)
+#   5. Health check defined
+#   6. Minimal packages only
+#   7. Explicit COPY for required files only
+#   8. .dockerignore in place
+#
+# Compliance: CIS Docker 4.1, 4.2, 4.6, 4.9, SLSA Level 2
+
+# FIXED: Pinned base image with SHA digest
+FROM python:3.11-slim-bookworm@sha256:abc123... AS builder
+
+# FIXED: Set environment for reproducibility
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+WORKDIR /build
+
+# FIXED: Copy only requirements first (cache layer)
+COPY requirements.txt .
+
+# FIXED: Install in builder, no runtime tools
+RUN pip install --user --no-warn-script-location -r requirements.txt
+
+# ====== Runtime Stage ======
+FROM python:3.11-slim-bookworm@sha256:abc123...
+
+# FIXED: Labels for traceability
+LABEL org.opencontainers.image.source="https://github.com/company/app" \
+      org.opencontainers.image.revision="${GIT_SHA}" \
+      org.opencontainers.image.vendor="Company" \
+      maintainer="security-team@company.com"
+
+# FIXED: Minimal packages, clean cache
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# FIXED: Create non-root user
+RUN groupadd --gid 1000 appuser \
+    && useradd --uid 1000 --gid 1000 --shell /bin/false appuser
+
+WORKDIR /app
+
+# FIXED: Copy from builder (installed packages)
+COPY --from=builder /root/.local /home/appuser/.local
+
+# FIXED: Copy only application code (not everything)
+COPY --chown=appuser:appuser src/ ./src/
+COPY --chown=appuser:appuser app.py .
+
+# FIXED: Switch to non-root user
+USER appuser
+
+# FIXED: Update PATH for user-installed packages
+ENV PATH=/home/appuser/.local/bin:$PATH
+
+# FIXED: NO secrets in image - pass at runtime
+# Secrets come from:
+#   - Kubernetes Secrets
+#   - AWS Secrets Manager
+#   - HashiCorp Vault
+#   - Docker secrets (swarm)
+
+# FIXED: Health check for orchestrator
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
+
+EXPOSE 8000
+
+# FIXED: Use exec form to properly handle signals
+CMD ["python", "-m", "gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "app:app"]

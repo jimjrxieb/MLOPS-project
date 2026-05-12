@@ -1,0 +1,146 @@
+{
+  "benchmark_file": "results/benchmark_20251230_143757.json",
+  "evaluation_timestamp": "2025-12-30T14:38:42.883087",
+  "questions": [
+    {
+      "jade_scores": {
+        "correctness": 6,
+        "npc_knowledge": 4,
+        "workflow": 3,
+        "practicality": 7,
+        "total": 20
+      },
+      "haiku_scores": {
+        "correctness": 8,
+        "npc_knowledge": 9,
+        "workflow": 9,
+        "practicality": 8,
+        "total": 34
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku correctly identified both required NPCs (gitleaks_npc.py and secrets_fixer_npc.py) and followed the proper scan\u2192fix\u2192verify workflow, while JADE focused on manual git commands without mentioning the secrets_fixer_npc or following the expected automated workflow.",
+      "question_id": "ops-001",
+      "domain": "Secrets Management",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 6,
+        "npc_knowledge": 4,
+        "workflow": 7,
+        "practicality": 5,
+        "total": 22
+      },
+      "haiku_scores": {
+        "correctness": 8,
+        "npc_knowledge": 9,
+        "workflow": 9,
+        "practicality": 8,
+        "total": 34
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku correctly identified and used the exact NPCs mentioned in the expected elements (kube_bench_npc.py and kubernetes_fixer_npc.py) while following the proper workflow, whereas JADE hallucinated tool names and used incorrect NPC references despite being more verbose.",
+      "question_id": "ops-002",
+      "domain": "Container Security",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 8,
+        "npc_knowledge": 9,
+        "workflow": 9,
+        "practicality": 9,
+        "total": 35
+      },
+      "haiku_scores": {
+        "correctness": 6,
+        "npc_knowledge": 7,
+        "workflow": 8,
+        "practicality": 6,
+        "total": 27
+      },
+      "winner": "JADE",
+      "explanation": "JADE provides concrete, executable commands with correct NPC references and follows the exact scan\u2192fix\u2192verify workflow, while Haiku introduces non-existent orchestrators and NPCs not mentioned in the toolkit, making it less practically useful despite good conceptual understanding.",
+      "question_id": "ops-003",
+      "domain": "Dependency Security",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 7,
+        "npc_knowledge": 6,
+        "workflow": 8,
+        "practicality": 7,
+        "total": 28
+      },
+      "haiku_scores": {
+        "correctness": 9,
+        "npc_knowledge": 8,
+        "workflow": 9,
+        "practicality": 9,
+        "total": 35
+      },
+      "winner": "HAIKU",
+      "explanation": "Haiku provides a more comprehensive and structured response with correct NPC references, proper workflow explanation, and practical integration details, while JADE has some inaccuracies in NPC naming conventions.",
+      "question_id": "ops-004",
+      "domain": "IaC Security",
+      "question_type": "operational"
+    },
+    {
+      "jade_scores": {
+        "correctness": 9,
+        "npc_knowledge": 10,
+        "workflow": 10,
+        "practicality": 9,
+        "total": 38
+      },
+      "haiku_scores": {
+        "correctness": 8,
+        "npc_knowledge": 9,
+        "workflow": 9,
+        "practicality": 7,
+        "total": 33
+      },
+      "winner": "JADE",
+      "explanation": "JADE provides more comprehensive practical examples with actual code snippets, JSON outputs, and concrete before/after workflow fixes, while maintaining perfect NPC knowledge and workflow understanding. Haiku is solid but less actionable for immediate implementation.",
+      "question_id": "ops-005",
+      "domain": "CI/CD Security",
+      "question_type": "operational"
+    }
+  ],
+  "summary": {
+    "total_evaluated": 5,
+    "skipped": 0,
+    "jade_wins": 2,
+    "haiku_wins": 3,
+    "ties": 0,
+    "jade_win_rate": 0.4,
+    "haiku_win_rate": 0.6,
+    "jade_avg_total": 28.6,
+    "haiku_avg_total": 32.6,
+    "by_category": {
+      "jade": {
+        "correctness": 7.2,
+        "npc_knowledge": 6.6,
+        "workflow": 7.4,
+        "practicality": 7.4
+      },
+      "haiku": {
+        "correctness": 7.8,
+        "npc_knowledge": 8.4,
+        "workflow": 8.8,
+        "practicality": 7.6
+      }
+    },
+    "operational_questions": {
+      "jade_wins": 2,
+      "haiku_wins": 3,
+      "ties": 0
+    },
+    "domain_questions": {
+      "jade_wins": 0,
+      "haiku_wins": 0,
+      "ties": 0
+    }
+  }
+}

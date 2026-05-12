@@ -1,0 +1,59 @@
+# Experiment 002 — Katie v2 Curated Training
+# Date: 2026-03-17 → in progress
+# Hypothesis: 42k curated examples outperform 284k raw
+
+model:
+  base: "unsloth/Llama-3.2-3B-Instruct"
+  quantization: "4bit"
+
+lora:
+  r: 64
+  alpha: 128
+  dropout: 0
+  target_modules: ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+
+training:
+  epochs_per_chunk: 2
+  batch_size: 4
+  gradient_accumulation_steps: 8
+  learning_rate: 2e-5
+  warmup_ratio: 0.03
+  lr_scheduler: "cosine"
+  weight_decay: 0.01
+  max_seq_length: 2048
+  chunk_size: 10000
+
+data:
+  corpus: "1-data-pipeline/05-data-quality/curated/katie_v2_clean.jsonl"
+  total_examples: 42276
+  curation_tool: "tools/curate_corpus.py"
+  format: "ChatML"  # Enforced — Alpaca rejected
+  quality_gates:
+    - format_validation (ChatML only)
+    - scope_check (CKS/CKA/CKAD/CNPA/OPS keywords)
+    - garbage_rejection (placeholders, raw JSON, stubs)
+    - transcript_rejection (YouTube captions)
+    - deduplication (exact + near-duplicate)
+    - response_quality (must contain real commands/YAML)
+    - min_chunk_size (500 examples)
+
+  target_distribution:
+    CKS: 35%
+    CKA: 30%
+    CKAD: 20%
+    CNPA: 10%
+    OPS: 5%
+
+artifacts:
+  corpus_sha256: "0347e5e9df5aa0cf8dacfed3ba58f2e063c5c6607f2f7757b878d428b2121e30"
+  checkpoint: "3-model-registry/v2.0-3b/chunk_0001_10k/merged"
+  training_state: "3-model-registry/v2.0-3b/training_state.json"
+  training_state_sha256: "866526d5d4b5cbdc817fdc3279ba030bedea2a15e1eca786630268eb6a450c5c"
+
+changes_from_exp001:
+  - "Fresh LoRA from base model (no stacked weights)"
+  - "Curated corpus: 284k → 42k (85% rejected)"
+  - "ChatML format enforced (Alpaca rejected)"
+  - "Quality gates on every example"
+  - "Domain distribution tracked and targeted"
+  - "Eval after every chunk (catch regression early)"

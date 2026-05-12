@@ -1,0 +1,224 @@
+# JADE Operational Playbook: Evicted Pod
+# Pod removed by kubelet due to resource pressure
+
+name: Evicted
+category: pod-failures
+severity: HIGH
+frequency: MODERATE
+
+trigger_patterns:
+  - "Evicted"
+  - "The node was low on resource"
+  - "ephemeral-storage"
+  - "memory pressure"
+  - "disk pressure"
+  - "pid pressure"
+
+description: |
+  Kubelet evicted the pod to reclaim resources on the node. This happens when
+  node is under memory, disk, or PID pressure. Pod with lower priority or
+  higher resource usage gets evicted first.
+
+gameplan:
+  step_1:
+    name: "Identify eviction reason"
+    commands:
+      - "kubectl describe pod {pod} -n {ns} | grep -A5 'Status:\\|Message:'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.status.reason}'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.status.message}'"
+
+    branches:
+      memory_pressure:
+        patterns:
+          - "memory pressure"
+          - "The node was low on memory"
+        meaning: "Node running out of memory, pods evicted to free up"
+        fix_rank: "C"
+        fixes:
+          - action: "Check node memory status"
+            command: "kubectl top nodes"
+          - action: "Check which pods using most memory"
+            command: "kubectl top pods -A --sort-by=memory"
+          - action: "Set memory limits on pods to prevent one pod consuming all"
+          - action: "Add more nodes if consistently under pressure"
+
+      disk_pressure:
+        patterns:
+          - "disk pressure"
+          - "ephemeral-storage"
+          - "DiskPressure"
+          - "The node was low on disk"
+        meaning: "Node running out of disk space"
+        fix_rank: "C"
+        fixes:
+          - action: "Check node disk usage"
+            command: "kubectl describe node {node} | grep -A5 'Conditions:'"
+          - action: "Clean up unused images"
+            note: "Container runtime should auto-GC, but may need manual cleanup"
+          - action: "Clean up completed pods"
+            command: "kubectl delete pods -A --field-selector=status.phase=Succeeded"
+          - action: "Set ephemeral-storage limits on pods"
+
+      pid_pressure:
+        patterns:
+          - "pid pressure"
+          - "PIDPressure"
+        meaning: "Node running out of process IDs"
+        fix_rank: "C"
+        fixes:
+          - action: "Check for fork bomb or runaway process spawning"
+          - action: "Increase node max PIDs"
+          - action: "Set PID limits on containers"
+
+      exceeded_limits:
+        patterns:
+          - "exceeded"
+          - "usage exceeded"
+        meaning: "Pod exceeded its resource limits (usually ephemeral storage)"
+        fix_rank: "D"
+        fixes:
+          - action: "Check ephemeral storage usage"
+          - action: "Increase ephemeral-storage limit"
+            template: |
+              resources:
+                limits:
+                  ephemeral-storage: "2Gi"
+          - action: "Use PVC instead of ephemeral storage for large data"
+
+  step_2_check_node_conditions:
+    name: "Analyze node health"
+    commands:
+      - "kubectl describe node {node} | grep -A10 'Conditions:'"
+      - "kubectl top node {node}"
+      - "kubectl get pods -A --field-selector spec.nodeName={node} -o wide"
+
+    condition_types:
+      MemoryPressure:
+        threshold: "100Mi available by default"
+        action: "Evict pods until memory freed"
+
+      DiskPressure:
+        threshold: "15% available by default"
+        action: "Evict pods, GC images/containers"
+
+      PIDPressure:
+        threshold: "Based on kernel settings"
+        action: "Evict pods spawning too many processes"
+
+  step_3_analyze_eviction_order:
+    name: "Understand why this pod was evicted"
+    commands:
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.priorityClassName}'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.containers[*].resources}'"
+
+    eviction_priority:
+      description: "Kubelet evicts pods in this order:"
+      order:
+        - "BestEffort pods (no requests/limits) - FIRST to go"
+        - "Burstable pods exceeding requests"
+        - "Guaranteed pods (requests == limits) - LAST to go"
+
+      qos_classes:
+        BestEffort:
+          definition: "No resources.requests or resources.limits set"
+          risk: "Highest eviction priority"
+          recommendation: "Always set at least requests"
+
+        Burstable:
+          definition: "Some resources set, but requests != limits"
+          risk: "Medium eviction priority"
+          recommendation: "Set reasonable limits"
+
+        Guaranteed:
+          definition: "requests == limits for all containers"
+          risk: "Lowest eviction priority (still can be evicted)"
+          recommendation: "Use for critical workloads"
+
+  step_4_prevent_future_evictions:
+    name: "Implement prevention measures"
+
+    solutions:
+      set_resource_requests:
+        description: "Ensure pods have resource requests"
+        fix_rank: "D"
+        template: |
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+      use_priority_classes:
+        description: "Critical workloads get higher priority"
+        fix_rank: "C"
+        template: |
+          apiVersion: scheduling.k8s.io/v1
+          kind: PriorityClass
+          metadata:
+            name: high-priority
+          value: 1000000
+          globalDefault: false
+          description: "High priority for critical workloads"
+
+      pod_disruption_budget:
+        description: "Limit how many pods can be evicted"
+        fix_rank: "C"
+        template: |
+          apiVersion: policy/v1
+          kind: PodDisruptionBudget
+          metadata:
+            name: {app}-pdb
+          spec:
+            minAvailable: 1
+            selector:
+              matchLabels:
+                app: {app}
+
+      node_capacity_planning:
+        description: "Ensure cluster has enough headroom"
+        fix_rank: "B"
+        actions:
+          - "Monitor node utilization trends"
+          - "Scale cluster before hitting limits"
+          - "Use cluster autoscaler"
+
+common_auto_fixes:
+  - id: "evict-add-requests"
+    trigger: "BestEffort pod evicted"
+    rank: "D"
+    action: "add_resource_requests"
+    params:
+      memory: "256Mi"
+      cpu: "100m"
+
+  - id: "evict-add-priority"
+    trigger: "Critical app evicted"
+    rank: "C"
+    action: "add_priority_class"
+    params:
+      priority: "high-priority"
+
+  - id: "evict-clean-completed"
+    trigger: "disk pressure AND completed pods exist"
+    rank: "D"
+    action: "delete_completed_pods"
+
+escalation_triggers:
+  - condition: "Guaranteed pod evicted"
+    escalate_to: "JADE"
+    reason: "Node under severe pressure - investigate root cause"
+
+  - condition: "Multiple pods evicted in short time"
+    escalate_to: "JADE"
+    reason: "Cluster capacity issue"
+
+  - condition: "Same pod repeatedly evicted"
+    escalate_to: "JADE"
+    reason: "Chronic resource issue needs investigation"
+
+related_playbooks:
+  - oomkilled
+  - pending
+  - crashloopbackoff

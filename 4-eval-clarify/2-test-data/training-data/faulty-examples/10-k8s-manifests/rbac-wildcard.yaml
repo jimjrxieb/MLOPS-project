@@ -1,0 +1,66 @@
+---
+# INSECURE RBAC - Wildcard Permissions
+# Tags: rbac, pac, insecure, wildcard-violations
+# Violations: CIS 5.1.x, MITRE T1078
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: insecure-admin-role
+rules:
+# VIOLATION: Wildcard verbs on all resources
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: insecure-admin-binding
+subjects:
+# VIOLATION: Binding cluster-admin to all service accounts
+- kind: Group
+  name: system:serviceaccounts
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  # VIOLATION: Binding to cluster-admin
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: overly-permissive-role
+  namespace: production
+rules:
+# VIOLATION: Wildcard on secrets
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["*"]
+# VIOLATION: Wildcard on pods/exec
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create"]
+# VIOLATION: Wildcard on configmaps
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["*"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: overly-permissive-binding
+  namespace: production
+subjects:
+# VIOLATION: Binding to default service account
+- kind: ServiceAccount
+  name: default
+  namespace: production
+roleRef:
+  kind: Role
+  name: overly-permissive-role
+  apiGroup: rbac.authorization.k8s.io

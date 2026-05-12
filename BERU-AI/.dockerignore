@@ -1,0 +1,16 @@
+# Don't ship training artifacts or caches into the API image
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.claude/
+mlruns/
+training-data/
+m1_api_exercise.py
+Modelfile_beru3b
+Modelfile_beru_v14
+*.gguf
+docker/
+Dockerfile
+docker-compose.yml
+.dockerignore

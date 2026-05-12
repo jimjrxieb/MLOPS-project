@@ -1,0 +1,31 @@
+==================================================
+JADE TRAINING DATA CURATION REPORT
+==================================================
+Total Examples: 284,844
+
+COUNTS BY DOMAIN:
+  kubernetes     : 109,543 ( 38.5%)
+  general        : 65,473 ( 23.0%)
+  devsecops      : 45,777 ( 16.1%)
+  cloud          : 34,387 ( 12.1%)
+  compliance     : 10,790 (  3.8%)
+  secrets        :  9,542 (  3.3%)
+  terraform      :  9,332 (  3.3%)
+
+COUNTS BY RANK:
+  S              : 20,164 (  7.1%)
+  E              : 144,072 ( 50.6%)
+  D              : 48,934 ( 17.2%)
+  C              : 48,315 ( 17.0%)
+  B              : 23,359 (  8.2%)
+
+MATRIX (DOMAIN vs RANK):
+rank            S     B      C      D      E
+domain                                      
+cloud        2284  4453   5918   4722  17010
+compliance   1367  1105   1610   2276   4432
+devsecops    1314  1678   6635   5950  30200
+general       596  6256  12562   6889  39170
+kubernetes  13875  8116  18976  25887  42689
+secrets       702  1535   2005   1921   3379
+terraform      26   216    609   1289   7192

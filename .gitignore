@@ -1,0 +1,135 @@
+# ============================================================================
+# GP-MODEL-OPS .gitignore — repo: github.com/jimjrxieb/MLOPS-project
+#
+# Rule: GitHub stores CODE, CONFIG, PLAYBOOKS, SMALL DATA. It does NOT store
+# model weights, vendored C++ deps, RAG vector stores, or anything regenerable.
+# If a file is > a few MB and not hand-authored, it does not belong here.
+# ============================================================================
+
+# --- Model weights & large artifacts (NEVER commit — GitHub is not a model store) ---
+3-model-registry/
+*.gguf
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.h5
+*.onnx
+*.tflite
+# knowledge graph pickle lives in GP-S3, not here, but guard anyway
+*.pkl
+# small sklearn models ARE versioned on purpose (rank classifier = source of truth)
+!1-local-pipeline/rank-training-data/*.joblib
+
+# --- Vendored dependencies (clone these, don't commit) ---
+llama.cpp/
+**/llama.cpp/
+unsloth_compiled_cache/
+**/unsloth_compiled_cache/
+
+# --- RAG / vector store data (regenerable, large) ---
+2-rag-ingestion/05-ragged-data/
+**/chroma/
+*.chroma
+chroma.sqlite3
+
+# --- MLflow / experiment tracking output ---
+mlruns/
+**/mlruns/
+mlflow.db
+
+# --- Training run output & checkpoints ---
+*.log
+checkpoint-*/
+checkpoints/
+**/_checkpoints/
+runs/
+wandb/
+04-trained-data/
+03-chunked-untrained/
+# ETL intermediate corpora — regenerable, and some exceed GitHub's 100 MB file limit
+1-local-pipeline/02-ETL-data/
+**/02-ETL-data/
+
+# --- Eval result dumps (regenerable; keep the questions + scorers, not the runs) ---
+4-eval-clarify/3-results/
+**/full_results.json
+**/failquestions_*.jsonl
+**/archive/
+
+# --- Stray backups / scratch output ---
+*.jade_backup
+*_backup
+nohup.out
+
+# --- Claude Code local state ---
+**/.claude/
+.coverage
+.coverage.*
+htmlcov/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+ENV/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Secrets — never, under any circumstances ---
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*.token
+*_token
+credentials
+credentials.*
+secrets.yaml
+secrets.yml
+secrets.json
+service-account*.json
+.aws/
+.ssh/
+*.kubeconfig
+kubeconfig
+
+# --- Windows / WSL cruft ---
+*:Zone.Identifier
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# --- IDE / editor ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- OS ---
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# --- Temp / scratch ---
+/tmp/
+tmp/
+*.tmp
+*.bak
+*.orig

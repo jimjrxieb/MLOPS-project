@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "postgresql.fullname" . }}
+  labels:
+    {{- include "postgresql.labels" . | nindent 4 }}
+    app.kubernetes.io/component: primary
+spec:
+  serviceName: {{ include "postgresql.fullname" . }}-headless
+  replicas: {{ .Values.primary.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "postgresql.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: primary
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      labels:
+        {{- include "postgresql.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: primary
+        postgres-client: "true"
+    spec:
+      serviceAccountName: {{ include "postgresql.serviceAccountName" . }}
+      securityContext:
+        fsGroup: {{ .Values.primary.securityContext.fsGroup }}
+        runAsUser: {{ .Values.primary.securityContext.runAsUser }}
+        runAsNonRoot: {{ .Values.primary.securityContext.runAsNonRoot }}
+        seccompProfile:
+          type: {{ .Values.primary.securityContext.seccompProfile.type }}
+      containers:
+      - name: postgresql
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        securityContext:
+          {{- toYaml .Values.primary.securityContext | nindent 12 }}
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.auth.existingSecret }}
+              key: {{ .Values.auth.secretKeys.adminPasswordKey }}
+        - name: POSTGRES_USER
+          value: {{ .Values.auth.username }}
+        - name: POSTGRES_DB
+          value: {{ .Values.auth.database }}
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        ports:
+        - name: postgresql
+          containerPort: 5432
+          protocol: TCP
+        {{- if .Values.livenessProbe.enabled }}
+        livenessProbe:
+          {{- toYaml .Values.livenessProbe | nindent 12 }}
+        {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
+        readinessProbe:
+          {{- toYaml .Values.readinessProbe | nindent 12 }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.primary.resources | nindent 12 }}
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+        - name: config
+          mountPath: /etc/postgresql/postgresql.conf
+          subPath: postgresql.conf
+        - name: config
+          mountPath: /etc/postgresql/pg_hba.conf
+          subPath: pg_hba.conf
+        - name: tmp
+          mountPath: /tmp
+        - name: run
+          mountPath: /var/run/postgresql
+      volumes:
+      - name: config
+        configMap:
+          name: {{ include "postgresql.fullname" . }}
+      - name: tmp
+        emptyDir: {}
+      - name: run
+        emptyDir: {}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- if .Values.primary.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      labels:
+        {{- include "postgresql.labels" . | nindent 8 }}
+    spec:
+      accessModes:
+        {{- range .Values.primary.persistence.accessModes }}
+        - {{ . }}
+        {{- end }}
+      {{- if .Values.primary.persistence.storageClass }}
+      storageClassName: {{ .Values.primary.persistence.storageClass }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.primary.persistence.size }}
+  {{- end }}

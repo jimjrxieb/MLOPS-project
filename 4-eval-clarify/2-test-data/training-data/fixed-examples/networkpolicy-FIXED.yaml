@@ -1,0 +1,173 @@
+# FIXED VERSION OF NETWORKPOLICY EXAMPLE #1
+# Fixes Applied:
+#   1. Specific pod selector (not empty)
+#   2. Explicit egress restrictions
+#   3. Namespace selectors for cross-namespace
+#   4. Specific port restrictions
+#   5. Default deny with explicit allows
+#
+# Compliance: CIS K8s 5.3.2, NIST SC-7, Zero Trust
+
+---
+# FIXED: Default deny all ingress in namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: production
+spec:
+  podSelector: {}  # All pods
+  policyTypes:
+    - Ingress
+  # Empty ingress = deny all by default
+
+---
+# FIXED: Default deny all egress in namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-egress
+  namespace: production
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  # Empty egress = deny all by default
+
+---
+# FIXED: Application-specific network policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-network-policy
+  namespace: production
+  labels:
+    app.kubernetes.io/name: api
+    compliance: cis-k8s-5.3.2
+spec:
+  # FIXED: Specific pod selector
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: api
+      app.kubernetes.io/component: backend
+
+  policyTypes:
+    - Ingress
+    - Egress  # FIXED: Explicit egress control
+
+  ingress:
+    # FIXED: Allow from ingress-nginx in ingress-nginx namespace
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8080  # FIXED: Specific port only
+
+    # FIXED: Allow from frontend in same namespace
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: production
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: frontend
+      ports:
+        - protocol: TCP
+          port: 8080
+
+    # FIXED: Allow Prometheus scraping from monitoring namespace
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 9090  # Metrics port only
+
+  egress:
+    # FIXED: Allow to database in same namespace
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgresql
+      ports:
+        - protocol: TCP
+          port: 5432
+
+    # FIXED: Allow to Redis cache
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+
+    # FIXED: Allow DNS resolution (kube-dns)
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+    # FIXED: Allow HTTPS to external APIs (via egress gateway recommended)
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8      # Block private
+              - 172.16.0.0/12   # Block private
+              - 192.168.0.0/16  # Block private
+      ports:
+        - protocol: TCP
+          port: 443  # HTTPS only
+
+---
+# FIXED: Database network policy (very restrictive)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: database-network-policy
+  namespace: production
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: postgresql
+
+  policyTypes:
+    - Ingress
+    - Egress
+
+  ingress:
+    # FIXED: Only API pods can connect
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: api
+      ports:
+        - protocol: TCP
+          port: 5432
+
+  egress:
+    # FIXED: Database only needs DNS
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53

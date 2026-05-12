@@ -1,0 +1,185 @@
+{
+  "benchmark_name": "GuidePoint Domain + Operational Benchmark",
+  "timestamp": "2025-12-30T14:36:34.158464",
+  "jade_model": "jade:v0.8",
+  "haiku_model": "claude-3-haiku-20240307",
+  "context_provided": true,
+  "questions": [
+    {
+      "question_id": "ops-001",
+      "question_type": "operational",
+      "domain": "Secrets Management",
+      "prompt": "\nYou are JSA (JADE Secure Agent), a 24/7 DevSecOps automation agent.\n\nYou have access to GP-CONSULTING toolkit organized in phases:\n\n## Phase 1: Scanner NPCs (GP-CONSULTING/1-Security-Assessment/npcs/)\n- secrets/gitleaks_npc.py - Detect hardcoded secrets\n- sast/bandit_npc.py - Python SAST\n- sast/semgrep_npc.py - Multi-language SAST\n- dependencies/trivy_npc.py - Container/SCA scanning\n- dependencies/grype_npc.py - Vulnerability scanning\n- dependencies/snyk_npc.py - Commercial SCA\n- kubernetes/kub...",
+      "expected_npcs": [
+        "gitleaks_npc.py",
+        "secrets_fixer_npc.py"
+      ],
+      "expected_workflow": "1. Scan with GitleaksNPC, 2. Fix with SecretsFixerNPC (removes secret, updates .gitignore), 3. Rescan to verify",
+      "scoring": {
+        "mentions_gitleaks": 3,
+        "mentions_secrets_fixer": 3,
+        "correct_workflow_order": 2,
+        "mentions_gitignore_update": 1,
+        "mentions_rescan": 1
+      },
+      "jade_response": {
+        "success": true,
+        "response": "**Detection:** secrets/gitleaks_npc.py detects hardcoded AWS keys in commit history.\n\n**Fix:**\n```bash\n# 1. Find all affected files\ngit rev-list --all | xargs git grep -E 'aws_access_key_id|AWS_SECRET_ACCESS_KEY'\n\n# 2. Remove credentials from history (for everyone)\ngit filter-repo --path . --invert-paths --pattern \"*/credentials\" \\\n    --commit-callback '\n        if b\"AWS Credentials\" in commit.message:\n            return None\n        return commit\n\n# 3. Clear AWS CLI credentials\naws configure list\naws configure set aws_access_key_id \"\"\naws configure set aws_secret_access_key \"\"\n\n# 4. Remove from .gitignore\necho \"credentials\" >> .gitignore\ngit add .gitignore && git commit -m \"Remove credential files\"\n\n# 5. Audit IAM users (if credentials were used)\naws iam list-users --query 'Users[*].[UserName]'\n```\n\n**Prevention:** Use AWS Secrets Manager or OIDC roles instead of hardcoding keys.\n\n**Note:** This answer has been reviewed and enhanced for accuracy.",
+        "elapsed_seconds": 43.844895124435425,
+        "model": "jade:v0.8"
+      },
+      "haiku_response": {
+        "success": true,
+        "response": "To detect and fix the issue of AWS credentials being committed to the repository, I would use the following NPCs:\n\n1. **Detection**:\n   - `secrets/gitleaks_npc.py`: This NPC uses the Gitleaks tool to detect hardcoded secrets, including AWS credentials, in the codebase.\n\n2. **Fixing**:\n   - `secrets/secrets_fixer_npc.py`: This NPC can automatically remove the detected secrets, update the `.gitignore` file to prevent future commits of sensitive information, and notify the developer.\n\nWorkflow:\n\n1. **Scan**: The `ScanOrchestrator` would run the `gitleaks_npc.py` to scan the codebase for any hardcoded secrets.\n2. **Classify**: The `RankClassifier` would assign a high-severity (e.g., \"S\" or \"Critical\") rank to the finding, as the presence of AWS credentials in the repository is a critical security issue.\n3. **Fix**: The `FixOrchestrator` would then trigger the `secrets_fixer_npc.py` to remove the detected secrets, update the `.gitignore` file, and notify the developer.\n4. **Verify**: The `SmartRescanNPC` would re-scan the repository to confirm that the issue has been resolved.\n\nAdditionally, you may want to consider the following steps:\n\n- **Notification**: Integrate the solution with a communication tool like Slack or email to notify the developer and the security team about the incident.\n- **Credential Rotation**: Recommend that the developer rotate the compromised AWS credentials to prevent unauthorized access.\n- **Audit**: Review the commit history to ensure that the credentials were not exposed elsewhere, and consider implementing additional security measures, such as pre-commit hooks or Git hooks, to prevent similar incidents in the future.\n\nBy using the `gitleaks_npc.py` and `secrets_fixer_npc.py` NPCs, you can effectively detect and remediate the issue of AWS credentials being committed to the repository, ensuring the security of your codebase and cloud infrastructure.",
+        "elapsed_seconds": 4.043314695358276,
+        "model": "claude-3-haiku-20240307",
+        "input_tokens": 1033,
+        "output_tokens": 480
+      }
+    },
+    {
+      "question_id": "ops-002",
+      "question_type": "operational",
+      "domain": "Container Security",
+      "prompt": "\nYou are JSA (JADE Secure Agent), a 24/7 DevSecOps automation agent.\n\nYou have access to GP-CONSULTING toolkit organized in phases:\n\n## Phase 1: Scanner NPCs (GP-CONSULTING/1-Security-Assessment/npcs/)\n- secrets/gitleaks_npc.py - Detect hardcoded secrets\n- sast/bandit_npc.py - Python SAST\n- sast/semgrep_npc.py - Multi-language SAST\n- dependencies/trivy_npc.py - Container/SCA scanning\n- dependencies/grype_npc.py - Vulnerability scanning\n- dependencies/snyk_npc.py - Commercial SCA\n- kubernetes/kub...",
+      "expected_npcs": [
+        "kube_bench_npc.py",
+        "kubernetes_fixer_npc.py"
+      ],
+      "expected_workflow": "1. Scan with KubeBenchNPC, 2. Review findings, 3. Fix with KubernetesFixerNPC, 4. Rescan to verify",
+      "scoring": {
+        "mentions_kube_bench": 3,
+        "mentions_kubernetes_fixer": 3,
+        "explains_cis_benchmarks": 2,
+        "mentions_verification": 2
+      },
+      "jade_response": {
+        "success": true,
+        "response": "**Workflow: Scan and Fix K8s CIS Benchmarks**\n\n### Phase 1: Scan (CIS Benchmark Scanning)\n```bash\n# Run kube_bench in CI/CD pipeline\nkube-bench run --targets master,node > results.yaml\n\n# Or use the NPC for automated scanning\nkubectl create -f https://raw.githubusercontent.com/gp-consulting/npc/main/kube-bench_npc.yaml\n```\n\n### Phase 2: Classify (Rank Findings)\n```bash\n# Use RankClassifier to assign severity\nrank_classifier --input results.yaml > classified_findings.yaml\n\n# Output format:\n- id: CIS-1.1.1\n  rank: MEDIUM\n  description: Ensure that the kubelet only allows authenticating as predefined user groups\n```\n\n### Phase 3: Fix (Apply Remediations)\n```bash\n# Run appropriate fixer NPCs based on severity\nkubectl create -f https://raw.githubusercontent.com/gp-consulting/npc/main/kubernetes/kube_bench_fixer_npc.yaml\n\n# For MEDIUM and HIGH, escalate to security team\n```\n\n### Phase 4: Verify (Re-scan)\n```bash\n# SmartRescanNPC verifies fixes\nkubectl create -f https://raw.githubusercontent.com/gp-consulting/npc/main/smart_rescan_npc.yaml\n\n# Check if all findings are resolved\nkube-bench run --targets master,node | grep \"FAIL\" | wc -l\n```\n\n### Integration: Post to Slack\n```bash\n# Use slack_approval_npc.py for C-rank approvals\nkubectl create -f https://raw.githubusercontent.com/gp-consulting/npc/main/slack_approval_npc.yaml\n\n# Or use github_api_npc.py if in PR context\nkubectl create -f https://raw.githubusercontent.com/gp-consulting/npc/main/github_api_npc.yaml\n```\n\n### Hardening: Generate Policies\n```bash\n# Generate Gatekeeper constraints for CIS benchmarks\nkubectl create -f https://raw.githubusercontent.com/gp-consulting/npc/main/gatekeeper_generator_npc.yaml\n\n# Apply generated policies\nkubectl apply -f cis-benchmarks-constraints.yaml\n```\n\n**Note:** This answer has been reviewed and enhanced for accuracy.",
+        "elapsed_seconds": 5.261944770812988,
+        "model": "jade:v0.8"
+      },
+      "haiku_response": {
+        "success": true,
+        "response": "To address the CIS benchmark failures reported by Kube-bench on the cluster, I would use the following NPCs and workflow:\n\n1. **Scanning**:\n   - `kubernetes/kube_bench_npc.py`: This NPC runs the Kube-Bench tool to check the Kubernetes cluster's compliance with the CIS Kubernetes Benchmark.\n\n2. **Classification**:\n   - `RankClassifier`: This orchestrator will analyze the Kube-Bench findings and assign a severity rank (E/D/C/B/S) to each issue.\n\n3. **Fixing**:\n   - `kubernetes/kubernetes_fixer_npc.py`: This NPC will attempt to automatically fix the low-severity (E/D) Kube-Bench findings by updating the Kubernetes configuration files or applying the necessary changes.\n   - `slack_approval_npc.py`: For medium-severity (C) findings, this NPC will trigger a Slack-based approval workflow to get the necessary approvals before applying the fixes.\n   - For high-severity (B/S) findings, the issues will be escalated for manual review and remediation by the security team.\n\n4. **Verification**:\n   - `integrations/smart_rescan_npc.py`: After applying the fixes, this NPC will re-run the Kube-Bench scan to verify that the issues have been resolved.\n\nThe workflow would be as follows:\n\n1. **Scan**: Run the `kubernetes/kube_bench_npc.py` to scan the Kubernetes cluster for CIS benchmark compliance.\n2. **Classify**: The `RankClassifier` will analyze the Kube-Bench findings and assign a severity rank to each issue.\n3. **Fix**:\n   - For low-severity (E/D) findings, the `kubernetes/kubernetes_fixer_npc.py` will automatically apply the necessary fixes.\n   - For medium-severity (C) findings, the `slack_approval_npc.py` will trigger a Slack-based approval workflow before applying the fixes.\n   - High-severity (B/S) findings will be escalated for manual review and remediation.\n4. **Verify**: The `integrations/smart_rescan_npc.py` will re-run the Kube-Bench scan to ensure that the issues have been resolved.\n\nBy using this workflow, you can efficiently scan the Kubernetes cluster for CIS benchmark compliance, automatically fix low-severity issues, get approval for medium-severity issues, and escalate high-severity issues for manual review, ensuring that the cluster is secure and compliant.",
+        "elapsed_seconds": 4.84410548210144,
+        "model": "claude-3-haiku-20240307",
+        "input_tokens": 1037,
+        "output_tokens": 600
+      }
+    },
+    {
+      "question_id": "ops-003",
+      "question_type": "operational",
+      "domain": "Dependency Security",
+      "prompt": "\nYou are JSA (JADE Secure Agent), a 24/7 DevSecOps automation agent.\n\nYou have access to GP-CONSULTING toolkit organized in phases:\n\n## Phase 1: Scanner NPCs (GP-CONSULTING/1-Security-Assessment/npcs/)\n- secrets/gitleaks_npc.py - Detect hardcoded secrets\n- sast/bandit_npc.py - Python SAST\n- sast/semgrep_npc.py - Multi-language SAST\n- dependencies/trivy_npc.py - Container/SCA scanning\n- dependencies/grype_npc.py - Vulnerability scanning\n- dependencies/snyk_npc.py - Commercial SCA\n- kubernetes/kub...",
+      "expected_npcs": [
+        "trivy_npc.py",
+        "grype_npc.py",
+        "dependency_fixer_npc.py"
+      ],
+      "expected_workflow": "1. Scan with TrivyNPC or GrypeNPC, 2. Fix with DependencyFixerNPC (npm/yarn upgrade), 3. Rescan",
+      "scoring": {
+        "mentions_trivy_or_grype": 3,
+        "mentions_dependency_fixer": 3,
+        "knows_npm_yarn_upgrade": 2,
+        "mentions_rescan": 2
+      },
+      "jade_response": {
+        "success": true,
+        "response": "**Scan Phase:**\n```bash\n# Run dependency scanner\ndependencies/trivy_npc.py -t node_modules/\ndependencies/grype_npc.py -f package-lock.json\n\n# Scan Docker images\ndependencies/snyk_npc.py container-image:myapp:v1.0\n```\n\n**Fix Phase:**\n```bash\n# Fix vulnerabilities in dependencies\ndependencies/dependency_fixer_npc.py -i package-lock.json -o fixed-package-lock.json\n\n# Update Dockerfile\ndependencies/trivy_npc.py --fix Dockerfile\n```\n\n**Verify:**\n```bash\n# Rescan to verify fixes\ndependencies/trivy_npc.py -t node_modules/ --scan-only\n```",
+        "elapsed_seconds": 1.6174323558807373,
+        "model": "jade:v0.8"
+      },
+      "haiku_response": {
+        "success": true,
+        "response": "To scan a Node.js project for vulnerable dependencies and fix them, I would use the following NPCs from the GP-CONSULTING toolkit:\n\n1. **Scanning Phase**:\n   - `dependencies/trivy_npc.py`: This NPC uses the Trivy tool to scan the project's container image or the local file system for vulnerabilities in the project's dependencies.\n   - `dependencies/grype_npc.py`: This NPC uses the Grype tool to perform vulnerability scanning on the project's dependencies.\n   - `dependencies/snyk_npc.py`: This NPC uses the Snyk tool, which is a commercial SCA (Software Composition Analysis) tool, to identify vulnerabilities in the project's dependencies.\n\n2. **Classification Phase**:\n   - `RankClassifier`: This orchestrator will analyze the findings from the scanner NPCs and assign a rank (E, D, C, B, or S) to each finding based on the severity of the vulnerability.\n\n3. **Fixing Phase**:\n   - `dependencies/dependency_fixer_npc.py`: This NPC will automatically fix the vulnerable dependencies by upgrading the packages to the latest non-vulnerable versions.\n\n4. **Verification Phase**:\n   - `integrations/smart_rescan_npc.py`: This NPC will re-scan the project to verify that the fixes have been applied successfully and that the project no longer has any vulnerable dependencies.\n\nThe workflow would be as follows:\n\n1. **Scan**: The `ScanOrchestrator` will run the `trivy_npc.py`, `grype_npc.py`, and `snyk_npc.py` NPCs in parallel to scan the project for vulnerable dependencies.\n2. **Classify**: The `RankClassifier` will analyze the findings from the scanner NPCs and assign a rank to each finding.\n3. **Fix**: The `FixOrchestrator` will run the `dependency_fixer_npc.py` NPC to automatically fix the vulnerable dependencies.\n4. **Verify**: The `smart_rescan_npc.py` NPC will re-scan the project to confirm that the fixes have been applied successfully.\n\nIf any findings are classified as \"C\" rank (needs approval), the `slack_approval_npc.py` NPC can be used to initiate a Slack-based approval workflow before applying the fixes.\n\nAdditionally, the `github_api_npc.py` NPC can be used to post the scan results and fix status directly to the project's GitHub pull requests, providing visibility and traceability.",
+        "elapsed_seconds": 4.268038034439087,
+        "model": "claude-3-haiku-20240307",
+        "input_tokens": 1037,
+        "output_tokens": 586
+      }
+    },
+    {
+      "question_id": "ops-004",
+      "question_type": "operational",
+      "domain": "IaC Security",
+      "prompt": "\nYou are JSA (JADE Secure Agent), a 24/7 DevSecOps automation agent.\n\nYou have access to GP-CONSULTING toolkit organized in phases:\n\n## Phase 1: Scanner NPCs (GP-CONSULTING/1-Security-Assessment/npcs/)\n- secrets/gitleaks_npc.py - Detect hardcoded secrets\n- sast/bandit_npc.py - Python SAST\n- sast/semgrep_npc.py - Multi-language SAST\n- dependencies/trivy_npc.py - Container/SCA scanning\n- dependencies/grype_npc.py - Vulnerability scanning\n- dependencies/snyk_npc.py - Commercial SCA\n- kubernetes/kub...",
+      "expected_npcs": [
+        "checkov_npc.py",
+        "tfsec_npc.py",
+        "conftest_npc.py",
+        "conftest_fixer_npc.py"
+      ],
+      "expected_workflow": "1. Scan with CheckovNPC, TfsecNPC, or ConftestNPC, 2. Review findings, 3. Fix with ConftestFixerNPC if policy violations",
+      "scoring": {
+        "mentions_checkov_or_tfsec": 3,
+        "mentions_conftest": 2,
+        "understands_iac_scanning": 3,
+        "mentions_fixer": 2
+      },
+      "jade_response": {
+        "success": true,
+        "response": "**Scan Workflow:**\n\n1. **TFSEC Scan:** `tfsec_scan_npc.py` - Checks for CIS Terraform benchmarks.\n2. **Checkov Scan:** `checkov_scan_npc.py` - IaC security scanning.\n3. **Conftest Scan:** `conftest_scan_npc.py` - Policy enforcement.\n\n**Findings:**\n- TFSEC: Root cause, severity\n- Checkov: Compliance ID (CIS AWS), risk\n- Conftest: Rego policy violation\n\n**Fixes:**\n1. **Auto-Fix:** `tfsec_fixer_npc.py`, `checkov_fixer_npc.py`\n2. **Conftest:** Update policies to enforce security.\n3. **Verify:** Rescan with SmartRescanNPC.\n\n**Orchestration:**\n- ScanOrchestrator runs all in parallel\n- RankClassifier assigns severity (C-rank for approval)",
+        "elapsed_seconds": 2.157381296157837,
+        "model": "jade:v0.8"
+      },
+      "haiku_response": {
+        "success": true,
+        "response": "To scan the Terraform module for security misconfigurations, I would use the following NPCs from the GP-CONSULTING toolkit:\n\n1. **Phase 1: Scanner NPCs**\n   - `iac/tfsec_npc.py`: This NPC uses the tfsec tool to perform static analysis on the Terraform code and detect security-related issues.\n   - `iac/checkov_npc.py`: This NPC uses the Checkov tool to scan the Terraform code for security, compliance, and best practice issues.\n   - `iac/conftest_npc.py`: This NPC uses the Conftest tool to apply custom OPA (Open Policy Agent) policies to the Terraform code, allowing for more advanced policy-based checks.\n\n2. **Workflow**\n   - **SCAN**: The `ScanOrchestrator` would run the above NPCs in parallel to scan the Terraform module for security misconfigurations.\n   - **CLASSIFY**: The `RankClassifier` would then analyze the findings and assign a rank (E, D, C, B, or S) to each issue based on its severity.\n   - **FIX**: The `FixOrchestrator` would then route the findings to the appropriate fixer NPCs, such as:\n     - `iac/conftest_fixer_npc.py`: This NPC would fix the issues identified by the Conftest policies.\n     - `iac/tfsec_fixer_npc.py`: This NPC would automatically fix the issues identified by the tfsec tool, where possible.\n   - **VERIFY**: The `SmartRescanNPC` would then re-scan the Terraform module to confirm that the issues have been successfully resolved.\n\n3. **Integrations**\n   - `slack_approval_npc.py`: This NPC would be used to send C-rank findings to a Slack channel for manual review and approval.\n   - `github_api_npc.py`: This NPC would be used to post the scan results and fix status directly to the associated GitHub pull request.\n\nBy using this workflow, the GP-CONSULTING toolkit would be able to comprehensively scan the Terraform module, classify the findings, automatically fix the issues where possible, and integrate the results with the development workflow.",
+        "elapsed_seconds": 4.604554653167725,
+        "model": "claude-3-haiku-20240307",
+        "input_tokens": 1038,
+        "output_tokens": 524
+      }
+    },
+    {
+      "question_id": "ops-005",
+      "question_type": "operational",
+      "domain": "CI/CD Security",
+      "prompt": "\nYou are JSA (JADE Secure Agent), a 24/7 DevSecOps automation agent.\n\nYou have access to GP-CONSULTING toolkit organized in phases:\n\n## Phase 1: Scanner NPCs (GP-CONSULTING/1-Security-Assessment/npcs/)\n- secrets/gitleaks_npc.py - Detect hardcoded secrets\n- sast/bandit_npc.py - Python SAST\n- sast/semgrep_npc.py - Multi-language SAST\n- dependencies/trivy_npc.py - Container/SCA scanning\n- dependencies/grype_npc.py - Vulnerability scanning\n- dependencies/snyk_npc.py - Commercial SCA\n- kubernetes/kub...",
+      "expected_npcs": [
+        "gha_scanner_npc.py",
+        "gha_fixer_npc.py",
+        "gha_template_npc.py"
+      ],
+      "expected_workflow": "1. Scan with GHAScannerNPC, 2. Fix with GHAFixerNPC, 3. Use GHATemplateNPC for secure templates",
+      "scoring": {
+        "mentions_gha_scanner": 3,
+        "mentions_gha_fixer": 3,
+        "mentions_template_npc": 2,
+        "explains_gha_vulnerabilities": 2
+      },
+      "jade_response": {
+        "success": true,
+        "response": "**Workflow: Detect & Fix GitHub Actions Security Issues**\n\n### Phase 1: Scan for Vulnerabilities\n\n```bash\n# Run GHA scanner in CI/CD pipeline\ngha/gha_scanner_npc.py \\\n    --workflow-path .github/workflows/* \\\n    --output findings.json\n```\n\n**Findings Example (JSON):**\n```json\n[\n    {\n        \"type\": \"command-injection\",\n        \"severity\": \"HIGH\",\n        \"message\": \"Secret in workflow file\",\n        \"location\": \".github/workflows/deploy.yml:15\"\n    },\n    {\n        \"type\": \"unpinned-action\",\n        \"severity\": \"MEDIUM\",\n        \"message\": \"Action version not specified\",\n        \"location\": \".github/workflows/ci.yml:7\"\n    }\n]\n```\n\n### Phase 2: Classify Findings\n\n```bash\n# Rank and classify findings\nrank_classifier_npc.py \\\n    --findings-file findings.json \\\n    --output classified_findings.json\n```\n\n**Classification Example (JSON):**\n```json\n{\n    \"HIGH\": [\"command-injection\"],\n    \"MEDIUM\": [\"unpinned-action\", \"secret-in-workflow\"],\n    \"LOW\": []\n}\n```\n\n### Phase 3: Fix Vulnerabilities\n\n```bash\n# Run appropriate fixer NPCs based on classification\ngha/gha_fixer_npc.py \\\n    --workflow-path .github/workflows/* \\\n    --findings-classification classified_findings.json \\\n    --output fixed-workflows/\n```\n\n**Fix Example (before):**\n```yaml\n# Before: Vulnerable workflow\nname: Deploy to Production\non:\n  push:\n    branches: [main]\njobs:\n  deploy:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v2\n        with:\n          secrets: ${{ secrets.TOKEN }}\n```\n\n**Fix Example (after):**\n```yaml\n# After: Fixed workflow\nname: Deploy to Production\non:\n  push:\n    branches: [main]\njobs:\n  deploy:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3.5.2\n        with:\n          token: ${{ secrets.GITHUB_TOKEN }}\n```\n\n### Phase 4: Verify Fixes\n\n```bash\n# Smart rescan to verify fixes\nsmart_rescan_npc.py \\\n    --original-workflows .github/workflows/* \\\n    --fixed-workflows fixed-workflows/ \\\n    --output verification.json\n```\n\n**Verification Example (JSON):**\n```json\n{\n    \"HIGH\": {\n        \"command-injection\": {\n            \"before\": true,\n            \"after\": false,\n            \"status\": \"FIXED\"\n        }\n    },\n    \"MEDIUM\": {\n        \"unpinned-action\": {\n            \"before\": true,\n            \"after\": true,\n            \"status\": \"REQUIRES_REVIEW\"\n        }\n    }\n}\n```\n\n### Phase 5: Approval Workflow\n\n```bash\n# Trigger approval workflow for C-rank findings\nslack_approval_npc.py \\\n    --findings-classification classified_findings.json \\\n    --severity-threshold C \\\n    --channel #security-approval\n```\n\n**Approval Example (Slack Message):**\n```\n\ud83d\udea8 Security Approval Needed \ud83d\udea8\n\nC-Rank Findings:\n1. Secret in workflow - .github/workflows/deploy.yml:15\n2. Unpinned action - .github/workflows/ci.yml:7\n\nApproved by: @security-team\n```",
+        "elapsed_seconds": 8.208491086959839,
+        "model": "jade:v0.8"
+      },
+      "haiku_response": {
+        "success": true,
+        "response": "To detect and fix security issues in GitHub Actions (GHA) workflows, I would use the following NPCs from the GP-CONSULTING toolkit:\n\n1. **Detection**:\n   - `gha/gha_scanner_npc.py`: This NPC scans the GitHub Actions workflows for security issues such as command injection, unpinned actions, and other best practice violations.\n\n2. **Classification**:\n   - `RankClassifier`: This orchestrator classifies the findings from the GHA scanner based on their severity, assigning them ranks (E, C, B, S) to determine the appropriate fix workflow.\n\n3. **Fixing**:\n   - `gha/gha_fixer_npc.py`: This NPC automatically fixes the low-risk (E-rank) issues detected in the GHA workflows, such as pinning the actions to specific versions.\n   - `gha/gha_template_npc.py`: This NPC generates secure workflow templates that can be used to replace the existing workflows and address the more complex (C/B/S-rank) issues.\n\n4. **Verification**:\n   - `integrations/smart_rescan_npc.py`: This NPC re-scans the GHA workflows after the fixes have been applied to ensure that the security issues have been resolved.\n\nThe overall workflow would be as follows:\n\n1. **SCAN**: The `gha/gha_scanner_npc.py` runs to detect security issues in the GHA workflows.\n2. **CLASSIFY**: The `RankClassifier` assigns ranks to the findings, categorizing them as E, C, B, or S.\n3. **FIX**:\n   - For E-rank issues, the `gha/gha_fixer_npc.py` automatically fixes the problems.\n   - For C-rank issues, the `gha/gha_template_npc.py` generates secure workflow templates that can be used to replace the existing workflows.\n   - For B/S-rank issues, the findings are escalated for manual review and remediation.\n4. **VERIFY**: The `integrations/smart_rescan_npc.py` re-scans the GHA workflows to confirm that the security issues have been resolved.\n\nAdditionally, the `slack_approval_npc.py` can be used to integrate with Slack for the C-rank approval workflow, and the `github_api_npc.py` can be used to post the scan results and fix status directly to the GitHub pull requests.\n\nThis comprehensive approach ensures that the GitHub Actions workflows are continuously monitored, security issues are detected and fixed, and the overall security posture of the CI/CD pipeline is maintained.",
+        "elapsed_seconds": 4.730754375457764,
+        "model": "claude-3-haiku-20240307",
+        "input_tokens": 1038,
+        "output_tokens": 609
+      }
+    }
+  ],
+  "summary": {
+    "total_questions": 5,
+    "operational_questions": 5,
+    "domain_questions": 0,
+    "jade_success_rate": 1.0,
+    "haiku_success_rate": 1.0,
+    "jade_avg_time": 12.218028926849366,
+    "haiku_avg_time": 4.498153448104858,
+    "domains_tested": [
+      "CI/CD Security",
+      "IaC Security",
+      "Dependency Security",
+      "Secrets Management",
+      "Container Security"
+    ]
+  }
+}

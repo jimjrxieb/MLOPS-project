@@ -1,0 +1,66 @@
+# FAULTY RBAC CLUSTERROLE EXAMPLE #1
+# Common Mistakes: Overprivileged RBAC Configuration
+# Issues:
+#   1. Wildcard verbs (*)
+#   2. Wildcard resources (*)
+#   3. Wildcard API groups (*)
+#   4. Cluster-admin equivalent
+#   5. Can access secrets cluster-wide
+#   6. Can escalate privileges
+#   7. No restrictions on resource names
+#
+# Severity: CRITICAL (full cluster compromise)
+# Compliance: CIS K8s 5.1.1, 5.1.3, NIST AC-6
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: developer-role
+  # BUG: No annotations for audit
+rules:
+  # BUG #1, #2, #3: Full admin access
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+
+---
+# Another overprivileged pattern
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: monitoring-role
+rules:
+  # BUG #5: Can read ALL secrets cluster-wide
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch"]
+
+  # BUG: Can exec into any pod (container escape)
+  - apiGroups: [""]
+    resources: ["pods/exec", "pods/attach"]
+    verbs: ["create"]
+
+  # BUG #6: Can create/modify roles (privilege escalation)
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["roles", "rolebindings", "clusterroles", "clusterrolebindings"]
+    verbs: ["*"]
+
+  # BUG: Can modify admission webhooks (bypass all policies)
+  - apiGroups: ["admissionregistration.k8s.io"]
+    resources: ["mutatingwebhookconfigurations", "validatingwebhookconfigurations"]
+    verbs: ["*"]
+
+---
+# BUG #4: Binding to cluster-admin
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: developer-admin
+subjects:
+  - kind: Group
+    name: developers  # BUG: All developers get cluster-admin!
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin  # CRITICAL: Built-in super admin
+  apiGroup: rbac.authorization.k8s.io

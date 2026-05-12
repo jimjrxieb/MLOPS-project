@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Generation Manifest",
+  "description": "Written by 0-data-lab/tools/generate_utils.py after each data generation run. Tracks what was generated, when, and the file hash for versioning.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["generator", "domain", "generated_at", "output_file", "examples_count", "file_sha256"],
+    "properties": {
+      "generator": {
+        "type": "string",
+        "description": "Script name (e.g., generate_cka_admin_ops.py)"
+      },
+      "domain": {
+        "type": "string",
+        "description": "Training domain (CKS, CKA, CKAD, CNPA, OPS, Cloud)"
+      },
+      "version": {
+        "type": "string",
+        "description": "Generator version (bump when logic changes)"
+      },
+      "generated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "output_file": {
+        "type": "string",
+        "description": "Absolute path to generated JSONL"
+      },
+      "output_file_name": {
+        "type": "string",
+        "description": "Filename only"
+      },
+      "examples_count": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "file_sha256": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$",
+        "description": "SHA256 hash of the output file for versioning"
+      },
+      "file_size_bytes": {
+        "type": "integer"
+      },
+      "domain_distribution": {
+        "type": "object",
+        "additionalProperties": {"type": "integer"},
+        "description": "Count of examples per domain in this batch"
+      }
+    }
+  }
+}

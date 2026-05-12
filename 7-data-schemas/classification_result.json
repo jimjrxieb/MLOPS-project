@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Classification Result",
+  "description": "Output from RANK-AI classifier (both rule-based and ML). Determines what happens to a finding.",
+  "type": "object",
+  "required": ["rank", "confidence", "reason", "suggested_action"],
+  "properties": {
+    "rank": {
+      "type": "string",
+      "enum": ["E", "D", "C", "B", "S"],
+      "description": "Automation rank"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Classification confidence (0-1)"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why this rank was assigned (rule match, scanner base, text pattern, etc.)"
+    },
+    "auto_fixable": {
+      "type": "boolean",
+      "description": "Can this be fixed without human intervention?"
+    },
+    "requires_approval": {
+      "type": "boolean",
+      "description": "Does this need JADE C-rank approval?"
+    },
+    "escalate": {
+      "type": "boolean",
+      "description": "Should this go to human dashboard?"
+    },
+    "suggested_action": {
+      "type": "string",
+      "enum": ["auto_fix", "request_approval", "escalate"],
+      "description": "What the system should do"
+    },
+    "fix_complexity": {
+      "type": "string",
+      "enum": ["trivial", "simple", "moderate", "complex", "architectural"],
+      "description": "Estimated fix complexity"
+    },
+    "classification_source": {
+      "type": "string",
+      "enum": ["rule_override", "operational_pattern", "operational_source", "dependency_fix", "scanner", "text_pattern", "jade", "default"],
+      "description": "How the classification was determined"
+    }
+  }
+}

@@ -1,0 +1,172 @@
+# JADE Operational Playbook: ProgressDeadlineExceeded
+# Deployment failed to make progress within deadline
+
+name: ProgressDeadlineExceeded
+category: deployment-failures
+severity: HIGH
+frequency: COMMON
+
+trigger_patterns:
+  - "ProgressDeadlineExceeded"
+  - "has exceeded its progress deadline"
+  - "deployment .* failed progression"
+  - "Progressing: False"
+
+description: |
+  Deployment hasn't made progress within progressDeadlineSeconds (default 600s/10min).
+  Usually means new pods aren't becoming ready. The deployment is NOT automatically
+  rolled back - it stays in this failed state.
+
+gameplan:
+  step_1:
+    name: "Identify what's blocking progress"
+    commands:
+      - "kubectl rollout status deployment/{deployment} -n {ns}"
+      - "kubectl describe deployment {deployment} -n {ns} | grep -A5 'Conditions:'"
+      - "kubectl get pods -n {ns} -l app={app} --sort-by='.metadata.creationTimestamp'"
+
+    analysis:
+      - "Check if new pods are stuck (Pending, CrashLoopBackOff, etc.)"
+      - "Check if old pods are still running (rollback scenario)"
+      - "Check replica counts: desired vs current vs ready"
+
+  step_2_check_new_pods:
+    name: "Analyze new pods from failed rollout"
+    commands:
+      - "kubectl get pods -n {ns} -l app={app} -o wide"
+      - "kubectl describe pod {newest-pod} -n {ns}"
+
+    common_issues:
+      pods_crashloopbackoff:
+        meaning: "New version is crashing"
+        fix_rank: "C"
+        action: "See crashloopbackoff playbook"
+        likely_fix: "Rollback or fix application"
+
+      pods_pending:
+        meaning: "New pods can't be scheduled"
+        fix_rank: "C"
+        action: "See pending playbook"
+        likely_fix: "Add resources or fix scheduling constraints"
+
+      pods_imagepullbackoff:
+        meaning: "Can't pull new image"
+        fix_rank: "D"
+        action: "See imagepullbackoff playbook"
+        likely_fix: "Fix image name or credentials"
+
+      pods_not_ready:
+        meaning: "Pods running but failing health checks"
+        fix_rank: "C"
+        next_step: "step_3_check_readiness"
+
+  step_3_check_readiness:
+    name: "Investigate readiness probe failures"
+    commands:
+      - "kubectl describe pod {pod} -n {ns} | grep -A10 'Readiness:'"
+      - "kubectl logs {pod} -n {ns} --tail=100"
+      - "kubectl get events -n {ns} --field-selector involvedObject.name={pod}"
+
+    common_causes:
+      wrong_port:
+        meaning: "Readiness probe hitting wrong port"
+        fix_rank: "D"
+        fix: "Update probe port to match container port"
+
+      wrong_path:
+        meaning: "Health endpoint path incorrect"
+        fix_rank: "D"
+        fix: "Update probe path (e.g., /health, /healthz, /ready)"
+
+      slow_startup:
+        meaning: "App takes too long to start"
+        fix_rank: "D"
+        fix: "Increase initialDelaySeconds or use startupProbe"
+        template: |
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            periodSeconds: 5
+
+      dependency_not_ready:
+        meaning: "App waiting for dependency"
+        fix_rank: "D"
+        fix: "Add init container or fix dependency"
+
+  step_4_decide_action:
+    name: "Decide whether to rollback or fix forward"
+
+    rollback_criteria:
+      - "Production environment AND users impacted"
+      - "Root cause unclear AND deadline approaching"
+      - "Previous version known to work"
+
+    fix_forward_criteria:
+      - "Non-production environment"
+      - "Root cause identified and fixable"
+      - "Rollback would cause data issues"
+
+    rollback_command: |
+      kubectl rollout undo deployment/{deployment} -n {ns}
+      kubectl rollout status deployment/{deployment} -n {ns}
+
+    fix_forward:
+      - "Fix the issue in new pods"
+      - "Deployment will auto-resume once pods become ready"
+
+  step_5_increase_deadline:
+    name: "Increase deadline if legitimate slow rollout"
+    condition: "Rollout is actually progressing, just slowly"
+
+    template: |
+      spec:
+        progressDeadlineSeconds: 1200  # 20 minutes
+
+    considerations:
+      - "Large replica count takes longer"
+      - "Slow health checks take longer"
+      - "Don't set too high - want to catch real failures"
+
+common_auto_fixes:
+  - id: "pde-rollback"
+    trigger: "production AND pods crashing AND previous version stable"
+    rank: "D"
+    action: "rollback_deployment"
+    command: "kubectl rollout undo deployment/{deployment} -n {ns}"
+
+  - id: "pde-increase-deadline"
+    trigger: "pods becoming ready but just slowly"
+    rank: "D"
+    action: "patch_progress_deadline"
+    params:
+      seconds: 1200
+
+  - id: "pde-fix-probe"
+    trigger: "readiness probe failing on known-good port"
+    rank: "D"
+    action: "update_probe_config"
+
+escalation_triggers:
+  - condition: "Rollback also fails"
+    escalate_to: "JADE"
+    reason: "Multiple versions failing - deeper issue"
+
+  - condition: "Can't determine if rollback is safe"
+    escalate_to: "JADE"
+    reason: "Need human decision on data/state implications"
+
+  - condition: "Production impact detected"
+    escalate_to: "JADE"
+    reason: "Incident response may be needed"
+
+related_playbooks:
+  - replicafailure
+  - crashloopbackoff
+  - pending

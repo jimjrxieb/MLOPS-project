@@ -1,0 +1,155 @@
+# JADE Operational Playbook: RunContainerError
+# Container created but failed to start running
+
+name: RunContainerError
+category: pod-failures
+severity: HIGH
+frequency: MODERATE
+
+trigger_patterns:
+  - "RunContainerError"
+  - "Error: failed to start container"
+  - "container failed to start"
+  - "PostStartHook failed"
+
+description: |
+  Container was created but failed to start running. Different from CreateContainerError -
+  the container exists but the process inside failed to execute properly.
+
+gameplan:
+  step_1:
+    name: "Get error details"
+    commands:
+      - "kubectl describe pod {pod} -n {ns} | grep -A10 'State:\\|Events:'"
+      - "kubectl logs {pod} -n {ns} --previous 2>/dev/null"
+
+    branches:
+      entrypoint_not_found:
+        patterns:
+          - "executable file not found"
+          - "no such file or directory"
+          - "exec: .* not found"
+        meaning: "Entrypoint or command doesn't exist in container"
+        fix_rank: "D"
+        fixes:
+          - action: "Check if command exists in image"
+            command: "kubectl run test --rm -it --image={image} -- ls -la /bin/"
+          - action: "Verify command path"
+            note: "Some images have binaries in different locations"
+          - action: "Check for Alpine vs Debian path differences"
+            example: "/bin/bash doesn't exist in Alpine, use /bin/sh"
+
+      permission_denied:
+        patterns:
+          - "permission denied"
+          - "exec format error"
+        meaning: "Entrypoint not executable or wrong architecture"
+        fix_rank: "D"
+        fixes:
+          - action: "Check file is executable"
+            command: "kubectl run test --rm -it --image={image} -- ls -la {entrypoint}"
+          - action: "Check for architecture mismatch"
+            note: "ARM image on AMD64 node or vice versa"
+            command: "kubectl get nodes -o jsonpath='{.items[*].status.nodeInfo.architecture}'"
+
+      poststart_hook_failed:
+        patterns:
+          - "PostStartHook failed"
+          - "lifecycle hook failed"
+        meaning: "Container started but postStart hook failed"
+        fix_rank: "D"
+        fixes:
+          - action: "Check postStart hook definition"
+            command: "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.containers[0].lifecycle.postStart}'"
+          - action: "Test hook command manually"
+          - action: "Add error handling to hook"
+          - action: "Make hook optional if non-critical"
+
+      working_dir_error:
+        patterns:
+          - "workingDir"
+          - "working directory"
+          - "chdir"
+        meaning: "Specified workingDir doesn't exist in container"
+        fix_rank: "D"
+        fixes:
+          - action: "Remove workingDir if not needed"
+          - action: "Create directory in Dockerfile"
+          - action: "Use initContainer to create directory"
+
+  step_2_verify_image_contents:
+    name: "Verify image has expected structure"
+    commands:
+      - "kubectl run debug --rm -it --image={image} --command -- /bin/sh -c 'ls -la / && which {cmd}'"
+
+    checks:
+      - name: "Entrypoint/CMD exists"
+        method: "Check Dockerfile ENTRYPOINT or CMD"
+
+      - name: "Required files present"
+        method: "List expected paths"
+
+      - name: "Correct base image architecture"
+        method: "docker inspect --format='{{.Architecture}}' {image}"
+
+  step_3_check_command_override:
+    name: "Check if pod spec overrides entrypoint correctly"
+    commands:
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.containers[0].command}'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.containers[0].args}'"
+
+    common_issues:
+      command_vs_args:
+        explanation: |
+          Kubernetes:
+          - command: replaces Docker ENTRYPOINT
+          - args: replaces Docker CMD
+
+          If you set 'command', you override ENTRYPOINT entirely.
+          If you only set 'args', they're passed to the original ENTRYPOINT.
+
+      shell_required:
+        condition: "Using shell features but no shell in command"
+        fix: |
+          command: ["/bin/sh", "-c"]
+          args: ["your command with $VARS && pipes"]
+
+      array_vs_string:
+        condition: "Command passed as string instead of array"
+        fix: |
+          # Wrong:
+          command: "/bin/sh -c 'echo hello'"
+          # Right:
+          command: ["/bin/sh", "-c", "echo hello"]
+
+common_auto_fixes:
+  - id: "rce-fix-shell"
+    trigger: "executable not found AND shell command in args"
+    rank: "D"
+    action: "wrap_with_shell"
+    template: |
+      command: ["/bin/sh", "-c"]
+      args: ["{original_args}"]
+
+  - id: "rce-alpine-shell"
+    trigger: "bash not found AND alpine image"
+    rank: "D"
+    action: "replace_bash_with_sh"
+
+  - id: "rce-remove-workingdir"
+    trigger: "workingDir error AND workingDir is optional"
+    rank: "D"
+    action: "remove_working_dir"
+
+escalation_triggers:
+  - condition: "Architecture mismatch detected"
+    escalate_to: "JADE"
+    reason: "Need to rebuild image for correct architecture"
+
+  - condition: "postStart hook critical for app function"
+    escalate_to: "JADE"
+    reason: "May need application-level debugging"
+
+related_playbooks:
+  - createcontainererror
+  - crashloopbackoff

@@ -1,0 +1,45 @@
+name: Validate Training Data
+
+on:
+  push:
+    paths:
+      - '1-data-pipeline/01-raw-data-lake/**'
+      - '1-data-pipeline/00-processed/**'
+  pull_request:
+    paths:
+      - '1-data-pipeline/01-raw-data-lake/**'
+      - '1-data-pipeline/00-processed/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install jsonlines pandas
+
+      - name: Run quality gates
+        run: |
+          python3 GP-MODEL-OPS/9-mlops-deploy/tools/validate-training-data.py \
+            --input 1-data-pipeline/01-raw-data-lake/ \
+            --check all \
+            --report > validation-report.md
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-validation-report
+          path: validation-report.md
+
+      - name: Strict validation (fail on issues)
+        run: |
+          python3 GP-MODEL-OPS/9-mlops-deploy/tools/validate-training-data.py \
+            --input 1-data-pipeline/01-raw-data-lake/ \
+            --check all \
+            --strict

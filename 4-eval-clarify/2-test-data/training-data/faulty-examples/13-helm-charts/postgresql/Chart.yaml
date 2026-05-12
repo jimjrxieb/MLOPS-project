@@ -1,0 +1,15 @@
+apiVersion: v2
+name: postgresql
+description: Production-grade PostgreSQL database with security hardening and high availability
+type: application
+version: 1.0.0
+appVersion: "13.8"
+keywords:
+  - postgresql
+  - postgres
+  - database
+  - sql
+  - relational
+maintainers:
+  - name: GuidePoint Security
+    email: devsecops@guidepointsecurity.com

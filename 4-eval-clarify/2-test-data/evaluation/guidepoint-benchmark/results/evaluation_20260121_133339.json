@@ -1,0 +1,159 @@
+{
+  "benchmark_file": "results/benchmark_20260121_133329.json",
+  "evaluation_timestamp": "2026-01-21T13:33:39.034832",
+  "questions": [
+    {
+      "question_id": "ops-001",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "ops-002",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "ops-003",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "ops-004",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "ops-005",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "ops-006",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "ops-007",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "ops-008",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "ops-009",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "ops-010",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "ops-011",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "ops-012",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "ops-013",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "ops-014",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "ops-015",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "k8s-001",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "k8s-002",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "k8s-003",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "opa-001",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "opa-002",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "iac-001",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "iac-002",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "cicd-001",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "cicd-002",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "aws-001",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "aws-002",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "devsecops-001",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "compliance-001",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "zerotrust-001",
+      "error": "Haiku failed",
+      "skipped": true
+    },
+    {
+      "question_id": "incident-001",
+      "error": "Haiku failed",
+      "skipped": true
+    }
+  ],
+  "summary": {
+    "error": "No valid evaluations"
+  }
+}

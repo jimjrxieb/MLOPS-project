@@ -1,0 +1,205 @@
+# JADE Operational Playbook: OPA Gatekeeper Violation
+# Resource rejected by Gatekeeper constraint
+
+name: OPA-Gatekeeper-Violation
+category: security-failures
+severity: MEDIUM
+frequency: COMMON
+
+trigger_patterns:
+  - "gatekeeper"
+  - "admission.gatekeeper.sh"
+  - "constraint"
+  - "ConstraintTemplate"
+  - "denied by"
+
+description: |
+  OPA Gatekeeper rejected a resource due to policy violation.
+  Need to identify the constraint, understand the requirement,
+  and fix the resource to comply.
+
+gameplan:
+  step_1:
+    name: "Identify the failed constraint"
+    commands:
+      - "kubectl get constraints"
+      - "kubectl get constraints -o wide"
+      - "kubectl describe {constraint-kind} {constraint-name}"
+
+    extract:
+      - "Constraint kind (e.g., K8sRequiredLabels)"
+      - "Constraint name"
+      - "Violation message"
+      - "Total violations count"
+
+  step_2_get_constraint_details:
+    name: "Understand the constraint requirements"
+    commands:
+      - "kubectl get {constraint-kind} {constraint-name} -o yaml"
+      - "kubectl get constrainttemplate {template-name} -o yaml"
+
+    analyze:
+      - "spec.match: What resources does this apply to?"
+      - "spec.parameters: What are the policy parameters?"
+      - "Rego source in template: What's the logic?"
+
+  step_3_common_constraints:
+    name: "Handle common Gatekeeper constraints"
+
+    k8s_required_labels:
+      description: "Requires specific labels on resources"
+      check: "kubectl describe K8sRequiredLabels"
+      fix_rank: "D"
+      fix: |
+        metadata:
+          labels:
+            team: my-team
+            environment: production
+            cost-center: 12345
+
+    k8s_allowed_repos:
+      description: "Restricts container image registries"
+      check: "kubectl describe K8sAllowedRepos"
+      fix_rank: "C"
+      fix: "Use image from approved registry"
+      example: |
+        # Instead of:
+        image: nginx:latest
+        # Use:
+        image: gcr.io/my-approved-project/nginx:latest
+
+    k8s_container_limits:
+      description: "Requires resource limits"
+      check: "kubectl describe K8sContainerLimits"
+      fix_rank: "D"
+      fix: |
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+
+    k8s_block_privileged:
+      description: "Blocks privileged containers"
+      check: "kubectl describe K8sPSPPrivilegedContainer"
+      fix_rank: "D"
+      fix: |
+        securityContext:
+          privileged: false
+
+    k8s_require_probes:
+      description: "Requires readiness/liveness probes"
+      check: "kubectl describe K8sRequireProbes"
+      fix_rank: "D"
+      fix: |
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
+
+    k8s_external_ips:
+      description: "Blocks services with external IPs"
+      fix_rank: "C"
+      action: "Use LoadBalancer service type or request exemption"
+
+  step_4_request_exemption:
+    name: "Request exemption if needed"
+
+    namespace_exemption:
+      description: "Exempt entire namespace"
+      rank: "C"
+      template: |
+        apiVersion: constraints.gatekeeper.sh/v1beta1
+        kind: {ConstraintKind}
+        metadata:
+          name: {constraint-name}
+        spec:
+          match:
+            excludedNamespaces: ["exempt-ns"]
+
+    label_exemption:
+      description: "Exempt resources with specific label"
+      rank: "C"
+      template: |
+        apiVersion: mutations.gatekeeper.sh/v1alpha1
+        kind: ModifySet
+        metadata:
+          name: exempt-resources
+        spec:
+          location: "metadata.labels"
+          parameters:
+            values:
+              - value: "gatekeeper.sh/exempt=true"
+
+    temporary_dry_run:
+      description: "Switch constraint to dryrun mode temporarily"
+      rank: "B"
+      command: |
+        kubectl patch {constraint-kind} {constraint-name} \
+          --type=json \
+          -p='[{"op": "replace", "path": "/spec/enforcementAction", "value": "dryrun"}]'
+      warning: "Disables enforcement - use only in emergency"
+
+  step_5_audit_violations:
+    name: "Check all current violations"
+    commands:
+      - "kubectl get {constraint-kind} {constraint-name} -o jsonpath='{.status.violations}'"
+      - "kubectl get constraints -o json | jq '.items[].status.totalViolations'"
+
+    action: "Fix all existing violations before they cause issues"
+
+  step_6_verify_fix:
+    name: "Verify resource now complies"
+    commands:
+      - "kubectl apply --dry-run=server -f {resource.yaml}"
+      - "kubectl apply -f {resource.yaml}"
+      - "kubectl get constraints -o wide"
+
+common_auto_fixes:
+  - id: "gk-add-labels"
+    trigger: "K8sRequiredLabels violation"
+    rank: "D"
+    action: "add_required_labels"
+
+  - id: "gk-add-limits"
+    trigger: "K8sContainerLimits violation"
+    rank: "D"
+    action: "add_resource_limits"
+
+  - id: "gk-remove-privileged"
+    trigger: "K8sPSPPrivilegedContainer violation"
+    rank: "D"
+    action: "remove_privileged_flag"
+
+  - id: "gk-add-probes"
+    trigger: "K8sRequireProbes violation"
+    rank: "D"
+    action: "add_default_probes"
+
+escalation_triggers:
+  - condition: "Need registry exemption"
+    escalate_to: "JADE"
+    reason: "Security decision needed"
+
+  - condition: "Gatekeeper itself is failing"
+    escalate_to: "JADE"
+    reason: "Cluster infrastructure issue"
+
+  - condition: "Policy seems too strict for use case"
+    escalate_to: "JADE"
+    reason: "Policy review needed"
+
+related_playbooks:
+  - pss-psa-violation
+  - admission-webhook-denied
+  - rbac-denied

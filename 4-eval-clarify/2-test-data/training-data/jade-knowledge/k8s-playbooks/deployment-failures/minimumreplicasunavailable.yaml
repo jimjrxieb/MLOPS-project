@@ -1,0 +1,158 @@
+# JADE Operational Playbook: MinimumReplicasUnavailable
+# Deployment below minimum required availability
+
+name: MinimumReplicasUnavailable
+category: deployment-failures
+severity: CRITICAL
+frequency: COMMON
+
+trigger_patterns:
+  - "MinimumReplicasUnavailable"
+  - "Deployment does not have minimum availability"
+  - "Available: False"
+  - "available replicas: 0"
+
+description: |
+  Deployment has fewer ready replicas than minReadySeconds requires.
+  Service may be degraded or completely down. This is often a production incident.
+
+gameplan:
+  step_1:
+    name: "Assess impact immediately"
+    commands:
+      - "kubectl get deployment {deployment} -n {ns}"
+      - "kubectl get pods -n {ns} -l app={app} -o wide"
+      - "kubectl get endpoints {service} -n {ns}"
+
+    triage:
+      zero_ready:
+        condition: "0 ready replicas"
+        severity: "CRITICAL - Service completely down"
+        action: "Immediate investigation required"
+
+      partial_ready:
+        condition: "Some replicas ready but below minimum"
+        severity: "HIGH - Service degraded"
+        action: "Investigate failing pods"
+
+  step_2_identify_failing_pods:
+    name: "Check what's wrong with pods"
+    commands:
+      - "kubectl get pods -n {ns} -l app={app} --sort-by='.status.startTime'"
+      - "kubectl describe pods -n {ns} -l app={app} | grep -E 'Status:|Reason:|Message:'"
+
+    for_each_pod:
+      - "Categorize by failure type"
+      - "Route to appropriate playbook"
+
+    categories:
+      not_ready_but_running:
+        meaning: "Pods running but failing health checks"
+        playbook: "Check readiness probe configuration"
+        quick_check: "kubectl describe pod {pod} | grep -A5 'Readiness:'"
+
+      crashing:
+        meaning: "Pods in CrashLoopBackOff"
+        playbook: "crashloopbackoff"
+
+      pending:
+        meaning: "Pods can't be scheduled"
+        playbook: "pending"
+
+      terminating_stuck:
+        meaning: "Old pods stuck terminating"
+        playbook: "terminating-stuck"
+
+  step_3_quick_recovery:
+    name: "Get service back up quickly"
+
+    if_new_version_failing:
+      action: "Rollback to last known good"
+      command: "kubectl rollout undo deployment/{deployment} -n {ns}"
+      rank: "D"
+
+    if_resource_exhausted:
+      action: "Scale down other workloads temporarily"
+      rank: "C"
+
+    if_dependency_down:
+      action: "Check and fix dependency first"
+
+    if_node_failure:
+      action: "Pods should reschedule automatically"
+      check: "kubectl get nodes"
+
+  step_4_check_deployment_strategy:
+    name: "Verify deployment strategy isn't too aggressive"
+    commands:
+      - "kubectl get deployment {deployment} -n {ns} -o jsonpath='{.spec.strategy}'"
+
+    issues:
+      max_unavailable_too_high:
+        condition: "maxUnavailable allows too many pods down at once"
+        fix: "Reduce maxUnavailable"
+        template: |
+          strategy:
+            type: RollingUpdate
+            rollingUpdate:
+              maxSurge: 1
+              maxUnavailable: 0  # Zero downtime
+
+      minreadyseconds_not_set:
+        condition: "Pods counted as ready before actually ready"
+        fix: "Add minReadySeconds"
+        template: |
+          spec:
+            minReadySeconds: 10
+
+  step_5_check_health_endpoint:
+    name: "Verify health endpoint is working"
+    commands:
+      - "kubectl exec {running-pod} -n {ns} -- curl -s localhost:{port}/health"
+      - "kubectl port-forward pod/{pod} 8080:{port} &; curl localhost:8080/health"
+
+    issues:
+      health_endpoint_missing:
+        fix_rank: "C"
+        fix: "Add health endpoint to application"
+
+      health_returning_false:
+        fix_rank: "C"
+        action: "Check why app reports unhealthy"
+
+common_auto_fixes:
+  - id: "mru-rollback"
+    trigger: "0 ready AND previous RS had ready pods"
+    rank: "D"
+    action: "rollback_deployment"
+    command: "kubectl rollout undo deployment/{deployment} -n {ns}"
+
+  - id: "mru-restart-stuck"
+    trigger: "pods running but stuck not ready for > 5 min"
+    rank: "D"
+    action: "rolling_restart"
+    command: "kubectl rollout restart deployment/{deployment} -n {ns}"
+
+  - id: "mru-fix-probe"
+    trigger: "probe failing on valid health endpoint"
+    rank: "D"
+    action: "update_probe_settings"
+
+escalation_triggers:
+  - condition: "0 ready replicas in production"
+    escalate_to: "JADE"
+    reason: "CRITICAL - Production service down"
+    priority: "P1"
+
+  - condition: "Rollback also fails"
+    escalate_to: "JADE"
+    reason: "Cannot restore service automatically"
+
+  - condition: "Root cause unknown after 5 minutes"
+    escalate_to: "JADE"
+    reason: "Need human investigation"
+
+related_playbooks:
+  - replicafailure
+  - progressdeadlineexceeded
+  - crashloopbackoff

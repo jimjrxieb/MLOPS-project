@@ -1,0 +1,14 @@
+# Namespace for intentionally vulnerable application
+# Used for JADE training data collection
+# WARNING: This namespace has NO security restrictions by design
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: broken-app
+  labels:
+    app.kubernetes.io/name: broken-app
+    app.kubernetes.io/purpose: jade-training
+    # Explicitly set PSA to privileged (no restrictions)
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged

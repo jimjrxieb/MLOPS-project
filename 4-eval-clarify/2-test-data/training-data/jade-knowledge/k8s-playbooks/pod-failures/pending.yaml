@@ -1,0 +1,282 @@
+# JADE Operational Playbook: Pending Pod
+# Pod cannot be scheduled to any node
+
+name: Pending
+category: pod-failures
+severity: MEDIUM
+frequency: COMMON
+
+trigger_patterns:
+  - "status: Pending"
+  - "FailedScheduling"
+  - "0/N nodes are available"
+  - "Insufficient cpu"
+  - "Insufficient memory"
+  - "node(s) didn't match"
+
+description: |
+  Pod is waiting to be scheduled but no node can satisfy its requirements.
+  Could be resource constraints, affinity rules, taints, or PVC issues.
+
+gameplan:
+  step_1:
+    name: "Get scheduling failure reason"
+    commands:
+      - "kubectl describe pod {pod} -n {ns} | grep -A10 'Events:'"
+      - "kubectl get events -n {ns} --field-selector involvedObject.name={pod},reason=FailedScheduling"
+
+    branches:
+      insufficient_cpu:
+        patterns:
+          - "Insufficient cpu"
+          - "cpu insufficient"
+        meaning: "No node has enough allocatable CPU"
+        fix_rank: "C"
+        next_step: "step_2_check_resources"
+
+      insufficient_memory:
+        patterns:
+          - "Insufficient memory"
+          - "memory insufficient"
+        meaning: "No node has enough allocatable memory"
+        fix_rank: "C"
+        next_step: "step_2_check_resources"
+
+      node_selector_mismatch:
+        patterns:
+          - "node(s) didn't match Pod's node affinity/selector"
+          - "MatchNodeSelector"
+        meaning: "nodeSelector or nodeAffinity doesn't match any node"
+        fix_rank: "D"
+        next_step: "step_3_check_node_selector"
+
+      taints_not_tolerated:
+        patterns:
+          - "node(s) had taints that the pod didn't tolerate"
+          - "had taint"
+        meaning: "Nodes are tainted and pod lacks tolerations"
+        fix_rank: "D"
+        next_step: "step_4_check_taints"
+
+      pod_affinity_conflict:
+        patterns:
+          - "didn't match pod affinity"
+          - "didn't match pod anti-affinity"
+        meaning: "Pod affinity/anti-affinity rules can't be satisfied"
+        fix_rank: "C"
+        next_step: "step_5_check_affinity"
+
+      pvc_not_bound:
+        patterns:
+          - "persistentvolumeclaim .* not found"
+          - "pod has unbound immediate PersistentVolumeClaims"
+        meaning: "PVC doesn't exist or isn't bound"
+        fix_rank: "D"
+        next_step: "step_6_check_pvc"
+
+      topology_spread:
+        patterns:
+          - "didn't match pod topology spread constraints"
+        meaning: "TopologySpreadConstraints can't be satisfied"
+        fix_rank: "C"
+        next_step: "step_7_check_topology"
+
+  step_2_check_resources:
+    name: "Analyze cluster resource availability"
+    commands:
+      - "kubectl top nodes"
+      - "kubectl describe nodes | grep -A5 'Allocated resources'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.containers[*].resources}'"
+
+    analysis:
+      calculate:
+        - "Total requested CPU vs allocatable CPU per node"
+        - "Total requested memory vs allocatable memory per node"
+        - "Largest pod that can be scheduled"
+
+    fixes:
+      reduce_requests:
+        condition: "Pod requests more than any single node has"
+        rank: "D"
+        action: "Reduce resource requests if overprovisioned"
+
+      add_nodes:
+        condition: "All nodes at capacity"
+        rank: "B"
+        action: "Scale up cluster (add nodes)"
+
+      clean_up_pods:
+        condition: "Many completed/failed pods consuming resources"
+        rank: "D"
+        action: |
+          kubectl delete pods -n {ns} --field-selector=status.phase=Succeeded
+          kubectl delete pods -n {ns} --field-selector=status.phase=Failed
+
+      evict_low_priority:
+        condition: "Cluster has PriorityClasses configured"
+        rank: "C"
+        action: "Set higher priorityClassName to preempt lower priority pods"
+
+  step_3_check_node_selector:
+    name: "Verify nodeSelector matches available nodes"
+    commands:
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.nodeSelector}'"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.affinity.nodeAffinity}'"
+      - "kubectl get nodes --show-labels"
+
+    analysis:
+      - "List all unique node labels"
+      - "Compare with pod's nodeSelector"
+      - "Identify missing labels"
+
+    fixes:
+      label_node:
+        condition: "Node exists but lacks required label"
+        rank: "D"
+        command: "kubectl label node {node} {key}={value}"
+
+      fix_selector:
+        condition: "Selector has typo or wrong value"
+        rank: "D"
+        action: "Update pod spec with correct selector"
+
+      remove_selector:
+        condition: "Selector not actually needed"
+        rank: "D"
+        action: "Remove nodeSelector from pod spec"
+
+  step_4_check_taints:
+    name: "Verify taints and tolerations"
+    commands:
+      - "kubectl get nodes -o custom-columns=NAME:.metadata.name,TAINTS:.spec.taints"
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.tolerations}'"
+
+    common_taints:
+      master_taint:
+        taint: "node-role.kubernetes.io/master:NoSchedule"
+        meaning: "Control plane node"
+        fix: "Don't schedule regular workloads on masters"
+
+      not_ready:
+        taint: "node.kubernetes.io/not-ready:NoSchedule"
+        meaning: "Node is not healthy"
+        fix: "Investigate and fix node health"
+
+      unschedulable:
+        taint: "node.kubernetes.io/unschedulable:NoSchedule"
+        meaning: "Node is cordoned"
+        fix: "kubectl uncordon {node}"
+
+      custom_taint:
+        example: "dedicated=gpu:NoSchedule"
+        fix: "Add toleration to pod"
+        template: |
+          tolerations:
+          - key: "dedicated"
+            operator: "Equal"
+            value: "gpu"
+            effect: "NoSchedule"
+
+  step_5_check_affinity:
+    name: "Analyze affinity/anti-affinity rules"
+    commands:
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.affinity}' | jq"
+      - "kubectl get pods -n {ns} -o wide --show-labels"
+
+    common_issues:
+      required_anti_affinity:
+        condition: "requiredDuringSchedulingIgnoredDuringExecution with anti-affinity"
+        meaning: "Hard anti-affinity can't be satisfied"
+        fixes:
+          - "Change to preferredDuringSchedulingIgnoredDuringExecution"
+          - "Add more nodes to spread pods"
+          - "Reduce replica count"
+
+      zone_spread:
+        condition: "Requiring pods in different zones but only one zone available"
+        fix: "Add nodes in other zones or relax constraint"
+
+  step_6_check_pvc:
+    name: "Verify PersistentVolumeClaim status"
+    commands:
+      - "kubectl get pvc -n {ns}"
+      - "kubectl describe pvc {pvc} -n {ns}"
+      - "kubectl get pv"
+      - "kubectl get storageclass"
+
+    branches:
+      pvc_pending:
+        condition: "PVC status is Pending"
+        causes:
+          - "No matching PV available"
+          - "StorageClass provisioner failing"
+          - "Zone mismatch (EBS/PD is zonal)"
+        fixes:
+          - action: "Check StorageClass provisioner logs"
+            command: "kubectl logs -n kube-system -l app=ebs-csi-controller"
+          - action: "Verify storage quota not exceeded"
+          - action: "For zonal storage, ensure pod and PV in same zone"
+
+      pvc_lost:
+        condition: "PVC bound to Lost PV"
+        fix_rank: "B"
+        action: "PV was deleted while PVC exists - data may be lost"
+
+      wrong_access_mode:
+        condition: "AccessMode mismatch"
+        note: "RWO volume can only attach to one node"
+        fix: "Use RWX StorageClass or ensure pods on same node"
+
+  step_7_check_topology:
+    name: "Check TopologySpreadConstraints"
+    commands:
+      - "kubectl get pod {pod} -n {ns} -o jsonpath='{.spec.topologySpreadConstraints}'"
+      - "kubectl get nodes --show-labels | grep topology"
+
+    common_issues:
+      max_skew_too_strict:
+        condition: "maxSkew: 1 with DoNotSchedule"
+        fix: "Increase maxSkew or use ScheduleAnyway"
+
+      missing_labels:
+        condition: "Nodes don't have required topology label"
+        fix: "Label nodes with topology.kubernetes.io/zone"
+
+common_auto_fixes:
+  - id: "pending-uncordon"
+    trigger: "node cordoned AND only one node AND not intentional"
+    rank: "D"
+    action: "uncordon_node"
+
+  - id: "pending-label-node"
+    trigger: "nodeSelector mismatch AND label is common one"
+    rank: "D"
+    action: "label_node"
+
+  - id: "pending-clean-pods"
+    trigger: "Insufficient resources AND completed pods exist"
+    rank: "D"
+    action: "delete_completed_pods"
+
+  - id: "pending-add-toleration"
+    trigger: "standard taint not tolerated"
+    rank: "D"
+    action: "add_toleration"
+
+escalation_triggers:
+  - condition: "Insufficient resources AND cluster at max size"
+    escalate_to: "JADE"
+    reason: "May need to request capacity increase or optimize workloads"
+
+  - condition: "PVC pending for > 10 minutes"
+    escalate_to: "JADE"
+    reason: "Storage provisioner issue needs investigation"
+
+  - condition: "Multiple pods pending for same reason"
+    escalate_to: "JADE"
+    reason: "Systemic issue affecting multiple workloads"
+
+related_playbooks:
+  - evicted
+  - oomkilled
+  - crashloopbackoff

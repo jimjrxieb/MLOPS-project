@@ -1,0 +1,114 @@
+---
+# INSECURE Deployment - Violates Multiple CKS/CKA Policies
+# Tags: insecure, violations, test-negative
+# Violations: privileged, hostPath, :latest, no-limits, no-probes, default-namespace
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # VIOLATION: Using default namespace
+  name: insecure-web-app
+  # VIOLATION: Missing standard labels
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      # VIOLATION: Using default service account
+      # VIOLATION: Automounting service account token
+      automountServiceAccountToken: true
+
+      # VIOLATION: No pod-level security context
+
+      containers:
+      - name: web
+        # VIOLATION: Using :latest tag (non-deterministic)
+        image: nginx:latest
+
+        # VIOLATION: Privileged container
+        securityContext:
+          privileged: true
+          # VIOLATION: Allows privilege escalation
+          allowPrivilegeEscalation: true
+          # VIOLATION: Running as root
+          runAsUser: 0
+          # VIOLATION: Read-write root filesystem
+          readOnlyRootFilesystem: false
+
+        # VIOLATION: No resource limits (resource exhaustion risk)
+        # VIOLATION: No resource requests
+
+        # VIOLATION: No liveness probe
+        # VIOLATION: No readiness probe
+
+        # VIOLATION: Using privileged port
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        - containerPort: 443
+          protocol: TCP
+
+        # VIOLATION: Hardcoded secrets in environment
+        env:
+        - name: DB_PASSWORD
+          value: "super-secret-password-123"
+        - name: API_KEY
+          value: "sk-1234567890abcdef"
+        - name: AWS_SECRET_ACCESS_KEY
+          value: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+
+        # VIOLATION: Mounting sensitive host paths
+        volumeMounts:
+        - name: docker-sock
+          mountPath: /var/run/docker.sock
+        - name: host-root
+          mountPath: /host
+        - name: etc-passwd
+          mountPath: /etc/host-passwd
+          readOnly: true
+
+      # VIOLATION: Using hostPath volumes
+      volumes:
+      - name: docker-sock
+        hostPath:
+          path: /var/run/docker.sock
+          type: Socket
+      - name: host-root
+        hostPath:
+          path: /
+          type: Directory
+      - name: etc-passwd
+        hostPath:
+          path: /etc/passwd
+          type: File
+
+      # VIOLATION: Using host network
+      hostNetwork: true
+      # VIOLATION: Using host PID namespace
+      hostPID: true
+      # VIOLATION: Using host IPC namespace
+      hostIPC: true
+
+---
+# VIOLATION: No NetworkPolicy defined (unrestricted traffic)
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: insecure-web-app
+spec:
+  # VIOLATION: Using NodePort (exposes service externally)
+  type: NodePort
+  selector:
+    app: web
+  ports:
+  - port: 80
+    targetPort: 80
+    # VIOLATION: Using privileged NodePort range
+    nodePort: 30080
+    protocol: TCP
