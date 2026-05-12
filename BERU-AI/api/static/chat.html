@@ -201,6 +201,11 @@ async function run(){
   const btn = document.getElementById('runBtn');
   btn.disabled = true; btn.innerHTML = '<span class="spin"></span> running…';
   document.getElementById('timing').textContent = '';
+  // Replace the previous scan's results immediately — a new run starts fresh,
+  // it doesn't pile on top of the old one.
+  const modeLabel = {grade:'Grade SSP', assess:'Assess (+evidence)', ask:'Ask'}[tab] || tab;
+  document.getElementById('results').innerHTML =
+    '<div class="empty"><span class="spin"></span>&nbsp; running BERU — '+escapeHtml(modeLabel)+' — this can take 30-90s for a multi-control SSP…</div>';
   const t0 = performance.now();
   try {
     let res;
