@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BERU — GRC Analyst</title>
+<style>
+  :root {
+    --bg:#0f1115; --panel:#171a21; --panel2:#1d2129; --line:#2a2f3a;
+    --txt:#d8dde6; --muted:#8b93a3; --accent:#5b9dff;
+    --pass:#3fb950; --partial:#d29922; --fail:#f85149; --blocked:#a371f7;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt);
+         font:14px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+  header { padding:14px 20px; border-bottom:1px solid var(--line);
+           display:flex; align-items:center; gap:14px; background:var(--panel); }
+  header h1 { font-size:18px; margin:0; letter-spacing:.5px; }
+  header .tag { font-size:11px; color:var(--muted); border:1px solid var(--line);
+                padding:2px 8px; border-radius:10px; }
+  #health { margin-left:auto; font-size:12px; color:var(--muted); }
+  #health b { color:var(--accent); }
+  .wrap { display:grid; grid-template-columns:420px 1fr; gap:0; height:calc(100vh - 53px); }
+  .left { border-right:1px solid var(--line); overflow:auto; padding:16px; background:var(--panel); }
+  .right { overflow:auto; padding:16px 20px; }
+  .tabs { display:flex; gap:6px; margin-bottom:12px; }
+  .tabs button { flex:1; background:var(--panel2); color:var(--muted); border:1px solid var(--line);
+                 padding:8px; border-radius:6px; cursor:pointer; font-size:13px; }
+  .tabs button.active { color:var(--txt); border-color:var(--accent); background:#1a2230; }
+  label { display:block; font-size:12px; color:var(--muted); margin:12px 0 4px; }
+  textarea { width:100%; background:var(--bg); color:var(--txt); border:1px solid var(--line);
+             border-radius:6px; padding:10px; font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;
+             resize:vertical; }
+  .actions { margin-top:14px; display:flex; gap:8px; }
+  .actions button { flex:1; background:var(--accent); color:#0a0d12; border:0; padding:10px;
+                    border-radius:6px; cursor:pointer; font-weight:600; font-size:13px; }
+  .actions button:disabled { opacity:.5; cursor:default; }
+  .hint { font-size:11px; color:var(--muted); margin-top:10px; }
+  .meta { font-size:12px; color:var(--muted); margin:8px 0 14px;
+          display:flex; gap:14px; flex-wrap:wrap; }
+  .meta b { color:var(--txt); }
+  .finding { background:var(--panel); border:1px solid var(--line); border-radius:8px;
+             margin-bottom:12px; overflow:hidden; }
+  .finding .hd { display:flex; align-items:center; gap:10px; padding:10px 12px;
+                 background:var(--panel2); border-bottom:1px solid var(--line); font-size:13px; }
+  .finding .cid { font-weight:700; font-family:ui-monospace,monospace; }
+  .badge { font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; }
+  .b-PASS { background:rgba(63,185,80,.18); color:var(--pass); }
+  .b-PARTIAL { background:rgba(210,153,34,.18); color:var(--partial); }
+  .b-FAIL { background:rgba(248,81,73,.18); color:var(--fail); }
+  .b-rank { background:#222a36; color:var(--muted); }
+  .b-det { background:#1f2630; color:#7aa2cf; }
+  .b-halluc { background:rgba(163,113,247,.18); color:var(--blocked); }
+  .finding pre { margin:0; padding:12px; white-space:pre-wrap; word-break:break-word;
+                 font:12px/1.5 ui-monospace,monospace; color:#c6cdd9; max-height:340px; overflow:auto; }
+  .blocked { border-color:var(--blocked); }
+  .blocked .hd { background:rgba(163,113,247,.12); }
+  .hitl-item { background:var(--panel); border:1px solid var(--blocked); border-radius:8px;
+               padding:10px 12px; margin-bottom:10px; font-size:12px; }
+  .hitl-item .row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .hitl-item input { flex:1; background:var(--bg); color:var(--txt); border:1px solid var(--line);
+                     border-radius:5px; padding:5px 7px; font-size:12px; }
+  .hitl-item button { border:0; border-radius:5px; padding:5px 10px; cursor:pointer; font-size:12px; }
+  .btn-approve { background:rgba(63,185,80,.2); color:var(--pass); }
+  .btn-reject { background:rgba(248,81,73,.2); color:var(--fail); }
+  .hitl-item pre { margin:6px 0 0; white-space:pre-wrap; font:11px/1.45 ui-monospace,monospace;
+                   color:var(--muted); max-height:120px; overflow:auto; }
+  h2 { font-size:14px; color:var(--muted); margin:22px 0 10px; border-bottom:1px solid var(--line);
+       padding-bottom:6px; }
+  h2:first-child { margin-top:0; }
+  .empty { color:var(--muted); font-size:13px; padding:20px; text-align:center; }
+  .spin { display:inline-block; width:12px; height:12px; border:2px solid var(--line);
+          border-top-color:var(--accent); border-radius:50%; animation:s .7s linear infinite; }
+  @keyframes s { to { transform:rotate(360deg); } }
+  .errbox { background:rgba(248,81,73,.1); border:1px solid var(--fail); color:#f0b6b2;
+            border-radius:6px; padding:8px 10px; font-size:12px; margin-bottom:10px; }
+  a { color:var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <h1>BERU</h1>
+  <span class="tag">NIST 800-53 + AI RMF · GRC analyst</span>
+  <span class="tag">model: <span id="modelName">…</span></span>
+  <span id="health">checking…</span>
+</header>
+
+<div class="wrap">
+  <!-- LEFT: input -->
+  <div class="left">
+    <div class="tabs">
+      <button data-tab="grade" class="active" onclick="setTab('grade')">Grade SSP</button>
+      <button data-tab="assess" onclick="setTab('assess')">Assess (+evidence)</button>
+      <button data-tab="ask" onclick="setTab('ask')">Ask</button>
+    </div>
+
+    <div id="tab-grade">
+      <label>SSP section / control narrative — paste it</label>
+      <textarea id="g-ssp" rows="16" placeholder="### Implemented Controls&#10;**AC-2**: ArgoCD AppProject restricts deployment sources to trusted repos.&#10;**SC-8**: Kyverno ClusterPolicy enforces require-non-root (Enforce mode).&#10;..."></textarea>
+      <div class="hint">BERU grades each control narrative against the great-tier rubric. One-word stubs → FAIL with the rewrite scoped in the POA&amp;M.</div>
+    </div>
+
+    <div id="tab-assess" style="display:none">
+      <label>SSP section — the system owner's CLAIMS</label>
+      <textarea id="a-ssp" rows="9" placeholder="**AU-2**: CloudTrail logs all API events; reviewed weekly."></textarea>
+      <label>Evidence — scanner output / policy excerpt / command output (what you actually have)</label>
+      <textarea id="a-ev" rows="9" placeholder="kube-bench 3.2.1: FAIL — audit-policy.yaml not found&#10;CloudTrail: 1 trail, multi-region=false, log file validation=disabled&#10;Last audit-log review recorded: none"></textarea>
+      <div class="hint">BERU checks each SSP claim against the evidence. PASS only if documented AND evidenced. Gaps → POA&amp;M.</div>
+    </div>
+
+    <div id="tab-ask" style="display:none">
+      <label>Ask BERU a GRC question</label>
+      <textarea id="k-q" rows="16" placeholder="Scanner output review:&#10;repo: payments-service / file: stripe.py:14 / rule: stripe-secret-key / severity: HIGH&#10;Produce the BERU finding for this credential leak."></textarea>
+      <div class="hint">Free-form. BERU produces a 9-field finding for any scenario you describe.</div>
+    </div>
+
+    <div class="actions">
+      <button id="runBtn" onclick="run()">Run BERU</button>
+    </div>
+    <div class="hint" id="timing"></div>
+  </div>
+
+  <!-- RIGHT: results -->
+  <div class="right">
+    <div id="results"><div class="empty">Results appear here. Pick a mode, paste, hit <b>Run BERU</b>.</div></div>
+    <h2>Human-in-the-loop queue <span class="hint" id="hitlCount"></span></h2>
+    <div id="hitl"><div class="empty">No findings pending review.</div></div>
+  </div>
+</div>
+
+<script>
+const API = '/api/beru';
+let tab = 'grade';
+
+function setTab(t){
+  tab = t;
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.tab===t));
+  ['grade','assess','ask'].forEach(x=>document.getElementById('tab-'+x).style.display = (x===t?'':'none'));
+}
+
+async function j(url, opts){
+  const r = await fetch(url, opts);
+  const txt = await r.text();
+  let body; try { body = JSON.parse(txt); } catch { body = txt; }
+  if(!r.ok) throw new Error((body && body.detail) ? body.detail : ('HTTP '+r.status));
+  return body;
+}
+
+async function refreshHealth(){
+  try {
+    const h = await j(API+'/health');
+    document.getElementById('modelName').textContent = h.model_resolved + (h.using_fallback?' (fallback!)':'');
+    document.getElementById('health').innerHTML = h.ollama_reachable
+      ? 'status: <b>'+h.status+'</b> · ollama reachable'
+      : 'status: <b style="color:var(--fail)">'+h.status+'</b> · ollama unreachable — start it';
+  } catch(e){ document.getElementById('health').textContent = 'health check failed'; }
+}
+
+function badge(cls, txt){ return '<span class="badge '+cls+'">'+txt+'</span>'; }
+
+function renderRun(res){
+  const el = document.getElementById('results');
+  let html = '';
+  if(res.errors && res.errors.length){
+    html += '<div class="errbox">'+res.errors.map(e=>'• '+escapeHtml(e)).join('<br>')+'</div>';
+  }
+  html += '<div class="meta">'
+        + '<span>run <b>'+escapeHtml(res.run_id||'')+'</b></span>'
+        + '<span>findings <b>'+(res.findings||[]).length+'</b></span>'
+        + '<span>blocked (HITL) <b>'+(res.blocked_findings||[]).length+'</b></span>'
+        + '<span>POA&amp;M items <b>'+(res.poam_count||0)+'</b></span>'
+        + '<span>SSP narratives <b>'+(res.ssp_narrative_count||0)+'</b></span>'
+        + (res.evidence_archive_path? '<span>evidence ZIP: <b>'+escapeHtml(res.evidence_archive_path)+'</b></span>':'')
+        + '</div>';
+  if(!(res.findings||[]).length && !(res.blocked_findings||[]).length){
+    html += '<div class="empty">No findings produced. Check the errors above (or paste more content).</div>';
+  }
+  for(const f of (res.findings||[])){
+    const st = (f.status||'?').toUpperCase();
+    html += '<div class="finding"><div class="hd">'
+          + '<span class="cid">'+escapeHtml(f.control_id||'?')+'</span>'
+          + badge('b-'+st, st)
+          + badge('b-rank', 'rank '+escapeHtml(f.rank||'?'))
+          + (f.deterministic? badge('b-det','deterministic'):'')
+          + (f.evidence_hallucination? badge('b-halluc','evidence flagged → HITL'):'')
+          + '<span style="margin-left:auto;color:var(--muted)">hitl: '+escapeHtml(f.hitl_status||'')+'</span>'
+          + '</div><pre>'+escapeHtml(f.raw||'(no text)')+'</pre></div>';
+  }
+  for(const b of (res.blocked_findings||[])){
+    html += '<div class="finding blocked"><div class="hd">'
+          + '<span class="cid">'+escapeHtml(b.control_id||'?')+'</span>'
+          + badge('b-blocked', 'B/S — HELD FOR HUMAN')
+          + badge('b-rank','rank '+escapeHtml(b.rank||'?'))
+          + (b.queue_id? '<span style="margin-left:auto;color:var(--muted)">queue '+escapeHtml(b.queue_id)+'</span>':'')
+          + '</div><pre>'+escapeHtml((b.raw||'')+(b.reason? '\n\n— '+b.reason : ''))+'</pre></div>';
+  }
+  el.innerHTML = html;
+}
+
+async function run(){
+  const btn = document.getElementById('runBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span> running…';
+  document.getElementById('timing').textContent = '';
+  const t0 = performance.now();
+  try {
+    let res;
+    if(tab==='grade'){
+      const ssp = document.getElementById('g-ssp').value.trim();
+      if(!ssp) throw new Error('paste an SSP section first');
+      res = await j(API+'/grade-ssp', {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ssp_text: ssp, system_name:'ui-demo', client:'ui'})});
+    } else if(tab==='assess'){
+      const ssp = document.getElementById('a-ssp').value.trim();
+      const ev  = document.getElementById('a-ev').value.trim();
+      if(!ssp) throw new Error('paste the SSP claim(s) first');
+      res = await j(API+'/assess', {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ssp_text: ssp, evidence_text: ev? [ev] : [], system_name:'ui-demo', client:'ui'})});
+    } else {
+      const q = document.getElementById('k-q').value.trim();
+      if(!q) throw new Error('type a question first');
+      res = await j(API+'/ask', {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({text: q, system_name:'ui-demo', client:'ui'})});
+    }
+    renderRun(res);
+    refreshHitl();
+  } catch(e){
+    document.getElementById('results').innerHTML = '<div class="errbox">'+escapeHtml(e.message||String(e))+'</div>';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Run BERU';
+    document.getElementById('timing').textContent = 'took '+((performance.now()-t0)/1000).toFixed(1)+'s';
+  }
+}
+
+async function refreshHitl(){
+  try {
+    const items = await j(API+'/hitl/pending');
+    const el = document.getElementById('hitl');
+    document.getElementById('hitlCount').textContent = items.length? '('+items.length+' pending)' : '';
+    if(!items.length){ el.innerHTML = '<div class="empty">No findings pending review.</div>'; return; }
+    el.innerHTML = items.map(it => {
+      const qid = escapeHtml(it.queue_id);
+      return '<div class="hitl-item">'
+        + '<div class="row"><b>'+escapeHtml(it.control_id||'?')+'</b> '
+        +   badge('b-blocked','rank '+escapeHtml(it.rank))+' '
+        +   '<span style="color:var(--muted)">'+escapeHtml(it.queued_at||'')+' · '+escapeHtml(it.control_citation||'')+'</span></div>'
+        + '<div class="row"><input id="note-'+qid+'" placeholder="reviewer note / reason…">'
+        +   '<button class="btn-approve" onclick="hitl(\''+qid+'\',\'approve\')">Approve</button>'
+        +   '<button class="btn-reject" onclick="hitl(\''+qid+'\',\'reject\')">Reject</button></div>'
+        + '<pre>'+escapeHtml(it.finding_preview||'')+'</pre></div>';
+    }).join('');
+  } catch(e){ /* leave as-is */ }
+}
+
+async function hitl(qid, action){
+  const note = (document.getElementById('note-'+qid)||{}).value || '';
+  try {
+    if(action==='approve'){
+      await j(API+'/hitl/'+qid+'/approve', {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({approver:'ui-reviewer', notes: note})});
+    } else {
+      await j(API+'/hitl/'+qid+'/reject', {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({reviewer:'ui-reviewer', reason: note})});
+    }
+    refreshHitl();
+  } catch(e){ alert('HITL '+action+' failed: '+(e.message||e)); }
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+refreshHealth(); refreshHitl();
+setInterval(refreshHealth, 20000);
+</script>
+</body>
+</html>

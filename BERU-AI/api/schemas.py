@@ -35,6 +35,23 @@ class AskRequest(BaseModel):
     ai_context: bool = False
 
 
+class AssessRequest(BaseModel):
+    """POST /assess body — full GRC assessment: SSP claims + evidence → gaps + POA&M.
+
+    Provide the SSP via ssp_path OR ssp_text. Evidence is optional but is the
+    point — scanner output / policy docs / command outputs that confirm or
+    contradict the SSP's claims. Each evidence file is auto-parsed as scanner
+    output if possible; otherwise treated as a policy/text artifact.
+    """
+    ssp_path: Optional[str] = Field(None, description="Path to SSP markdown file")
+    ssp_text: Optional[str] = Field(None, description="SSP markdown as a string")
+    evidence_paths: List[str] = Field(default_factory=list, description="Paths to evidence files (scanner output, policy docs, command outputs)")
+    evidence_text: List[str] = Field(default_factory=list, description="Inline evidence blobs (pasted text)")
+    system_name: str = "unknown-system"
+    client: str = "unknown-client"
+    ai_context: bool = False
+
+
 class CISOBriefRequest(BaseModel):
     """POST /ciso-brief body — synthesize an executive summary over pre-computed findings."""
     findings: List[Dict[str, Any]] = Field(..., description="List of BERU finding dicts")
@@ -51,6 +68,7 @@ class FindingSummary(BaseModel):
     deterministic: bool = False
     evidence_hallucination: bool = False
     rank_bumped_for_hallucination: bool = False
+    raw: str = ""  # the full 9-field finding text the model (or Guard 1) produced
 
 
 class BlockedFindingSummary(BaseModel):
@@ -59,6 +77,7 @@ class BlockedFindingSummary(BaseModel):
     rank: str
     queue_id: Optional[str] = None
     reason: Optional[str] = None
+    raw: str = ""  # the finding text that was held for human review
 
 
 class RunResponse(BaseModel):

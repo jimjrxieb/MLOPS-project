@@ -28,6 +28,7 @@ from agent.graph import (  # noqa: E402
     run_audit,
     run_ssp_grading,
     run_freeform,
+    run_assessment,
     run_ciso_briefing,
 )
 from tools.hitl_router import HITLRouter  # noqa: E402
@@ -60,6 +61,7 @@ def _to_finding_summaries(findings: List[Dict[str, Any]]) -> List[S.FindingSumma
             deterministic=bool(f.get("deterministic", False)),
             evidence_hallucination=bool(f.get("evidence_hallucination", False)),
             rank_bumped_for_hallucination=bool(f.get("rank_bumped_for_hallucination", False)),
+            raw=f.get("raw", ""),
         )
         for f in findings
     ]
@@ -72,6 +74,7 @@ def _to_blocked_summaries(blocked: List[Dict[str, Any]]) -> List[S.BlockedFindin
             rank=b.get("rank", "?"),
             queue_id=(b.get("hitl_meta") or {}).get("queue_id"),
             reason=(b.get("hitl_meta") or {}).get("message"),
+            raw=b.get("raw", ""),
         )
         for b in blocked
     ]
@@ -148,6 +151,51 @@ def grade_ssp(req: S.GradeSSPRequest):
     ) as m:
         result = run_ssp_grading(
             ssp_path=ssp_path,
+            system_name=req.system_name,
+            client=req.client,
+            ai_context=req.ai_context,
+            output_dir=f"/tmp/beru-api/{rid}",
+            run_id=rid,
+        )
+        m.absorb_result(result)
+    return _shape_run_result(rid, result)
+
+
+@router.post("/assess", response_model=S.RunResponse)
+def assess(req: S.AssessRequest):
+    """Full GRC assessment: SSP claims + evidence → claim-vs-evidence findings,
+    EVIDENCE GAPs, and POA&M items. The 'load SSP and evidence, find the gaps,
+    prep the POA&M' workflow."""
+    if not req.ssp_path and not req.ssp_text:
+        raise HTTPException(status_code=400, detail="provide ssp_path OR ssp_text")
+    rid = _run_id("assess")
+
+    ssp_path = req.ssp_path
+    if ssp_path and not Path(ssp_path).exists():
+        raise HTTPException(status_code=400, detail=f"ssp_path not found: {ssp_path}")
+    for ep in req.evidence_paths:
+        if not Path(ep).exists():
+            raise HTTPException(status_code=400, detail=f"evidence path not found: {ep}")
+
+    ssp_size = (Path(ssp_path).stat().st_size if ssp_path else len(req.ssp_text or ""))
+    ev_size = sum(len(t) for t in req.evidence_text) + sum(
+        (Path(p).stat().st_size if Path(p).exists() else 0) for p in req.evidence_paths
+    )
+    tracker = get_tracker()
+    with tracker.track(
+        "assess",
+        model=_model_name(),
+        system_name=req.system_name,
+        client=req.client,
+        ai_context=req.ai_context,
+        input_size_chars=ssp_size + ev_size,
+        run_id=rid,
+    ) as m:
+        result = run_assessment(
+            ssp_path=ssp_path,
+            ssp_text=req.ssp_text or "",
+            evidence_paths=req.evidence_paths,
+            evidence_text=req.evidence_text,
             system_name=req.system_name,
             client=req.client,
             ai_context=req.ai_context,

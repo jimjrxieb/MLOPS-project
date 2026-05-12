@@ -1,12 +1,16 @@
 """
 Ollama LLM Provider for BERU-AI
 
-HTTP-based inference against local Ollama server.
-Default model: beru:v1.0 (LLaMA 3.2-3B fine-tuned as NIST 800-53 + AI RMF GRC analyst).
-Falls back to llama3.2:3b base if fine-tuned model not available — see D-009.
+HTTP-based inference against an Ollama server.
+Default model: beru:v1.4 (LLaMA 3.2-3B fine-tuned, exp-010 champion) — override
+with the BERU_MODEL env var or the model_name arg.
+Default base URL: localhost:11434 — override with the OLLAMA_HOST env var (so the
+same code runs on a laptop and inside docker-compose where ollama is a service).
+Falls back to llama3.2:3b base if the fine-tune isn't loaded — see D-009.
 """
 
 import json
+import os
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -36,11 +40,18 @@ class OllamaProvider(BaseLLMProvider):
 
     def __init__(
         self,
-        model_name: str = "beru:v1.0",
+        model_name: Optional[str] = None,
         config: Optional[Dict[str, Any]] = None,
     ):
-        super().__init__(model_name, config)
-        self.base_url = self.config.get("base_url", "http://localhost:11434").rstrip("/")
+        # model precedence: explicit arg > BERU_MODEL env > current champion default.
+        resolved_model = model_name or os.environ.get("BERU_MODEL") or "beru:v1.4"
+        super().__init__(resolved_model, config)
+        # base_url precedence: config arg > OLLAMA_HOST env > localhost default.
+        self.base_url = (
+            self.config.get("base_url")
+            or os.environ.get("OLLAMA_HOST")
+            or "http://localhost:11434"
+        ).rstrip("/")
         self.fallback_model = self.config.get("fallback_model", "llama3.2:3b")
         self.timeout = self.config.get("timeout", 120)
         self.system_prompt = _load_system_prompt()

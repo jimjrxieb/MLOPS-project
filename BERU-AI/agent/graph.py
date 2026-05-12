@@ -182,6 +182,37 @@ def run_freeform(
     return graph.invoke(state, config={"recursion_limit": 250})
 
 
+def run_assessment(
+    *,
+    ssp_path: Optional[str] = None,
+    ssp_text: str = "",
+    evidence_paths: Optional[List[str]] = None,
+    evidence_text: Optional[List[str]] = None,
+    system_name: str = "unknown-system",
+    client: str = "unknown-client",
+    ai_context: bool = False,
+    output_dir: str = "/tmp/beru-out",
+    run_id: str = "",
+) -> Dict[str, Any]:
+    """Full GRC assessment: SSP claims + evidence artifacts → claim-vs-evidence
+    findings + EVIDENCE GAPs + POA&M items. This is the 'load SSP and evidence,
+    BERU finds the gaps and preps POA&M' workflow."""
+    state = new_state(
+        input_type="assessment",
+        input_path=ssp_path,
+        raw_input=ssp_text,
+        system_name=system_name,
+        client=client,
+        ai_context=ai_context,
+        output_dir=output_dir,
+        run_id=run_id,
+    )
+    state["evidence_paths"] = list(evidence_paths or [])
+    state["evidence_text"] = list(evidence_text or [])
+    graph = build_graph()
+    return graph.invoke(state, config={"recursion_limit": 250})
+
+
 def run_ciso_briefing(
     findings: List[Dict[str, Any]],
     *,

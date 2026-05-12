@@ -9,7 +9,9 @@ import operator
 from typing import Annotated, Any, Dict, List, Literal, Optional, TypedDict
 
 
-InputType = Literal["scanner_output", "ssp_grading", "freeform_request", "ciso_briefing"]
+InputType = Literal[
+    "scanner_output", "ssp_grading", "freeform_request", "ciso_briefing", "assessment"
+]
 
 
 class BERUState(TypedDict, total=False):
@@ -20,6 +22,9 @@ class BERUState(TypedDict, total=False):
     system_name: str
     client: str
     ai_context: bool
+    # assessment mode only: evidence artifacts to check the SSP's claims against
+    evidence_paths: List[str]
+    evidence_text: List[str]
 
     # --- routing ---
     pending_controls: List[str]
@@ -76,6 +81,8 @@ def new_state(
         system_name=system_name,
         client=client,
         ai_context=ai_context,
+        evidence_paths=[],
+        evidence_text=[],
         pending_controls=[],
         current_control=None,
         family_playbook_path=None,

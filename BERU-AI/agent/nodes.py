@@ -144,6 +144,58 @@ def parse_input(state: BERUState) -> Dict[str, Any]:
             except Exception as e:
                 errors.append(f"ssp parse failed: {e}")
 
+    elif itype == "assessment":
+        # SSP (the system owner's CLAIMS) + evidence artifacts (scanner output,
+        # policy docs, command outputs). We assess the controls the SSP claims,
+        # using the evidence to confirm or contradict each claim.
+        if not path and not raw:
+            errors.append("assessment requires an SSP (input_path or ssp_text)")
+        else:
+            try:
+                parser = _get_ssp_parser()
+                chunks = parser.parse_file(path) if path else parser.parse_text(raw, "inline")
+                for c in chunks:
+                    cid = c.get("control_id")
+                    if cid and control_exists(cid) and cid not in candidate_controls:
+                        candidate_controls.append(cid)
+                    evidence.append({"ssp_chunk": c})
+            except Exception as e:
+                errors.append(f"ssp parse failed: {e}")
+
+        # Evidence files: try to parse as scanner output (so findings map to
+        # controls); if that yields nothing, treat the file as a policy/text
+        # artifact and include it as general context for every control.
+        mapper = _get_mapper()
+        for ep in state.get("evidence_paths", []) or []:
+            p = Path(ep)
+            if not p.exists():
+                errors.append(f"evidence path not found: {ep}")
+                continue
+            attached = False
+            try:
+                findings_raw = _get_findings_ingestion().ingest_file(p)
+                for f in findings_raw:
+                    f.setdefault("ai_context", ai_context)
+                    mapped = mapper.map_finding(f)
+                    f["mapped_controls"] = mapped.get("controls", [])
+                    f["mapped_ai_rmf"] = mapped.get("ai_rmf_subcategories", [])
+                    f["evidence_label"] = p.name
+                    evidence.append(f)
+                    attached = True
+            except Exception:
+                pass
+            if not attached:
+                try:
+                    evidence.append({"freeform": p.read_text(errors="replace")[:8000],
+                                     "label": f"evidence:{p.name}"})
+                except Exception as e2:
+                    errors.append(f"could not read evidence {ep}: {e2}")
+
+        # Inline evidence blobs (pasted text — policy excerpts, command outputs).
+        for i, blob in enumerate(state.get("evidence_text", []) or []):
+            if blob and blob.strip():
+                evidence.append({"freeform": blob[:8000], "label": f"evidence:inline-{i+1}"})
+
     elif itype == "freeform_request":
         # Pull any explicit control IDs out of the user's text.
         for m in _NIST_RE.finditer(raw):
@@ -330,6 +382,18 @@ def assess_control(state: BERUState) -> Dict[str, Any]:
         if state.get("ai_context") and state.get("validated_ai_rmf_ids")
         else ""
     )
+    assessment_hint = ""
+    if state.get("input_type") == "assessment":
+        assessment_hint = (
+            "\n\nThis is an evidence-vs-claim assessment. The SSP narrative above is the "
+            "system owner's CLAIM about how this control is implemented. The other evidence "
+            "is what you actually have to verify it. Rules: STATUS=PASS only if the claim is "
+            "BOTH documented in the SSP AND supported by the evidence; STATUS=PARTIAL if the "
+            "claim is documented but the evidence is incomplete — name the specific missing "
+            "artifact in EVIDENCE GAP; STATUS=FAIL if the SSP claim is missing or a stub, OR "
+            "the evidence contradicts the claim. Do not pass a control on the strength of the "
+            "narrative alone — a claim without supporting evidence is at best PARTIAL."
+        )
 
     user_msg = (
         f"You are assessing control {cid}.\n\n"
@@ -338,10 +402,10 @@ def assess_control(state: BERUState) -> Dict[str, Any]:
         f"--- Evidence reviewed ---\n{evidence_block}\n\n"
         f"--- Output template ---\n{template}\n\n"
         f"Produce the BERU finding for {cid}. Cite only validated controls "
-        f"({state.get('validated_control_ids', [cid])}).{ai_rmf_hint}"
+        f"({state.get('validated_control_ids', [cid])}).{ai_rmf_hint}{assessment_hint}"
     )
 
-    provider = _make_provider(state.get("input_path", "").endswith("__stub__") or state.get("run_id", "").endswith("-dry"))
+    provider = _make_provider((state.get("run_id") or "").endswith("-dry"))
     try:
         text = provider.chat(
             [{"role": "user", "content": user_msg}],

@@ -11,18 +11,25 @@ Docs:
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, RedirectResponse
 
 from .routes import router
+
+_STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 app = FastAPI(
     title="BERU GRC Analyst API",
     description=(
         "HTTP service wrapping the BERU LangGraph agent. "
-        "Grades SSPs, audits scanner output, generates POA&Ms, drafts CISO briefings. "
+        "Grades SSPs, runs full assessments (SSP claims + evidence → gaps + POA&M), "
+        "audits scanner output, drafts CISO briefings. "
         "Hard architectural floor: B/S-rank findings route to the HITL queue and "
-        "cannot be auto-output. NIST AI RMF MANAGE-2.2 + GOVERN-1.5."
+        "cannot be auto-output. NIST AI RMF MANAGE-2.2 + GOVERN-1.5. "
+        "Chat UI at /ui — interactive Swagger at /docs."
     ),
     version="1.4.0",
 )
@@ -43,6 +50,16 @@ def root():
     return {
         "service": "BERU GRC Analyst",
         "version": "1.4.0",
+        "chat_ui": "/ui",
         "docs": "/docs",
         "endpoints": "/api/beru/*",
     }
+
+
+@app.get("/ui", include_in_schema=False)
+def chat_ui():
+    """The BERU chat UI — paste SSP sections, run grade/assess/ask, manage the HITL queue."""
+    f = _STATIC_DIR / "chat.html"
+    if not f.exists():
+        return RedirectResponse("/docs")
+    return FileResponse(f, media_type="text/html")
