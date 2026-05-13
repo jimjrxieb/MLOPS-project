@@ -461,6 +461,81 @@ def narrative_check(state: BERUState) -> Dict[str, Any]:
     }
 
 
+# Gold-standard PASS example shown in the ssp_grading prompt as a one-shot.
+# Modeled on a real great-tier AC-6 grading (defined intervals, named mechanisms,
+# verifiable artifacts; evidence-reviewed cites the SSP narrative + the artifacts
+# it names — does NOT invent scanner output). This is the target FORMAT and VOICE.
+_GOLD_PASS_EXAMPLE = """\
+FINDING: AC-6 (Least Privilege) is implemented with a layered, automated control set: an IAM policy lint (`iam-policy-lint.py` CI job) blocks wildcard grants at PR time; a `lm-permission-boundary-policy` hard-caps maximum privilege as a second layer; K8s RBAC is minimized monthly via `rbac-minimizer.sh`; privileged accounts are named, justified, and reviewed quarterly; privileged-function use triggers a CloudWatch alarm with a 1h/4h ISSO response SLA. Enhancements (1), (2), (5), (9), (10) all addressed with named mechanisms.
+CONTROL: AC-6 — Least Privilege (enhancements (1), (2), (5), (9), (10) addressed)
+AI RMF: n/a — IT control, no AI system in scope.
+STATUS: PASS
+EVIDENCE REVIEWED: SSP control-implementation narrative for AC-6 (claimed status Implemented, last reviewed 2026-05-01 by M. Chen, ISSO). The narrative cites: `infra-iac/iam/` (IAM policy source); the `iam-policy-lint.py` CI job + GitHub Actions run history; the `lm-permission-boundary-policy`; the `rbac-minimizer.sh` script and its monthly reports at `platform-gitops/security/rbac-minimizer-YYYY-MM.md`; the privileged-account inventory (Confluence: LM-SECURITY / Privileged Accounts, quarterly); the `lm-priv-function-alarm` CloudWatch alarm config in `infra-iac/monitoring/priv-alerts.tf`; CloudTrail with S3 Object Lock; K8s audit logs forwarded to OpenSearch; quarterly review record at `platform-gitops/security/lp-review-YYYY-QQ.md`; the Kyverno `deny-privileged-sa` policy.
+EVIDENCE GAP: None for this assessment cycle. Continuous-monitoring spot-checks at the next quarterly review: (1) confirm the next privileged-account review record by the scheduled date; (2) confirm three consecutive monthly RBAC-minimizer reports exist; (3) confirm a recent GitHub Actions run of `iam-policy-lint.py` rejecting a synthetic wildcard test.
+RISK: Likelihood Low × Impact Moderate → Rank E — the control is documented with named mechanisms, defined intervals, and verifiable artifacts an assessor can request and confirm; residual risk is low.
+CONTROL OWNER: Cloud Security Engineer (IAM least privilege, permission boundaries), Platform Engineer (K8s RBAC), ISSO (privileged-account ownership + quarterly review).
+POA&M ITEM: N/A — control fully implemented; no remediation required.
+CISO SUMMARY: The organization demonstrates least privilege through a defense-in-depth design: source-controlled IAM policies are blocked from granting wildcard permissions by automated lint at pull-request time, permission boundaries hard-cap maximum role privilege as a second layer, and Kubernetes RBAC is continuously minimized via a monthly automated review. Privileged accounts are individually named, justified, and reviewed every quarter, with real-time alerting on every privileged operation acknowledged by the ISSO within one business hour. An assessor can verify every claim in this narrative from the cited artifacts. No remediation required this cycle; maintain the quarterly review and the per-PR lint."""
+
+
+_SSP_GRADING_RULES = """\
+1. EVIDENCE REVIEWED is the SSP narrative + the artifacts the narrative names.
+   You have NO scanner data. Do NOT cite `kubectl`, `Kubescape`, `Prowler`, or any
+   other tool's OUTPUT — you did not run any tool. If the narrative names a tool
+   (e.g. an IAM Access Analyzer report, a CI lint job, a CloudTrail trail), cite
+   THAT artifact as it is named in the narrative. Be specific: name the file
+   paths, Confluence pages, script names, and intervals the narrative gives you.
+2. STATUS=PASS only if the narrative names (a) the implementing mechanism, (b)
+   the interval/frequency the control requires, AND (c) at least one verifiable
+   artifact (a file path, a tool output location, a dated record) an assessor
+   could request and check. EVIDENCE GAP on a PASS becomes the continuous-monitoring
+   spot-checks for the next review cycle — never "None" alone.
+3. STATUS=PARTIAL if the narrative is documented but missing one of those three
+   elements. EVIDENCE GAP names exactly what's missing (the interval, the
+   artifact, or the named mechanism), and POA&M ITEM scopes how to close it.
+4. STATUS=FAIL if the narrative is a stub, restates the requirement without
+   describing implementation, or is contradicted by anything in it. EVIDENCE GAP
+   = "the narrative does not state [the specific missing element]"; POA&M ITEM
+   = "rewrite the narrative to include [the specific elements]."
+5. RISK is a SINGLE Likelihood × SINGLE Impact → SINGLE rank. No "High | Medium"
+   hedging. Use the matrix monotonically: Low×Low/Moderate → E; Low×High or
+   Medium×Low/Moderate → D; Medium×Moderate/High → C; High×High → B; emergency → S.
+   Add one sentence of justification.
+6. CONTROL OWNER names the role(s) the narrative attributes the control to.
+7. POA&M ITEM is required on FAIL or PARTIAL. "N/A — control fully implemented"
+   ONLY on PASS.
+8. CONTROL line cites the base control AND any enhancements the narrative
+   explicitly addresses (e.g. "AC-6 — Least Privilege (enhancements (1), (5),
+   (9) addressed)"). Do not invent enhancements the narrative does not address.
+9. CISO SUMMARY is governance-voice: "The organization demonstrates / does not
+   demonstrate ...". Not engineer voice ("X is missing"). One paragraph. No
+   NIST control IDs in this field."""
+
+
+def _ssp_grading_prompt(cid: str, narrative: str, control_text: str,
+                        validated: List[str], ai_rmf_hint: str) -> str:
+    """Build the ssp_grading user prompt: lead with the narrative, give the
+    rules, show one worked PASS example, then ask for the finding on THIS one."""
+    return (
+        f"You are GRADING a single NIST 800-53 control narrative from an SSP. You have NO scanner data — "
+        f"your only evidence is the narrative below and the artifacts it names.\n\n"
+        f"## CONTROL UNDER ASSESSMENT\n{cid}\n\n"
+        f"## CONTROL REQUIREMENT (from controls/{cid}.md, for reference)\n"
+        f"{control_text[:1200]}\n\n"
+        f"## SSP NARRATIVE TO GRADE (this is the only thing you grade)\n"
+        f"{narrative}\n\n"
+        f"## GRADING RULES\n{_SSP_GRADING_RULES}\n\n"
+        f"## GOLD-STANDARD EXAMPLE (for FORMAT and VOICE — your output must look like this)\n"
+        f"{_GOLD_PASS_EXAMPLE}\n\n"
+        f"## YOUR TASK\nGrade the SSP narrative above for control {cid}. Produce the 10-field "
+        f"BERU finding in the EXACT format and voice of the gold-standard example. "
+        f"Cite only validated controls ({validated}). Read the narrative carefully; if it names a "
+        f"mechanism, interval, and artifact, that is a PASS — do not default to FAIL or PARTIAL "
+        f"on a well-documented narrative. If it is a stub or restates the requirement, that is FAIL. "
+        f"Do not invent scanner output you did not see.{ai_rmf_hint}"
+    )
+
+
 def assess_control(state: BERUState) -> Dict[str, Any]:
     """Call the brain to produce a 9-field finding for the current control."""
     cid = state.get("current_control")
@@ -468,51 +543,64 @@ def assess_control(state: BERUState) -> Dict[str, Any]:
         return {"errors": ["assess_control called without a current_control"]}
 
     control_text = state.get("control_definition", "")
-    family_playbook = load_family_playbook(cid.split("-")[0])
     template = load_template("beru-finding")
 
     # Filter evidence relevant to this control.
     relevant_evidence: List[Dict[str, Any]] = []
+    ssp_narrative = ""
     for ev in state.get("evidence", []):
         if cid in (ev.get("mapped_controls") or []):
             relevant_evidence.append(ev)
         elif "ssp_chunk" in ev and ev["ssp_chunk"].get("control_id") == cid:
             relevant_evidence.append(ev)
+            ssp_narrative = (ev["ssp_chunk"].get("text") or "").strip()
         elif "freeform" in ev:
             relevant_evidence.append(ev)
 
-    evidence_block = (
-        "\n\n".join(json.dumps(e, indent=2)[:1500] for e in relevant_evidence)
-        if relevant_evidence
-        else "(no evidence collected — note this as an EVIDENCE GAP)"
-    )
     ai_rmf_hint = (
         f"\nWhen citing AI RMF, you may only use: {state.get('validated_ai_rmf_ids', [])}."
         if state.get("ai_context") and state.get("validated_ai_rmf_ids")
         else ""
     )
-    assessment_hint = ""
-    if state.get("input_type") == "assessment":
-        assessment_hint = (
-            "\n\nThis is an evidence-vs-claim assessment. The SSP narrative above is the "
-            "system owner's CLAIM about how this control is implemented. The other evidence "
-            "is what you actually have to verify it. Rules: STATUS=PASS only if the claim is "
-            "BOTH documented in the SSP AND supported by the evidence; STATUS=PARTIAL if the "
-            "claim is documented but the evidence is incomplete — name the specific missing "
-            "artifact in EVIDENCE GAP; STATUS=FAIL if the SSP claim is missing or a stub, OR "
-            "the evidence contradicts the claim. Do not pass a control on the strength of the "
-            "narrative alone — a claim without supporting evidence is at best PARTIAL."
-        )
 
-    user_msg = (
-        f"You are assessing control {cid}.\n\n"
-        f"--- Control definition (read first) ---\n{control_text}\n\n"
-        f"--- Family playbook (assessment rubric) ---\n{family_playbook[:3000]}\n\n"
-        f"--- Evidence reviewed ---\n{evidence_block}\n\n"
-        f"--- Output template ---\n{template}\n\n"
-        f"Produce the BERU finding for {cid}. Cite only validated controls "
-        f"({state.get('validated_control_ids', [cid])}).{ai_rmf_hint}{assessment_hint}"
-    )
+    # ── ssp_grading mode: text-only narrative grading ────────────────────────
+    # Leads with the SSP narrative, drops the scanner-oriented family playbook
+    # (which kept teaching BERU to invent kubectl/Kubescape outputs), and gives
+    # the model one worked PASS example so it has the target format in-context.
+    if state.get("input_type") == "ssp_grading" and ssp_narrative:
+        user_msg = _ssp_grading_prompt(cid, ssp_narrative, control_text,
+                                        state.get("validated_control_ids", [cid]),
+                                        ai_rmf_hint)
+    else:
+        # audit / freeform / assessment-with-real-evidence: keep the playbook-rich path.
+        family_playbook = load_family_playbook(cid.split("-")[0])
+        evidence_block = (
+            "\n\n".join(json.dumps(e, indent=2)[:1500] for e in relevant_evidence)
+            if relevant_evidence
+            else "(no evidence collected — note this as an EVIDENCE GAP)"
+        )
+        assessment_hint = ""
+        if state.get("input_type") == "assessment":
+            assessment_hint = (
+                "\n\nThis is an evidence-vs-claim assessment. The SSP narrative above is the "
+                "system owner's CLAIM about how this control is implemented. The other evidence "
+                "is what you actually have to verify it. Rules: STATUS=PASS only if the claim is "
+                "BOTH documented in the SSP AND supported by the evidence; STATUS=PARTIAL if the "
+                "claim is documented but the evidence is incomplete — name the specific missing "
+                "artifact in EVIDENCE GAP; STATUS=FAIL if the SSP claim is missing or a stub, OR "
+                "the evidence contradicts the claim. Do not pass a control on the strength of the "
+                "narrative alone — a claim without supporting evidence is at best PARTIAL."
+            )
+
+        user_msg = (
+            f"You are assessing control {cid}.\n\n"
+            f"--- Control definition (read first) ---\n{control_text}\n\n"
+            f"--- Family playbook (assessment rubric) ---\n{family_playbook[:3000]}\n\n"
+            f"--- Evidence reviewed ---\n{evidence_block}\n\n"
+            f"--- Output template ---\n{template}\n\n"
+            f"Produce the BERU finding for {cid}. Cite only validated controls "
+            f"({state.get('validated_control_ids', [cid])}).{ai_rmf_hint}{assessment_hint}"
+        )
 
     provider = _make_provider((state.get("run_id") or "").endswith("-dry"))
     try:

@@ -1,0 +1,225 @@
+{
+  "model": "beru:v1.5",
+  "tag": "exp-011-promptfix",
+  "run_date_utc": "2026-05-13T14:51:46.146442+00:00",
+  "ssp_dir": "/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/BERU-AI/knowledge/nist-800-53/ssp-examples",
+  "summary": {
+    "totals": {
+      "controls_graded": 15,
+      "clean_grade_rate": 0.467,
+      "hallucination_rate": 0.533
+    },
+    "bad_tier": {
+      "controls": 5,
+      "blocked": 3,
+      "clean_grade_rate": 0.4,
+      "pass": 0,
+      "partial": 2,
+      "fail": 0,
+      "pass_rate": 0.0,
+      "wrong_verdicts": 0,
+      "acceptable_clean_rate": 0.4
+    },
+    "good_tier": {
+      "controls": 5,
+      "blocked": 2,
+      "clean_grade_rate": 0.6,
+      "pass": 3,
+      "partial": 0,
+      "fail": 0,
+      "pass_rate": 0.6,
+      "wrong_verdicts": 0,
+      "acceptable_clean_rate": 0.6
+    },
+    "great_tier": {
+      "controls": 5,
+      "blocked": 3,
+      "clean_grade_rate": 0.4,
+      "pass": 2,
+      "partial": 0,
+      "fail": 0,
+      "pass_rate": 0.4,
+      "wrong_verdicts": 0,
+      "acceptable_clean_rate": 0.4
+    },
+    "headline": {
+      "bad_caught": 0.4,
+      "great_recognized": 0.4,
+      "discrimination": false,
+      "pass_rates": {
+        "bad": 0.0,
+        "good": 0.6,
+        "great": 0.4
+      },
+      "zero_bad_pass": true,
+      "zero_great_fail": true
+    }
+  },
+  "records": [
+    {
+      "file": "AC-ssp-bad.md",
+      "tier": "bad",
+      "control_id": "AC-2",
+      "verdict": "PARTIAL",
+      "rank": "D",
+      "deterministic": false,
+      "hallucination": false,
+      "blocked": false,
+      "file_elapsed_s": 35.3
+    },
+    {
+      "file": "AC-ssp-bad.md",
+      "tier": "bad",
+      "control_id": "AC-5",
+      "verdict": "PARTIAL",
+      "rank": "D",
+      "deterministic": false,
+      "hallucination": false,
+      "blocked": false,
+      "file_elapsed_s": 35.3
+    },
+    {
+      "file": "AC-ssp-bad.md",
+      "tier": "bad",
+      "control_id": "AC-3",
+      "verdict": "BLOCKED",
+      "rank": "B",
+      "deterministic": false,
+      "hallucination": true,
+      "blocked": true,
+      "file_elapsed_s": 35.3
+    },
+    {
+      "file": "AC-ssp-bad.md",
+      "tier": "bad",
+      "control_id": "AC-6",
+      "verdict": "BLOCKED",
+      "rank": "B",
+      "deterministic": false,
+      "hallucination": true,
+      "blocked": true,
+      "file_elapsed_s": 35.3
+    },
+    {
+      "file": "AC-ssp-bad.md",
+      "tier": "bad",
+      "control_id": "AC-17",
+      "verdict": "BLOCKED",
+      "rank": "B",
+      "deterministic": false,
+      "hallucination": true,
+      "blocked": true,
+      "file_elapsed_s": 35.3
+    },
+    {
+      "file": "AC-ssp-good.md",
+      "tier": "good",
+      "control_id": "AC-2",
+      "verdict": "PASS",
+      "rank": "E",
+      "deterministic": false,
+      "hallucination": false,
+      "blocked": false,
+      "file_elapsed_s": 23.9
+    },
+    {
+      "file": "AC-ssp-good.md",
+      "tier": "good",
+      "control_id": "AC-3",
+      "verdict": "PASS",
+      "rank": "E",
+      "deterministic": false,
+      "hallucination": false,
+      "blocked": false,
+      "file_elapsed_s": 23.9
+    },
+    {
+      "file": "AC-ssp-good.md",
+      "tier": "good",
+      "control_id": "AC-5",
+      "verdict": "PASS",
+      "rank": "E",
+      "deterministic": false,
+      "hallucination": false,
+      "blocked": false,
+      "file_elapsed_s": 23.9
+    },
+    {
+      "file": "AC-ssp-good.md",
+      "tier": "good",
+      "control_id": "AC-6",
+      "verdict": "BLOCKED",
+      "rank": "B",
+      "deterministic": false,
+      "hallucination": true,
+      "blocked": true,
+      "file_elapsed_s": 23.9
+    },
+    {
+      "file": "AC-ssp-good.md",
+      "tier": "good",
+      "control_id": "AC-17",
+      "verdict": "BLOCKED",
+      "rank": "B",
+      "deterministic": false,
+      "hallucination": true,
+      "blocked": true,
+      "file_elapsed_s": 23.9
+    },
+    {
+      "file": "AC-ssp-great.md",
+      "tier": "great",
+      "control_id": "AC-6",
+      "verdict": "PASS",
+      "rank": "E",
+      "deterministic": false,
+      "hallucination": false,
+      "blocked": false,
+      "file_elapsed_s": 26.4
+    },
+    {
+      "file": "AC-ssp-great.md",
+      "tier": "great",
+      "control_id": "AC-17",
+      "verdict": "PASS",
+      "rank": "E",
+      "deterministic": false,
+      "hallucination": false,
+      "blocked": false,
+      "file_elapsed_s": 26.4
+    },
+    {
+      "file": "AC-ssp-great.md",
+      "tier": "great",
+      "control_id": "AC-2",
+      "verdict": "BLOCKED",
+      "rank": "B",
+      "deterministic": false,
+      "hallucination": true,
+      "blocked": true,
+      "file_elapsed_s": 26.4
+    },
+    {
+      "file": "AC-ssp-great.md",
+      "tier": "great",
+      "control_id": "AC-3",
+      "verdict": "BLOCKED",
+      "rank": "B",
+      "deterministic": false,
+      "hallucination": true,
+      "blocked": true,
+      "file_elapsed_s": 26.4
+    },
+    {
+      "file": "AC-ssp-great.md",
+      "tier": "great",
+      "control_id": "AC-5",
+      "verdict": "BLOCKED",
+      "rank": "B",
+      "deterministic": false,
+      "hallucination": true,
+      "blocked": true,
+      "file_elapsed_s": 26.4
+    }
+  ]
+}
