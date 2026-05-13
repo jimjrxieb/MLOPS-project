@@ -1,0 +1,16 @@
+e132f5631a4cee4cae8b95c098e1c0256ea92999:2-rag-ingestion/02-preperation-factory/stages/sanitize_npc.py:stripe-access-token:464
+e132f5631a4cee4cae8b95c098e1c0256ea92999:4-eval-clarify/2-test-data/training-data/deployments/training/broken-app/configmap.yaml:private-key:31
+e132f5631a4cee4cae8b95c098e1c0256ea92999:4-eval-clarify/2-test-data/training-data/deployments/training/broken-app/configmap.yaml:generic-api-key:62
+e132f5631a4cee4cae8b95c098e1c0256ea92999:4-eval-clarify/2-test-data/training-data/faulty-examples/10-k8s-manifests/secrets-FAULTY.yaml:generic-api-key:31
+e132f5631a4cee4cae8b95c098e1c0256ea92999:4-eval-clarify/2-test-data/training-data/faulty-examples/10-k8s-manifests/secrets-FAULTY.yaml:generic-api-key:34
+e132f5631a4cee4cae8b95c098e1c0256ea92999:4-eval-clarify/2-test-data/training-data/faulty-examples/12-docker/Dockerfile-FAULTY:generic-api-key:31
+e132f5631a4cee4cae8b95c098e1c0256ea92999:4-eval-clarify/2-test-data/training-data/faulty-examples/12-docker/docker-compose-FAULTY.yaml:generic-api-key:30
+e132f5631a4cee4cae8b95c098e1c0256ea92999:4-eval-clarify/2-test-data/training-data/faulty-examples/13-helm-charts/values-secrets-exposed-FAULTY.yaml:private-key:34
+e132f5631a4cee4cae8b95c098e1c0256ea92999:4-eval-clarify/2-test-data/training-data/faulty-examples/14-vuln-apps/vuln-nodejs/config.js:generic-api-key:10
+e132f5631a4cee4cae8b95c098e1c0256ea92999:JADE-AI/tasks/day3.md:stripe-access-token:103
+e132f5631a4cee4cae8b95c098e1c0256ea92999:1-local-pipeline/06-eval-holdout/eval_set.jsonl:generic-api-key:256
+e132f5631a4cee4cae8b95c098e1c0256ea92999:1-local-pipeline/06-eval-holdout/eval_set.jsonl:generic-api-key:673
+e132f5631a4cee4cae8b95c098e1c0256ea92999:1-local-pipeline/01-raw-data-lake/beru_training_combined_v1.jsonl:generic-api-key:393
+e132f5631a4cee4cae8b95c098e1c0256ea92999:BERU-AI/training-data/chatml-examples/beru-training-examples.jsonl:generic-api-key:393
+12d0c9a87a375ae77d1eda344693862fab592692:1-local-pipeline/01-raw-data-lake/beru_training_exp011.jsonl:generic-api-key:852
+088bc3b726582187f537ffa2a7b22b7412a77b4f:1-local-pipeline/01-raw-data-lake/beru_training_exp012.jsonl:generic-api-key:349

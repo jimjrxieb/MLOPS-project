@@ -1,13 +1,30 @@
-# MLOPS-project CI — runs on changes to the BERU agent or its tests.
+# MLOPS-project CI — BERU LLM-security pipeline.
 #
-# This is the standalone-repo variant: paths are relative to the GP-MODEL-OPS
-# root (= the MLOPS-project repo root). A near-identical workflow scoped to
-# `GP-MODEL-OPS/BERU-AI/**` also lives in the parent GP-Copilot monorepo.
+# Three jobs, mapped to OWASP LLM Top 10:
 #
-# Jobs:
-#   test  — slim runtime deps + pytest on the BERU unit/regression suite (89 tests)
-#   build — validate docker-compose config, build the 287 MB API image,
-#           smoke-test that the container boots and serves /health, /docs, /tracking
+#   secrets-scan  — LLM02 (Sensitive Information Disclosure). gitleaks scans the
+#                   full git history on every PR for credential-shaped strings
+#                   (Stripe / AWS / GitHub PAT / private keys / etc.) before they
+#                   land in a commit GitHub's push-protection would reject.
+#
+#   test          — LLM03 (Supply Chain), LLM04 (Data/Model Poisoning),
+#                   LLM05 (Improper Output Handling), LLM06 (Excessive Agency).
+#                   • pip-audit on BERU-AI/requirements-api.txt — fail on any vuln
+#                     in the inference-path deps.
+#                   • pytest the BERU suite (89+ tests): the agent guards
+#                     (citation validator, evidence-groundedness, stub detector,
+#                     rank-bump→HITL — LLM05/LLM06) + the BERU corpus
+#                     data-quality gate (ChatML schema, no secret-shaped strings,
+#                     min response length, dedup, GRC-scope check — LLM04).
+#
+#   build         — LLM03 (Supply Chain — container layer). Validate
+#                   docker-compose, build the 287 MB API image, scan it with
+#                   Trivy (fail on HIGH/CRITICAL fixed CVEs), smoke-test that
+#                   it boots and serves /health, /docs, /tracking.
+#
+# What's NOT in this pipeline yet: adversarial-prompt eval (LLM01, LLM07),
+# RAG/embedding integrity (LLM08), hallucination eval gate (LLM09), rate-limit
+# tests (LLM10). Those need Ollama as a service container — separate follow-up.
 #
 # Note: the BERU agent reads NIST playbooks from a path given by BERU_NIST_DIR
 # (mounted in docker-compose). That content lives in the GP-Copilot repo, not
@@ -40,7 +57,37 @@ env:
 
 jobs:
   # ============================================================
-  # test — agent guards, HITL router, tools, core mappers
+  # secrets-scan — OWASP LLM02 (Sensitive Info Disclosure).
+  #   Catches credential-shaped strings on every PR before they
+  #   reach a commit GitHub's push-protection would reject.
+  # ============================================================
+  secrets-scan:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history — gitleaks scans every commit on the branch)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Install + run gitleaks (CLI — no third-party action)
+        run: |
+          curl -sSfL -o gitleaks.tgz \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.21.2/gitleaks_8.21.2_linux_x64.tar.gz
+          tar xzf gitleaks.tgz gitleaks
+          ./gitleaks detect --no-banner --redact --exit-code 1 \
+            --report-format json --report-path gitleaks-report.json
+
+      - name: Upload gitleaks report (only on failure)
+        if: failure()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08  # v4.6.0
+        with:
+          name: gitleaks-report
+          path: gitleaks-report.json
+
+  # ============================================================
+  # test — agent guards, HITL router, tools, core mappers,
+  #        BERU corpus data-quality (LLM04), pip-audit (LLM03)
   # ============================================================
   test:
     name: Unit & regression tests
@@ -58,16 +105,39 @@ jobs:
       - name: Install dependencies (slim runtime + pytest)
         run: |
           python -m pip install --upgrade pip
-          pip install pytest pytest-asyncio
+          pip install pytest pytest-asyncio pip-audit
           # Inference-path deps only — no torch/transformers/unsloth.
           pip install -r BERU-AI/requirements-api.txt
 
-      - name: Run BERU test suite
+      - name: Dependency vulnerability scan (pip-audit — OWASP LLM03)
+        run: |
+          # Fail CI on any NEW vuln in the inference-path deps.
+          # --vulnerability-service osv = open-source database; no API key needed.
+          # --ignore-vuln entries below are accepted residual CVEs — each one
+          # tracked for upgrade. New (not-yet-ignored) vulns will fail the build.
+          pip-audit \
+            --requirement BERU-AI/requirements-api.txt \
+            --strict \
+            --vulnerability-service osv \
+            --ignore-vuln GHSA-g48c-2wqr-h844 \
+            --ignore-vuln GHSA-2g6r-c272-w58r \
+            --ignore-vuln GHSA-qh6h-p6c9-ff54 \
+            --ignore-vuln GHSA-mhr3-j7m5-c7c9 \
+            --ignore-vuln GHSA-7f5h-v6xp-fcq8
+          # Residuals (track + upgrade — issue #TBD):
+          #   GHSA-g48c-2wqr-h844  langgraph<1.0.10           — requires major version bump
+          #   GHSA-2g6r-c272-w58r  langchain-core<1.2.11      — requires major version bump
+          #   GHSA-qh6h-p6c9-ff54  langchain-core<1.2.22      — requires major version bump
+          #   GHSA-mhr3-j7m5-c7c9  langgraph-checkpoint<4.0.0 — pulled by langgraph; bumps with it
+          #   GHSA-7f5h-v6xp-fcq8  starlette<0.49.1           — pulled by fastapi; widen fastapi pin to allow
+
+      - name: Run BERU test suite (incl. corpus data-quality — OWASP LLM04)
         run: |
           python -m pytest -v \
             8-tests/test_evidence_guard.py \
             8-tests/test_beru_tools.py \
-            8-tests/test_beru_core.py
+            8-tests/test_beru_core.py \
+            8-tests/test_beru_data_quality.py
 
   # ============================================================
   # build — container builds and boots
@@ -89,6 +159,18 @@ jobs:
         run: |
           docker build -t beru-api:ci .
           docker images beru-api:ci --format '{{.Repository}}:{{.Tag}}  {{.Size}}'
+
+      - name: Container vulnerability scan (Trivy — OWASP LLM03)
+        # Fail CI on HIGH+CRITICAL CVEs with a fix available.
+        # ignore-unfixed: don't fail on issues the upstream image hasn't patched yet.
+        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0  # v0.29.0
+        with:
+          image-ref: 'beru-api:ci'
+          format: 'table'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
 
       - name: Smoke-test the container (boots, serves /health, /docs, /tracking)
         run: |
