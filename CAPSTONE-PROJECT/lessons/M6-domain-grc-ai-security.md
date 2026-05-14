@@ -3,6 +3,7 @@
 > **Goal:** Know NIST 800-53 well enough to map any finding to the right control family, and understand where AI RMF fits alongside it.
 > **Build:** `BERU-COVERAGE.md` — the honest coverage map showing what BERU can and cannot assess.
 > **Gate:** Coverage map is complete with honest gaps documented. A 3PAO auditor can read it and know BERU's limits.
+> **Status (2026-05-13):** ✅ closed. Deliverable shipped at `BERU-AI/BERU-COVERAGE.md` — 42 controls / 12 families documented, 4 eval runs cited, champion `beru:v1.5 + promptfix` recorded, v1.6 marked do-not-promote.
 
 ---
 

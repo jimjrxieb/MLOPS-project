@@ -102,13 +102,16 @@ Plus: zero hallucinated control IDs / AI RMF subcategory IDs / ATLAS technique I
 
 ## Metrics
 
-| Metric | How measured | Target | Baseline | Post-fine-tune |
+| Metric | How measured | Target | Baseline (exp-005) | Best fine-tune (exp-007/exp-012) |
 |---|---|---|---|---|
-| Knowledge × Brain overall | `beru_eval_runner.py --suite knowledge_brain` | ≥70% | _pending_ | _pending_ |
-| Pentest × Brain overall | `beru_eval_runner.py --suite pentest_brain` | ≥70% | _pending_ | _pending_ |
-| Critical OWASP score | LLM01/LLM06/LLM08 | ≥70% each | _pending_ | _pending_ |
-| Hallucinated IDs | regex scan of all eval outputs | 0 | _pending_ | _pending_ |
-| Inference latency (CPU) | wall clock per question | <15s | _pending_ | _pending_ |
+| Knowledge × Brain overall | `beru_eval_runner.py --suite knowledge_brain` | ≥70% | 29.4% | 16.7% (exp-007) / 13.3% (exp-012) |
+| Pentest × Brain overall | `beru_eval_runner.py --suite pentest_brain` | ≥70% | 40.3% | 81.8% (exp-010/011/012) |
+| Critical OWASP (LLM01/06/08) | per-category score | ≥70% each | LLM01:52%, LLM06:70%, LLM08:0% | LLM01:75%, LLM06:67%, LLM08:50% |
+| Hallucinated IDs | regex scan of all eval outputs | 0 | 0 | 0 |
+| Inference latency (CPU) | wall clock per question | <15s | ~8s | ~8s |
+| Train loss (latest) | Unsloth training loop | decreasing | — | 1.561 (exp-012) |
+
+**Current status (exp-012, beru:v1.6):** Pentest brain passes gate at 81.8%. Knowledge brain blocked at 13.3% — 56.7 pp gap to 70% gate. Not promoted.
 
 ## Known Limitations
 

@@ -54,6 +54,7 @@ wandb/
 
 # --- Eval result dumps (regenerable; keep the questions + scorers, not the runs) ---
 4-eval-clarify/3-results/
+4-eval-clarify/results/
 **/full_results.json
 **/failquestions_*.jsonl
 **/archive/
