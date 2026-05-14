@@ -1,0 +1,14 @@
+# Accepted residual CVEs — each requires a major upstream version upgrade
+# that is tracked separately. Same items are suppressed in pip-audit via
+# --ignore-vuln in ci.yml.
+
+# CVE-2025-62727: starlette DoS via Range header merging (fixed >= 0.49.1)
+# Fix path: bump fastapi past the version that pulls starlette 0.49.1+
+# Dependency chain: fastapi<0.120 → starlette 0.48.x
+# pip-audit equivalent: GHSA-7f5h-v6xp-fcq8
+CVE-2025-62727
+
+# CVE-2026-34070: langchain-core path traversal in legacy load_prompt (fixed >= 1.2.22)
+# Fix path: langgraph 0.6.x requires langchain-core 0.3.x; upgrade needs langgraph 2.x
+# pip-audit equivalents: GHSA-qh6h-p6c9-ff54, GHSA-2g6r-c272-w58r
+CVE-2026-34070

@@ -11,3 +11,9 @@ langchain-core>=0.3,<0.4
 # mlflow-skinny: tracking client only — no pandas/scipy/sklearn/matplotlib.
 # We only call log_params/log_metrics/set_tags, so the full mlflow is dead weight.
 mlflow-skinny>=3.0,<4.0
+
+# Security pins — transitive deps pinned to CVE-fixed versions.
+# wheel: CVE-2026-24049 (priv-esc) fixed in 0.46.2
+wheel>=0.46.2
+# jaraco.context: CVE-2026-23949 (path traversal) fixed in 6.1.0; pulled by mlflow-skinny
+jaraco.context>=6.1.0

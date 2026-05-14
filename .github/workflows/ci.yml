@@ -173,6 +173,7 @@ jobs:
             --severity HIGH,CRITICAL \
             --exit-code 1 \
             --ignore-unfixed \
+            --ignorefile .trivyignore \
             --vuln-type os,library \
             --format table \
             beru-api:ci
