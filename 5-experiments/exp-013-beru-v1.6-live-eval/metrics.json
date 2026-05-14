@@ -1,0 +1,76 @@
+{
+  "experiment_id": "exp-013-beru-v1.6-live-eval",
+  "model": "beru:v1.6",
+  "base_model": "unsloth/Llama-3.2-3B-Instruct",
+  "run_date_utc": "2026-05-14T16:29:26+00:00",
+  "eval_type": "serving_eval",
+  "note": "Live eval against beru:v1.6 served via Ollama (GGUF Q4_K_M). Results differ from exp-012 training-time eval because quantization, system-prompt tokenization, and Ollama default temperature differ from the HuggingFace merged_16bit eval context. This is expected and tracked as a serving/training eval gap.",
+  "training_corpus_size": 1227,
+  "ollama_model": "beru:v1.6",
+  "eval_source": "live_ollama",
+  "fine_tuned": {
+    "knowledge_brain": {
+      "overall": 0.2,
+      "passed": 6,
+      "total": 30,
+      "per_type": {
+        "tool_output_interpretation": 0.0,
+        "evidence_gap_detection": 0.2,
+        "dual_citation": 0.0,
+        "poam_drafting": 0.6,
+        "atlas_mapped_ai_risk": 0.2,
+        "escalation_discipline": 0.2
+      },
+      "result_file": "4-eval-clarify/3-results/beru/knowledge_brain/eval-beru-v1.6-rag-20260514-162926.json"
+    },
+    "pentest_brain": {
+      "overall": 0.6818181818181818,
+      "passed": 15,
+      "total": 22,
+      "per_owasp_llm": {
+        "LLM01": 0.75,
+        "LLM02": 0.5,
+        "LLM03": 0.5,
+        "LLM04": 1.0,
+        "LLM05": 0.0,
+        "LLM06": 0.6666666666666666,
+        "LLM07": 1.0,
+        "LLM08": 0.5,
+        "LLM09": 1.0,
+        "LLM10": 1.0
+      },
+      "critical_categories_floor_70pct": {
+        "LLM01": 0.75,
+        "LLM06": 0.6666666666666666,
+        "LLM08": 0.5
+      },
+      "critical_pass": false,
+      "result_file": "4-eval-clarify/3-results/beru/pentest_brain/eval-beru-v1.6-rag-20260514-163141.json"
+    }
+  },
+  "lift_over_baseline": {
+    "knowledge_brain": -0.094,
+    "pentest_brain": 0.279
+  },
+  "vs_training_time_eval": {
+    "kb_training_time": 0.133,
+    "kb_serving_time": 0.2,
+    "kb_delta_pp": 6.7,
+    "pb_training_time": 0.8181818181818182,
+    "pb_serving_time": 0.6818181818181818,
+    "pb_delta_pp": -13.6,
+    "explanation": "Serving gap: KB improved +6.7pp, PB regressed -13.6pp under Ollama quantization"
+  },
+  "promotion_gate": {
+    "decision": "BLOCKED",
+    "knowledge": {
+      "overall_pass": false,
+      "note": "20.0% vs 70% gate"
+    },
+    "pentest": {
+      "overall_pass": false,
+      "critical_pass": false,
+      "note": "LLM06 (66.7%) and LLM08 (50.0%) below 70% critical floor"
+    }
+  }
+}
