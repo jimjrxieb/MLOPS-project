@@ -1,0 +1,71 @@
+{
+  "experiment_id": "exp-014-beru-v1.6-corrected-eval",
+  "model": "beru:v1.6",
+  "base_model": "unsloth/Llama-3.2-3B-Instruct",
+  "run_date_utc": "2026-05-14T18:59:47+00:00",
+  "eval_type": "corrected_eval_suite",
+  "note": "Re-eval after removing escalation_discipline questions (wrong mental model — BERU is a document-producing GRC analyst, not an action-taking agent). Replaced with finding_accuracy questions: given SSP claim + real evidence, grade the control PASS/PARTIAL/FAIL. This is BERU's actual job.",
+  "eval_suite_version": "knowledge_brain_v2 (post-correction)",
+  "eval_changes": "Removed 5 escalation_discipline questions (beru-knowledge-brain-escalate-001 through 005). Added 5 finding_accuracy questions (beru-knowledge-brain-findacc-001 through 005) testing SSP claim vs evidence grading.",
+  "fine_tuned": {
+    "knowledge_brain": {
+      "overall": 0.2,
+      "passed": 6,
+      "total": 30,
+      "per_type": {
+        "tool_output_interpretation": 0.2,
+        "evidence_gap_detection": 0.4,
+        "dual_citation": 0.0,
+        "poam_drafting": 0.2,
+        "atlas_mapped_ai_risk": 0.0,
+        "finding_accuracy": 0.4
+      },
+      "result_file": "4-eval-clarify/3-results/beru/knowledge_brain/eval-beru-v1.6-rag-20260514-185947.json"
+    },
+    "pentest_brain": {
+      "overall": 0.6818181818181818,
+      "passed": 15,
+      "total": 22,
+      "per_owasp_llm": {
+        "LLM01": 0.75,
+        "LLM02": 0.5,
+        "LLM03": 0.5,
+        "LLM04": 1.0,
+        "LLM05": 0.0,
+        "LLM06": 0.6666666666666666,
+        "LLM07": 1.0,
+        "LLM08": 0.5,
+        "LLM09": 1.0,
+        "LLM10": 1.0
+      },
+      "critical_categories_floor_70pct": {
+        "LLM01": 0.75,
+        "LLM06": 0.6666666666666666,
+        "LLM08": 0.5
+      },
+      "critical_pass": false,
+      "result_file": "4-eval-clarify/3-results/beru/pentest_brain/eval-beru-v1.6-rag-20260514-163141.json"
+    }
+  },
+  "vs_escalation_eval": {
+    "kb_escalation_suite": 0.2,
+    "kb_corrected_suite": 0.2,
+    "per_type_delta": {
+      "removed_escalation_discipline": "was 0.2 avg score (1/5 pass) — wrong question type for BERU",
+      "added_finding_accuracy": "0.4 avg score (2/5 pass) — correct question type, more signal"
+    },
+    "interpretation": "finding_accuracy scores 40% on first run with no targeted training — better baseline than escalation questions which tested the wrong behavior"
+  },
+  "promotion_gate": {
+    "decision": "BLOCKED",
+    "knowledge": {
+      "overall_pass": false,
+      "note": "20.0% overall vs 70% gate. finding_accuracy 40% and poam_drafting 20% are the closest to the 60% per-type floor."
+    },
+    "pentest": {
+      "overall_pass": false,
+      "critical_pass": false,
+      "note": "68.2% overall vs 70% gate. LLM06 (66.7%) and LLM08 (50.0%) below 70% critical floor."
+    }
+  }
+}
