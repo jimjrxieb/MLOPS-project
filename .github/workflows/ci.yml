@@ -161,16 +161,21 @@ jobs:
           docker images beru-api:ci --format '{{.Repository}}:{{.Tag}}  {{.Size}}'
 
       - name: Container vulnerability scan (Trivy — OWASP LLM03)
-        # Fail CI on HIGH+CRITICAL CVEs with a fix available.
-        # ignore-unfixed: don't fail on issues the upstream image hasn't patched yet.
-        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0  # v0.29.0
-        with:
-          image-ref: 'beru-api:ci'
-          format: 'table'
-          severity: 'HIGH,CRITICAL'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
+        # Install trivy directly (same pattern as gitleaks step) — avoids
+        # aquasecurity/trivy-action composite dep on setup-trivy@v0.2.2 which
+        # no longer resolves. Fail on HIGH/CRITICAL fixed CVEs only.
+        run: |
+          TRIVY_VERSION="0.70.0"
+          curl -sSfL -o trivy.tgz \
+            "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+          tar xzf trivy.tgz trivy
+          ./trivy image \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            --ignore-unfixed \
+            --vuln-type os,library \
+            --format table \
+            beru-api:ci
 
       - name: Smoke-test the container (boots, serves /health, /docs, /tracking)
         run: |
