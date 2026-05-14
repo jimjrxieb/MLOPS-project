@@ -15,12 +15,7 @@ RUN groupadd --gid 1000 beru && useradd --uid 1000 --gid beru --create-home beru
 
 WORKDIR /app
 
-# Security baseline: upgrade wheel + jaraco.context before requirements install.
-# wheel: CVE-2026-24049 (priv-esc); jaraco.context: CVE-2026-23949 (path traversal).
-# These are pre-installed/transitive deps that won't upgrade via requirements.txt alone.
-RUN pip install --no-cache-dir --upgrade "wheel>=0.46.2" "jaraco.context>=6.1.0"
-
-# Deps (layer cache — comes after security baseline so the cache busts on CVE pins)
+# Deps first (layer cache)
 COPY requirements-api.txt .
 RUN pip install --no-cache-dir -r requirements-api.txt
 
