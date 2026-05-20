@@ -192,3 +192,22 @@ class TestCrew:
         report_task = crew.tasks[3]
         assert report_task.context is not None
         assert len(report_task.context) == 3
+
+
+class TestMain:
+    """main.py: FastAPI app has correct routes and health check works."""
+
+    def test_app_has_required_routes(self):
+        from crewai_mlops.rag_ingestion.main import app
+        paths = [r.path for r in app.routes]
+        assert "/health" in paths
+        assert "/run/rag-prep" in paths
+
+    def test_health_returns_ok(self):
+        from fastapi.testclient import TestClient
+        from crewai_mlops.rag_ingestion.main import app
+        client = TestClient(app)
+        resp = client.get("/health")
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "ok"
+        assert resp.json()["crew"] == "rag-ingestion"
