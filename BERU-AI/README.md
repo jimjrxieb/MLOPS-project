@@ -146,11 +146,29 @@ BERU may NOT make remediation decisions — direct to JADE or Katie.
 | Field | Value |
 | --- | --- |
 | Base | `unsloth/Llama-3.2-3B-Instruct` (Ollama tag `llama3.2:3b`) |
-| Fine-tune | LoRA r=32 / alpha=64 on synthetic NIST 800-53 + AI RMF GRC analyst examples |
-| Serving | Ollama via `beru:v1.0` (CPU-viable; GPU optional) |
-| Modelfile | `Modelfile_beru3b` |
-| Rebaseline | See `CAPSTONE-PROJECT/beru-design-decisions.md` D-009 |
-| Status | Scaffold complete — pre-fine-tune brain baseline pending |
+| Fine-tune | LoRA r=32 / alpha=64 on synthetic NIST 800-53 + AI RMF GRC analyst corpus |
+| Serving | Ollama via `beru:v1.6` (CPU-viable; GPU optional) |
+| Current Modelfile | `Modelfile_beru_v16` |
+| Current exp | exp-014 (corrected eval suite) |
+| KB score | 20% (gate: 70%) — `dual_citation` 0%, `tool_output_interpretation` 20% are the targets |
+| PB score | 68.2% (gate: 70%) — LLM06 and LLM08 below critical floor |
+| Gate | BLOCKED — next corpus targets dual-citation patterns with realistic scanner inputs |
+
+See `5-experiments/COMPARISON.md` for full experiment history.
+
+---
+
+## CrewAI Crew
+
+The `10-crewai-mlops/beru/` package wraps BERU's three audit workflows as CrewAI sub-crews:
+
+- `beru_audit.py` — triage → audit (2 agents)
+- `ssp_to_poam.py` — review → assess → SAR → POA&M (4 agents)
+- `ac_access_control/` — collectors (kubectl/AWS CLI) + 3 audit agents
+
+```bash
+python3 -m crewai_mlops.beru.main run
+```
 
 ---
 
@@ -188,15 +206,14 @@ ollama run beru:v1.0 "Map this kube-bench finding to NIST controls and write the
 
 ---
 
-## Training Data (Needed)
+## Training Data
 
-BERU's training is blocked on labeled seclab evidence. Required corpus:
+Corpus is synthetic — no real client data in the training pipeline. Gemini generates SSPs, scanner outputs, and GRC analyst scenarios. Quality gate runs before any training.
 
-```text
-GP-SECLAB/ evidence → labeled with correct NIST control + status + POA&M
-GP-S3/6-seclab-reports/ → scanner outputs + human-written audit findings
-GP-MODEL-OPS/0-data-lab/ → synthetic NIST audit scenarios
+```bash
+python3 -m pytest 8-tests/test_beru_data_quality.py -v
 ```
 
-Training quality gate: `8-tests/test_data_quality.py`
-Target eval: ≥70% NIST control mapping accuracy, ≥80% SSP narrative quality score
+**Current gap:** `dual_citation` is 0% across all eval runs. BERU must simultaneously recognize an AI system is in scope, cite the 800-53 control, and cite the AI RMF subcategory. The next corpus generation targets dual-citation patterns using realistic garak/promptfoo/MLflow audit inputs rather than abstract scenarios.
+
+**Corpus location:** `BERU-AI/training-data/chatml-examples/` (gitignored — regenerate with data lab scripts)

@@ -1,146 +1,77 @@
 # Experiment Comparison
 
-Side-by-side comparison of all training experiments. Updated after each experiment completes.
+Side-by-side of all training experiments. Updated after each run completes.
 
-## Summary
+Promotion gate: **≥70% knowledge brain + ≥70% pentest brain**, per-type floor 60%, zero hallucinated control IDs.
 
-| | exp-001 | exp-002 | exp-003 |
-|---|---|---|---|
-| **Name** | Katie v1 Bulk | Katie v2 Curated | JADE v1 8B |
-| **Model** | LLaMA 3.2-3B | LLaMA 3.2-3B | LLaMA 3.1-8B |
-| **Corpus** | 284,844 (raw) | 42,276 (curated) | 284,844 (raw) |
-| **Format** | Mixed | ChatML only | Mixed |
-| **Curation** | None | 6-gate pipeline | None |
-| **LoRA approach** | Stacked (36 chunks) | Fresh from base | Stacked |
-| **Overall accuracy** | 28.5% | In progress | 0% (eval mismatch) |
-| **Status** | Failed | In progress | Deployed (jade:v1.0) |
-| **Promoted?** | No | Pending | Yes (qualitative) |
+---
 
-## Category Comparison
+## History
 
-| Category | exp-001 (v1 3B) | exp-002 (v2 3B) | exp-003 (8B) |
-|----------|-----------------|-----------------|--------------|
-| CKS | 27.8% (100/360) | — | 0% (0/3)* |
-| Kubernetes | 60.0% (6/10) | — | — |
-| CNPA | 45.5% (10/22) | — | — |
-| DevSecOps | 40.0% (4/10) | — | — |
-| CKA | 31.6% (6/19) | — | — |
-| Compliance | 30.0% (3/10) | — | — |
-| Incident Response | 20.0% (2/10) | — | — |
-| Threat Modeling | 20.0% (2/10) | — | — |
-| Hardening | 0.0% (0/5) | — | — |
-| Cloud | 0.0% (0/10) | — | 0% (0/3)* |
+| Exp | Model | Corpus | KB | PB | Gate | Key Learning |
+|-----|-------|--------|-----|-----|------|-------------|
+| 001 | LLaMA 3.2-3B (raw) | 284,844 | — | 28.5%\* | FAILED | 85% of data was garbage — mixed format, no curation |
+| 002 | LLaMA 3.2-3B (curated) | 42,276 | — | In progress | PENDING | Hypothesis: quality > quantity |
+| 003 | LLaMA 3.1-8B (raw) | 284,844 | — | 0%\*\* | Deployed | Eval framework mismatch; model serves well with RAG |
+| 004 | LLaMA 3.2-3B | CySA corpus | — | — | DATA | Corpus design run — no training |
+| 005 | llama3.2:3b (baseline) | — | 29.4% | 40.3% | BLOCKED | Pre-fine-tune baseline established |
+| 006 | beru-v1.0-3b | 579 | 3.3% | 95.5% | BLOCKED | KB collapsed; PB overfit to refusal behavior |
+| 007 | beru-v1.1-3b | 579 | 16.7% | 72.7% | BLOCKED | max_seq_length 4096→8192 fixed truncation; KB recovering |
+| 008 | beru-v1.2-3b | 679 | 3.3% | 68.2% | BLOCKED | KB regression on expanded corpus |
+| 009 | beru-v1.3-3b | 234 | 13.3% | 72.7% | BLOCKED | Smaller focused corpus; PB stable |
+| 010 | beru-v1.4-3b | — | 10.0% | 81.8% | BLOCKED | PB improving; KB plateau |
+| 011 | beru-v1.5-3b | — | 10.0% | 81.8% | BLOCKED | Plateau confirmed — corpus change needed |
+| 012 | beru-v1.6-3b | — | 13.3% | 81.8% | BLOCKED | KB marginal improvement; PB stable |
+| 013 | beru:v1.6 (live) | — | 20.0% | 68.2% | BLOCKED | Live Ollama serving eval; PB dip vs static |
+| 014 | beru:v1.6 (corrected) | — | 20.0% | 68.2% | BLOCKED | Corrected eval suite — see below |
 
-*exp-003 used a 10-question eval suite with strict keyword matching. Not directly comparable to exp-001's 466-question bridge eval.
+\* exp-001 used a 466-question bridge eval. Not comparable to BERU eval suite.  
+\*\* exp-003 used a 10-question strict-keyword eval. Eval mismatch, not model failure.
+
+---
+
+## Per-Type Breakdown (BERU knowledge brain, exp-014)
+
+| Question Type | Score | Notes |
+|---------------|-------|-------|
+| `finding_accuracy` | 40% | SSP claim vs real evidence — correct question type |
+| `evidence_gap_detection` | 40% | Identifying what's missing for a PASS |
+| `poam_drafting` | 20% | Temperature variance — was 60% in exp-012 |
+| `tool_output_interpretation` | 20% | Scanner output → control mapping |
+| `dual_citation` | 0% | 800-53 + AI RMF simultaneously — hardest capability |
+| `atlas_mapped_ai_risk` | 0% | MITRE ATLAS technique mapping |
+
+---
 
 ## What We Learned
 
-### exp-001 → exp-002 (the v1 to v2 pivot)
+### The garbage data problem (exp-001 → exp-002)
 
-| What failed in v1 | What v2 changes |
-|---|---|
-| 85% of data was garbage | curate_corpus.py rejects garbage |
-| Mixed format (Alpaca + ChatML) | ChatML enforced, Alpaca rejected |
-| Stacked LoRA caused forgetting | Fresh LoRA from base each time |
-| No eval between chunks | Eval after every chunk |
-| No domain tracking | CKS 35%, CKA 30%, CKAD 20%, CNPA 10%, OPS 5% |
-| No quality gates | 6-gate validation pipeline |
+| What failed | What changes |
+|-------------|-------------|
+| 85% of examples were garbage | 6-gate curation pipeline |
+| Mixed Alpaca + ChatML format | ChatML enforced, Alpaca rejected |
+| Stacked LoRA caused forgetting | Fresh LoRA from base each run |
+| No domain tracking | CKS 35% / CKA 30% / CKAD 20% / CNPA 10% / OPS 5% |
 
-### exp-003 (JADE 8B)
+### The truncation problem (exp-006 → exp-007)
 
-| Finding | Implication |
-|---|---|
-| 0% on 10-question benchmark | Eval suite was too narrow, not model failure |
-| Model serves useful answers with RAG | RAG compensates for weak fine-tuning |
-| Deployed without promotion gate | Gap — next version must pass gate |
-| Same garbage corpus as exp-001 | Needs curated corpus (same fix as Katie) |
+max_seq_length of 4096 was truncating 50-80% of every eval prompt. Increasing to 8192 recovered 13pp on KB in one run. Always validate that eval prompts fit the context window before attributing results to the model.
+
+### The dual-citation gap (persistent across all runs)
+
+`dual_citation` scores 0% across every experiment. The training corpus describes the format (cite both 800-53 + AI RMF) but doesn't give enough examples of the *trigger pattern* — recognizing that an AI system is in scope and switching into dual-citation mode. exp-015 targets this with realistic garak/promptfoo/MLflow audit inputs.
+
+### The eval design problem (exp-013 → exp-014)
+
+The original suite included `escalation_discipline` questions that tested whether BERU would refuse to output a report until a human "approved" it. Wrong mental model. BERU is a document-producing GRC analyst, not an action-taking agent. A GRC analyst doesn't hold their report — they write the finding, assign a rank, and send it. Human decisions happen in the recipient's inbox, not in the tool. Replaced with `finding_accuracy` questions (SSP claim vs actual evidence → PASS/PARTIAL/FAIL), which is BERU's actual job.
+
+---
 
 ## Decision Log
 
 | Date | Decision | Reason |
 |------|----------|--------|
-| 2026-03-15 | Abandon v1 corpus | 85% garbage, catastrophic forgetting after chunk 36 |
-| 2026-03-15 | Build curate_corpus.py | Need quality gates before any more training |
-| 2026-03-17 | Start exp-002 with curated data | Quality > quantity hypothesis |
-| 2026-03-17 | Keep jade:v1.0 in production | Works with RAG despite bad benchmark. Replace after v2 curated training. |
-
-## Promotion Gate (must pass to deploy)
-
-```
-Weighted total ≥ 60%
-  CKS  (40% weight) ≥ 50%
-  CKA  (25% weight) ≥ 50%
-  CNPA (25% weight) ≥ 50%
-  Cloud (10% weight) ≥ 50%
-
-Zero hallucinated commands
-New model must beat current champion on same eval suite
-```
-
-## Next Experiments
-
-| ID | Hypothesis | Blocked by |
-|----|-----------|------------|
-| exp-004 | Katie v2 chunk 2-5 training | exp-002 chunk 1 eval |
-| exp-013 | BERU: SSP-grading heavy corpus (392 examples) with PASS-rebalance rolled back | exp-012 regressed on PASS-rebalance |
-
----
-
-## BERU Track (GRC analyst 3B — exp-005 through exp-012)
-
-Promotion gate: **knowledge brain ≥70%, pentest brain ≥70%, zero hallucinated IDs.**  
-Knowledge brain is the hard wall — 30-question suite across 6 GRC question types.  
-Pentest brain is the security-robustness check — 22 questions across OWASP LLM01-LLM10.
-
-### Summary
-
-| | exp-005 | exp-006 | exp-007 | exp-008 | exp-009 | exp-010 | exp-011 | exp-012 |
-|---|---|---|---|---|---|---|---|---|
-| **Version** | v1.0 baseline | v1.0 | v1.1 | v1.2 | v1.3 | v1.4 | v1.5 | v1.6 |
-| **Type** | RAG baseline | Fine-tune | Fine-tune | Fine-tune | Fine-tune | Fine-tune | Fine-tune | Fine-tune |
-| **Corpus** | — | 579 | 579 | 679 | 234 | 835 | 1,031 | 1,227 |
-| **Train loss** | — | — | 2.056 | 2.037 | 1.936 | 1.901 | 1.759 | 1.561 |
-| **Duration** | — | — | 7.2 min | 8.2 min | 3.1 min | 10.2 min | 13.1 min | 16.3 min |
-| **Knowledge brain** | 29.4% | 3.3% | **16.7%** | 3.3% | 13.3% | 10.0% | 10.0% | 13.3% |
-| **Pentest brain** | 40.3% | 95.5% | 72.7% | 68.2% | 72.7% | **81.8%** | **81.8%** | **81.8%** |
-| **Decision** | BLOCKED | BLOCKED | BLOCKED | BLOCKED | BLOCKED | BLOCKED | BLOCKED | BLOCKED |
-
-Gate thresholds (70% both) shown in **bold** where pentest passes.
-
-### What We Learned
-
-| Experiment | What changed | What happened | Lesson |
-|---|---|---|---|
-| exp-005 | RAG baseline (no fine-tune) | KB: 29.4%, PB: 40.3% | This is the floor. RAG alone is insufficient. |
-| exp-006 | First fine-tune (3 epochs, 579 examples) | KB crashed to 3.3%; PB spiked to 95.5% | Catastrophic forgetting of GRC knowledge when training skewed toward adversarial. |
-| exp-007 | max_seq 4096→8192, train_on_responses_only, 2 epochs | KB: 16.7% (best so far), PB: 72.7% | Longer context + response-only training recovered KB from the exp-006 floor. |
-| exp-008 | Added 100 analyst examples to corpus (679 total) | KB: 3.3%, PB: 68.2% | Corpus addition alone without quality tuning regressed KB. Variable isolation failed. |
-| exp-009 | Isolated 234 analyst-only examples | KB: 13.3%, PB: 72.7% | Smaller, targeted corpus beats larger noisy one for KB. |
-| exp-010 | Combined 835 (adversarial + analyst, deduped) | KB: 10.0%, PB: 81.8% | Pentest brain stabilized at 81.8%. KB still regressed. Balance problem surfaced. |
-| exp-011 | Expanded to 1,031 examples (added SSP-grading corpus) | KB: 10.0%, PB: 81.8% | More SSP data did not lift KB. Model reached a plateau. |
-| exp-012 | 1,227 examples — doubled SSP-grading, PASS-rebalanced | KB: 13.3%, PB: 81.8% | Minor KB recovery but PASS-rebalance did not deliver the expected lift. Rolled back per commit notes. |
-
-### Decision Log (BERU track)
-
-| Date | Decision | Reason |
-|------|----------|--------|
-| 2026-05-08 | Establish RAG baseline (exp-005) before any fine-tune | D-010 requires beating baseline on KB, not regressions |
-| 2026-05-10 | Pivot: train_on_responses_only + seq_len 8192 (exp-007) | exp-006 catastrophic forgetting traced to full-sequence loss on instruction tokens |
-| 2026-05-11 | Revert PASS-rebalance after exp-012 | Did not lift KB; pentest held at 81.8% but KB gain insufficient |
-| 2026-05-13 | Current champion: none promoted yet | KB 13.3% (need 70%). Next: narrative-first prompt rewrite + heavier SSP corpus (exp-013) |
-
-### Promotion Gate (BERU)
-
-```
-Knowledge brain ≥70% overall
-  per question type floor: ≥60%
-  zero hallucinated control IDs / AI RMF subcategory IDs / ATLAS technique IDs
-
-Pentest brain ≥70% overall
-  LLM01, LLM06, LLM08 critical floor: ≥70% each
-
-Fine-tune must beat exp-005 baseline on knowledge brain.
-Fine-tune must not regress pentest brain below baseline (40.3%).
-```
-
-**Current status:** Pentest brain passes (81.8%). Knowledge brain blocked at 13.3% — 56.7 pp gap to gate.
+| 2026-05-08 | Rebaseline to 3B from 8B | 8B fine-tune takes 9+ hours on RTX 5080; 3B trains in ~45 min per chunk with comparable GRC output quality |
+| 2026-05-14 | Remove escalation_discipline questions | Wrong mental model — BERU produces documents, not actions |
+| 2026-05-14 | Add finding_accuracy questions | SSP claim vs real evidence grading is BERU's actual job |
