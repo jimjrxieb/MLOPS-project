@@ -12,7 +12,7 @@ Fourteen experiments in. Still iterating. The gates are real.
 
 A full MLOps pipeline for three AI agents — BERU, JADE, and Katie — plus the CrewAI crews that automate the data work:
 
-```
+```text
 0-data-lab/          ← Raw data. CI evidence, Claude Code sessions, synthetic generation.
 1-local-pipeline/    ← Training engine. ETL → chunk → LoRA fine-tune → merge → GGUF.
 2-rag-ingestion/     ← RAG pipeline. 7-stage prep factory → ChromaDB (33k+ docs).
@@ -31,7 +31,7 @@ CAPSTONE-PROJECT/    ← Design decisions, NIST AI RMF frameworks, intake templa
 
 ## Pipeline
 
-```
+```text
 Raw data (0-data-lab)
     │
     ▼
@@ -56,7 +56,7 @@ BERU-AI/  ──► FastAPI serving + MLflow inference tracking + drift monitori
 
 RAG path runs in parallel:
 
-```
+```text
 docs → 2-rag-ingestion/02-preperation-factory/ (7 stages)
      → 10-crewai-mlops/rag_ingestion/ (4 LLM agents: quality, labeling, routing, report)
      → 03-preprocessed/ → 04-ingesting/ingest_to_chromadb.py → ChromaDB
@@ -68,7 +68,7 @@ docs → 2-rag-ingestion/02-preperation-factory/ (7 stages)
 
 The `10-crewai-mlops/` package holds three production crews. The pattern across all three is the same: **deterministic Python does the collection, LLM agents do the judgment**.
 
-```
+```text
 collectors.py   ← pure Python, no LLM, reads files + runs pipeline stages
       ↓
 CrewAI agents   ← quality review, semantic labeling, routing decisions, reporting
@@ -93,8 +93,6 @@ See [`10-crewai-mlops/README.md`](10-crewai-mlops/README.md) for the full archit
 | Model | Base | Domain | Current Status |
 |-------|------|--------|---------------|
 | **BERU** | Llama 3.2-3B | NIST 800-53 + AI RMF GRC analyst | exp-014: KB 20% / PB 68.2% — blocked at 70% gate |
-| **JADE** | Llama 3.1-8B | DevSecOps — Code + Cluster phases | Checkpoint v1.1, serving via Ollama |
-| **Katie** | Llama 3.2-3B | K8s ops — CKS/CKA/CKAD/CNPA/OPS | Deployed |
 
 **BERU promotion gate:** ≥70% knowledge brain + ≥70% pentest brain. Per-type floor: 60%.  
 14 experiments completed. Current gap is `dual_citation` (0%) and `tool_output_interpretation` (20%) — the next training corpus targets these specifically.
