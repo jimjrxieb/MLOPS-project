@@ -6,7 +6,7 @@ JSON Schema definitions for every structured data format in the system. These ar
 
 | Schema | What it validates | Where data lives |
 |--------|------------------|-----------------|
-| `training_example.json` | ChatML training examples | `1-data-pipeline/01-raw-data-lake/*.jsonl` |
+| `training_example.json` | ChatML training examples | `1-local-pipeline/01-raw-data-lake/*.jsonl` |
 | `eval_result.json` | Benchmark output (scores, categories) | `4-eval-clarify/3-results/*/full_results.json` |
 | `eval_question.json` | Benchmark input (questions, expected keywords) | `4-eval-clarify/2-test-data/evaluation/*/*.jsonl` |
 | `jsa_finding.json` | Scanner findings (trivy, kubescape, etc.) | `GP-PROJECTS/*/jsa/inbox/*.json` |

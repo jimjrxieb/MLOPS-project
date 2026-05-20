@@ -8,6 +8,7 @@
 
 # --- Model weights & large artifacts (NEVER commit — GitHub is not a model store) ---
 3-model-registry/
+!3-model-registry/README.md
 *.gguf
 *.safetensors
 *.bin

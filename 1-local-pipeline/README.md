@@ -1,6 +1,8 @@
-# GP-GLUE: JADE Training Pipeline
+# 1-local-pipeline — Training Engine
 
-7-step MLOps pipeline for training JADE (the C-rank DevSecOps supervisor). Data flows forward through numbered directories, files archive after each step. Includes a closed-loop evaluation and feedback system.
+7-step MLOps pipeline for LoRA fine-tuning BERU, JADE, and Katie on local GPU. Data flows forward through numbered directories, files archive after each step. Includes a closed-loop evaluation and feedback system.
+
+**Primary model:** BERU (GRC analyst, 3B). JADE (DevSecOps, 8B) and Katie (K8s ops, 3B) share the same pipeline with different configs and corpora.
 
 ## Architecture
 

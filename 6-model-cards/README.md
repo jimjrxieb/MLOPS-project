@@ -11,8 +11,9 @@ Champion/challenger pattern for model promotion.
 │   │   └── model_card.md
 │   └── jade-8b/           ← JADE: C-rank reasoning + approvals
 │       └── model_card.md
-└── challenger/            ← Candidates being evaluated
-    └── (empty until 5-experiments/exp-002 completes eval)
+├── beru/                  ← BERU: GRC analyst (in training, exp-014)
+│   └── model_card.md
+└── challenger/            ← Candidates being evaluated (blocked until gate passes)
 ```
 
 ## Promotion Flow
