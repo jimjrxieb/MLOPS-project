@@ -51,14 +51,14 @@ import hashlib
 
 # Setup paths
 SCRIPT_DIR = Path(__file__).parent
-RAG_ROOT = SCRIPT_DIR.parent  # GP-MODEL-OPS/2-rag-ingestion/
+RAG_ROOT = SCRIPT_DIR.parent  # GP-MODEL-OPS/2-RagIngestion-Pipeline/
 MODEL_OPS_ROOT = RAG_ROOT.parent  # GP-MODEL-OPS/
 GP_ROOT = MODEL_OPS_ROOT.parent  # /home/jimmie/linkops-industries/GP-copilot/
 GP_S3 = GP_ROOT / "GP-S3"
 REPORTS_DIR = GP_S3 / "3-mlops-reports" / "1-rag-staging"
 
 PREPROCESSED_DIR = RAG_ROOT / "03-preprocessed"
-# Centralized RAG storage in GP-MODEL-OPS/2-rag-ingestion/05-ragged-data/
+# Centralized RAG storage in GP-MODEL-OPS/2-RagIngestion-Pipeline/05-ragged-data/
 INGESTED_DIR = RAG_ROOT / "05-ragged-data" / "rag-processed"
 CHROMA_DIR = RAG_ROOT / "05-ragged-data"  # Primary ChromaDB location
 GRAPH_DIR = GP_S3 / "knowledge-base"

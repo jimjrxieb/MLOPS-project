@@ -44,7 +44,7 @@ cells.append(md("""\
 - D-001 + D-009 — base model = Llama 3.2-3B-Instruct (rebaselined from 8B)
 - D-005 + D-012 — synthetic-only training data (579 examples curated)
 - D-010 — four-eval architecture; this run targets brain × {knowledge, pentest}
-- D-011 — RAG ingest lives at `2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py`
+- D-011 — RAG ingest lives at `2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py`
 
 **This notebook is the M3 evidence binder.** Run it end-to-end to reproduce the capstone deliverable. Outputs land at `5-experiments/exp-006-beru-v1.0/`.
 """))
@@ -64,8 +64,8 @@ GP_MODEL_OPS = Path('/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS')
 REPO_ROOT = GP_MODEL_OPS.parent
 
 CORPUS_PATH = GP_MODEL_OPS / 'BERU-AI' / 'training-data' / 'chatml-examples' / 'beru-training-examples.jsonl'
-VAL_PATH    = GP_MODEL_OPS / '1-local-pipeline' / '01-raw-data-lake' / 'beru_validation_v1.jsonl'
-CONFIG_PATH = GP_MODEL_OPS / '1-local-pipeline' / 'config_beru.yaml'
+VAL_PATH    = GP_MODEL_OPS / '1-FineTuning-Pipeline' / '01-raw-data-lake' / 'beru_validation_v1.jsonl'
+CONFIG_PATH = GP_MODEL_OPS / '1-FineTuning-Pipeline' / 'config_beru.yaml'
 EXP_DIR     = GP_MODEL_OPS / '5-experiments' / 'exp-006-beru-v1.0'
 BASELINE_DIR= GP_MODEL_OPS / '5-experiments' / 'exp-005-beru-3b-baseline'
 ADAPTER_OUT = GP_MODEL_OPS / '3-model-registry' / 'beru-v1.0-3b' / 'lora_adapter'
@@ -166,7 +166,7 @@ cells.append(md("""\
 ---
 ## Phase 2 — Training Configuration
 
-**Source of truth:** `1-local-pipeline/config_beru.yaml`. The notebook reads it; nothing is duplicated. Hyperparameter rationale traces to D-009 (LoRA r=32/alpha=64 for 3B is half of what JADE 8B uses; adapter capacity scales with base size).
+**Source of truth:** `1-FineTuning-Pipeline/config_beru.yaml`. The notebook reads it; nothing is duplicated. Hyperparameter rationale traces to D-009 (LoRA r=32/alpha=64 for 3B is half of what JADE 8B uses; adapter capacity scales with base size).
 """))
 
 cells.append(code("""\
@@ -204,7 +204,7 @@ cells.append(md("""\
 
 Convert the ChatML corpus into the format Unsloth's SFTTrainer expects. The model sees the rendered chat-template string; loss is computed only on the assistant response (Unsloth's `train_on_responses_only` semantic — handled by passing the full conversation and letting the trainer mask system+user tokens).
 
-Validation set is the held-out 85-example file at `1-local-pipeline/01-raw-data-lake/beru_validation_v1.jsonl` (per D-012).
+Validation set is the held-out 85-example file at `1-FineTuning-Pipeline/01-raw-data-lake/beru_validation_v1.jsonl` (per D-012).
 """))
 
 cells.append(code("""\
@@ -418,7 +418,7 @@ FastLanguageModel.for_inference(model)
 print('Model in inference mode.')
 
 # Set up RAG retrieval (same path as eval runner)
-sys.path.insert(0, str(GP_MODEL_OPS / '2-rag-ingestion' / '04-ingesting'))
+sys.path.insert(0, str(GP_MODEL_OPS / '2-RagIngestion-Pipeline' / '04-ingesting'))
 from ingest_beru_to_chromadb import (
     COLLECTION_NAME as RAG_COLLECTION,
     CHROMA_PATH as RAG_CHROMA_PATH,
@@ -693,7 +693,7 @@ This is the M3 capstone fine-tune run. Base model `{base_model_name}` plus LoRA 
 - Adapter:        `{ADAPTER_OUT.relative_to(REPO_ROOT)}`
 - Merged model:   `{MERGED_OUT.relative_to(REPO_ROOT)}`
 - Training data:  `BERU-AI/training-data/chatml-examples/beru-training-examples.jsonl` (SHA tracked in lineage manifest)
-- Validation set: `1-local-pipeline/01-raw-data-lake/beru_validation_v1.jsonl`
+- Validation set: `1-FineTuning-Pipeline/01-raw-data-lake/beru_validation_v1.jsonl`
 - Eval suites:    `4-eval-clarify/beru_knowledge_brain_v2.jsonl` + `beru_pentest_brain_v1.jsonl`
 - Baseline:       `5-experiments/exp-005-beru-3b-baseline/metrics.json`
 '''

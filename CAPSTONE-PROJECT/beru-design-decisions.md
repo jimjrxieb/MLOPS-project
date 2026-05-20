@@ -55,7 +55,7 @@ If you can't identify a control or justification, that's a signal to reconsider 
 - MAP 2.2 (scientific knowledge): Lewis et al. RAG paper — RAG reduces hallucination on knowledge-intensive tasks
 - MANAGE 4.2 (lifecycle): control text updates don't require full retraining cycle
 
-**Evidence artifact:** `2-rag-ingestion/` pipeline, ChromaDB collection `beru-nist-800-53`
+**Evidence artifact:** `2-RagIngestion-Pipeline/` pipeline, ChromaDB collection `beru-nist-800-53`
 
 ---
 
@@ -171,7 +171,7 @@ If you can't identify a control or justification, that's a signal to reconsider 
 
 ## D-008 — BERU-Specific RAG Ingest Path (Bypass of 7-Stage JADE Factory)
 
-**Decision:** BERU's RAG corpus is ingested via `BERU-AI/ingest_rag.py` rather than the project-standard 7-stage prep factory at `2-rag-ingestion/02-preperation-factory/stages/` (discover → preprocess → sanitize_npc → format_conversion_npc → labeling_npc → validators → ingest_to_chromadb.py).
+**Decision:** BERU's RAG corpus is ingested via `BERU-AI/ingest_rag.py` rather than the project-standard 7-stage prep factory at `2-RagIngestion-Pipeline/02-preperation-factory/stages/` (discover → preprocess → sanitize_npc → format_conversion_npc → labeling_npc → validators → ingest_to_chromadb.py).
 
 **Why:**
 1. Source material is already curated, version-controlled markdown — sanitize/PII/format-conversion gates would no-op on hand-written NIST control text and AI RMF subcategory definitions
@@ -207,7 +207,7 @@ If you can't identify a control or justification, that's a signal to reconsider 
 - `BERU-AI/ingest_rag.py` (the ingest script)
 - `8-tests/test_beru_rag.py` (the data quality gate)
 - `GP-S3/3-mlops-reports/1-rag-staging/rag-ingestion-{ts}-beru.md` (audit log per run)
-- ChromaDB collection: `beru-nist-800-53` at `2-rag-ingestion/05-ragged-data/chroma/`
+- ChromaDB collection: `beru-nist-800-53` at `2-RagIngestion-Pipeline/05-ragged-data/chroma/`
 
 **3PAO auditor question this answers:** "Why does BERU not use the same data preparation pipeline as JADE? How do you ensure BERU's RAG corpus meets the same quality bar?"
 **Answer:** "BERU's source material is hand-curated, not bulk-scraped — the standard factory's sanitization stages would no-op. We replaced them with stricter compensating controls: explicit stub-rejection, per-chunk provenance metadata, embedding-dimension assertion, persisted audit report per run, and an automated data quality test that runs before any model promotion gate."
@@ -308,7 +308,7 @@ This dogfooding principle is not a marketing line — it is the architectural ju
 - **CA-2 (Control Assessments):** All four eval suites are control assessments. Knowledge evals assess BERU's ability to perform control assessments on others (the analyst function). Pentest evals assess BERU's compliance with the controls she'd assess in others (the subject function).
 - **CA-7 (Continuous Monitoring):** All four suites run on every model version change. Eval result drift over time is monitored; regression triggers a hold.
 - **SA-11 (Developer Testing and Evaluation):** Pentest brain + agent suites are the security-focused testing required by SA-11 for AI systems. Knowledge suites are functional acceptance testing.
-- **SI-7 (Information Integrity):** Pentest agent suite includes RAG-poisoning scenarios — verifying that the integrity controls in `2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py` (stub-rejection, provenance metadata) hold under attack.
+- **SI-7 (Information Integrity):** Pentest agent suite includes RAG-poisoning scenarios — verifying that the integrity controls in `2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py` (stub-rejection, provenance metadata) hold under attack.
 - **AC-6 (Least Privilege):** Pentest agent suite includes tool-abuse and HITL-bypass scenarios — verifying that BERU's authority ceiling is enforced architecturally, not just trusted to the LLM.
 
 **Control justification (NIST AI RMF 1.0 / AI 600-1):**
@@ -350,26 +350,26 @@ This dogfooding principle is not a marketing line — it is the architectural ju
 
 ## D-011 — BERU Ingest Script Relocated to Pipeline Tree (Amends D-008 location only)
 
-**Decision:** BERU's ingest script is moved from `BERU-AI/ingest_rag.py` into the pipeline canonical location `2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py`. A pointer README is added at `2-rag-ingestion/01-unprocessed/beru-frameworks/README.md` so a developer or auditor walking the pipeline tree can find BERU's source files even though those files are not physically staged in `01-unprocessed/`.
+**Decision:** BERU's ingest script is moved from `BERU-AI/ingest_rag.py` into the pipeline canonical location `2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py`. A pointer README is added at `2-RagIngestion-Pipeline/01-unprocessed/beru-frameworks/README.md` so a developer or auditor walking the pipeline tree can find BERU's source files even though those files are not physically staged in `01-unprocessed/`.
 
 **This is a partial amendment to D-008, not a reversal:**
 
 | D-008 said | Status under D-011 |
 |---|---|
 | BERU's ingest does not run through the 7-stage JADE prep factory | **UNCHANGED** — JADE stages still don't fit BERU's curated markdown source. Compensating controls remain (stub-rejection regex, provenance metadata, post-ingest test, audit log). |
-| BERU's script lives outside the pipeline tree at `BERU-AI/ingest_rag.py` | **REVERSED** — script now lives at `2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py`, alongside JADE's `ingest_to_chromadb.py`. |
+| BERU's script lives outside the pipeline tree at `BERU-AI/ingest_rag.py` | **REVERSED** — script now lives at `2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py`, alongside JADE's `ingest_to_chromadb.py`. |
 
 **Why the location change matters even though the technical decision didn't:**
 
-The `2-rag-ingestion/` pipeline directory is a *discoverability contract*. A developer walking the tree expects: "raw inputs land in `01-unprocessed/`, transformations happen in `02-preperation-factory/`, embed-and-store happens in `04-ingesting/`, output sits in `05-ragged-data/`." When BERU's ingest path lived outside the tree, that contract broke — finding BERU artifacts required reading BERU-specific docs or grep'ing the codebase. Auditor-acceptable; engineer-unfriendly.
+The `2-RagIngestion-Pipeline/` pipeline directory is a *discoverability contract*. A developer walking the tree expects: "raw inputs land in `01-unprocessed/`, transformations happen in `02-preperation-factory/`, embed-and-store happens in `04-ingesting/`, output sits in `05-ragged-data/`." When BERU's ingest path lived outside the tree, that contract broke — finding BERU artifacts required reading BERU-specific docs or grep'ing the codebase. Auditor-acceptable; engineer-unfriendly.
 
 D-011 keeps the BERU-specific parsing strategy (per-control / per-subcategory / per-technique chunking, dual-framework metadata) but restores the discoverability contract.
 
 **What changed in code:**
 - `BERU-AI/ingest_rag.py` deleted
-- `2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py` created (same content; `Path(__file__).resolve().parents[3]` instead of `parents[2]` to find repo root from the deeper location)
+- `2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py` created (same content; `Path(__file__).resolve().parents[3]` instead of `parents[2]` to find repo root from the deeper location)
 - `8-tests/test_beru_rag.py` import updated: `from ingest_beru_to_chromadb import ...`
-- `2-rag-ingestion/01-unprocessed/beru-frameworks/README.md` created — pointer doc explaining where source files live and why they're not physically staged
+- `2-RagIngestion-Pipeline/01-unprocessed/beru-frameworks/README.md` created — pointer doc explaining where source files live and why they're not physically staged
 - Lessons + curriculum + BERU-AI README updated to reference the new path
 
 **Control justification (NIST 800-53 Rev 5):**
@@ -382,13 +382,13 @@ D-011 keeps the BERU-specific parsing strategy (per-control / per-subcategory / 
 - **GOVERN 4.1 (Decisions about AI deployment documented):** This decision document.
 
 **Evidence artifacts:**
-- `2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py` (the relocated script)
-- `2-rag-ingestion/01-unprocessed/beru-frameworks/README.md` (the pointer)
+- `2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py` (the relocated script)
+- `2-RagIngestion-Pipeline/01-unprocessed/beru-frameworks/README.md` (the pointer)
 - `8-tests/test_beru_rag.py` (passing from new path)
 - `GP-S3/3-mlops-reports/1-rag-staging/rag-ingestion-{ts}-beru.md` (audit log generated post-relocation)
 
 **3PAO auditor question this answers:** "Where does your AI system's RAG ingestion happen, and how is that location consistent with your other AI ingestion paths?"
-**Answer:** "All ChromaDB ingestion scripts — JADE's, Katie's, BERU's — live under `2-rag-ingestion/04-ingesting/`. BERU's parses curated framework markdown directly because the JADE 7-stage factory's sanitization stages are no-ops on hand-authored NIST text (D-008). The location consistency means an auditor or engineer can walk the pipeline tree and find every ingestion path in one directory, with a pointer at `01-unprocessed/beru-frameworks/README.md` explaining where BERU's source files actually live in git."
+**Answer:** "All ChromaDB ingestion scripts — JADE's, Katie's, BERU's — live under `2-RagIngestion-Pipeline/04-ingesting/`. BERU's parses curated framework markdown directly because the JADE 7-stage factory's sanitization stages are no-ops on hand-authored NIST text (D-008). The location consistency means an auditor or engineer can walk the pipeline tree and find every ingestion path in one directory, with a pointer at `01-unprocessed/beru-frameworks/README.md` explaining where BERU's source files actually live in git."
 
 ---
 

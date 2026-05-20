@@ -141,7 +141,7 @@ class TestKnowledgeBrainContent:
         """
         try:
             import sys
-            sys.path.insert(0, str(REPO_ROOT / "GP-MODEL-OPS" / "2-rag-ingestion" / "04-ingesting"))
+            sys.path.insert(0, str(REPO_ROOT / "GP-MODEL-OPS" / "2-RagIngestion-Pipeline" / "04-ingesting"))
             from ingest_beru_to_chromadb import (
                 COLLECTION_NAME,
                 CHROMA_PATH,

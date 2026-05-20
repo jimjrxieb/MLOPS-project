@@ -254,7 +254,7 @@ print('=' * 70); print('Phase 7 — Eval with RAG top_k=2'); print('=' * 70)
 
 FastLanguageModel.for_inference(model)
 
-sys.path.insert(0, str(GP_MODEL_OPS / '2-rag-ingestion' / '04-ingesting'))
+sys.path.insert(0, str(GP_MODEL_OPS / '2-RagIngestion-Pipeline' / '04-ingesting'))
 from ingest_beru_to_chromadb import (
     COLLECTION_NAME as RAG_COLLECTION,
     CHROMA_PATH as RAG_CHROMA_PATH,
