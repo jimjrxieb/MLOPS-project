@@ -1,1 +1,160 @@
-Descriptive statistics is an EDA technique used to summarize and describe the essential characteristics of a dataset using numerical measures such as mean, median, mode, variance, standard deviation, minimum, maximum, and percentiles. These statistics provide insight into central tendency and data dispersion.
+Q: In the Exploratory Data Analysis (EDA) stage, analysts frequently calculate numerical summaries to gain a clearer view of the data's distribution and variability. Which EDA method specifically involves computing measures like mean, median, mode, variance, standard deviation, min, max, and percentiles?
+A: Descriptive statistics is an EDA technique used to summarize and describe the essential characteristics of a dataset using numerical measures such as mean, median, mode, variance, standard deviation, minimum, maximum, and percentiles. These statistics provide insight into central tendency and data dispersion.
+
+Q:During data analysis, graphical displays are commonly employed to quickly uncover insights about data patterns and structure. What is the main goal of data visualization in this scenario?
+A:Data visualization is primarily used to reveal patterns, trends, and outliers in data using graphical tools such as histograms, box plots, bar charts, and scatter plots. These visuals help analysts quickly understand complex data relationships.
+
+Q:During the training of machine learning or deep learning models, the full dataset is typically fed through the model several times to enhance learning. What exactly does an 'epoch' mean in this process?
+A:An epoch refers to one complete pass of the entire training dataset through the learning algorithm. Multiple epochs allow the model to iteratively adjust its parameters and improve performance.
+
+Q:Once a machine learning model is trained, evaluating its effectiveness on unfamiliar data is essential. What does 'model evaluation' refer to here?
+A:Model evaluation involves assessing how well a trained model performs on unseen or test data using appropriate metrics. This step helps determine the model’s ability to generalize.
+
+Q:Beyond quantitative metrics, some models—particularly generative ones—are assessed through subjective assessment. Which option represents a qualitative evaluation approach?
+A:Qualitative evaluation relies on subjective judgment, such as human review of generated outputs, to assess aspects like coherence and relevance. This is especially important in generative tasks.
+
+Q:Transfer learning allows models to reuse knowledge from prior tasks or larger pre-trained models. Which method below is a form of transfer learning?
+A:Knowledge distillation is a transfer learning technique where a smaller student model learns from a larger, pre-trained teacher model. This helps retain performance while reducing model size. Option A is incorrect because feature scaling is a preprocessing step. Option B is wrong as data augmentation modifies training data rather than transferring knowledge. Option D is incorrect because dimensionality reduction focuses on reducing features.
+
+Q:In machine learning, input variables are key for pattern detection. What term describes a 'feature'?
+A:A feature is an individual measurable property or characteristic of the data used as input to a machine learning model. Features provide the information needed for learning patterns. Option A is incorrect because a dataset consists of multiple features. Option C is wrong as predictions are model outputs. Option D is incorrect because learning algorithms define how models learn, not the data itself.
+
+Q:For NLP tasks like translation, summarization, or paraphrasing, models need to transform input sequences into output sequences. Which architecture is best suited for these sequence-to-sequence problems?
+A:Overall explanation - The encoder-decoder mechanism is designed for sequence-to-sequence tasks, where the encoder processes the input sequence and the decoder generates the corresponding output sequence. Option A is incorrect because CNNs are mainly used for spatial data. Option B is wrong as attention alone does not define a full sequence-to-sequence architecture. Option D is incorrect because clustering is an unsupervised learning technique.
+
+Q:When handling large datasets with demanding ML algorithms, GPU acceleration boosts speed significantly. Which library provides GPU-accelerated alternatives to standard ML routines?
+A:Overall explanation
+cuML is a GPU-accelerated machine learning library developed by NVIDIA that provides high-performance implementations of common ML algorithms. Option A is incorrect because NumPy primarily operates on CPUs. Option B is wrong as Pandas is used for data manipulation, not ML acceleration. Option D is incorrect because scikit-learn is CPU-based.
+
+Q:Tensor-RT employs various optimizations to prepare models for efficient deployment. Which technique does Tensor-RT use to build faster inference engines?
+A:Overall explanation
+TensorRT uses layer fusion to combine multiple neural network layers into a single optimized operation, reducing latency and improving inference speed. Option A is incorrect because dropout is used during training. Option B is wrong as data augmentation is a training-time technique. Option D is incorrect because gradient clipping is used during backpropagation.
+
+Q:Which statement most accurately defines Word2vec?
+A:Overall explanation
+Word2vec is a technique developed by Google that uses shallow neural networks to learn vector representations (embeddings) of words, capturing their semantic relationships based on context in large text corpora. Therefore, the best description is that it is a deep learning algorithm that generates word embeddings.
+
+Q:In large language models, what role does the attention mechanism play?
+A:Overall explanation
+The attention mechanism is a critical component of large language models, particularly in Transformer architectures. Its primary purpose is to assign weights to each token in the input sequence based on its relevance to other tokens, allowing the model to focus on the most contextually important parts of the input when generating or interpreting text. This is achieved through mechanisms like self-attention, where each token computes a weighted sum of all other tokens’ representations, with weights determined by their relevance (e.g., via scaled dot-product attention). This enables the model to capture long-range dependencies and contextual relationships effectively, unlike traditional recurrent networks. Option A is incorrect because attention focuses on the input sequence, not the output sequence. Option B is wrong as the order of generation is determined by the model’s autoregressive or decoding strategy, not the attention mechanism itself. Option C is also inaccurate, as capturing the order of words is the role of positional encoding, not attention.
+
+Q:What function does positional encoding serve in the Transformer architecture?
+A:Overall explanation
+Positional encoding is a vital component of the Transformer architecture. Transformers lack the inherent sequential processing of recurrent neural networks, so they rely on positional encoding to incorporate information about the order of tokens in the input sequence. This is typically achieved by adding fixed or learned vectors (e.g., sine and cosine functions) to the token embeddings, where each position in the sequence has a unique encoding. This allows the model to distinguish the relative or absolute positions of tokens, enabling it to understand word order in tasks like translation or text generation. For example, in the sentence The cat sleeps, positional encoding ensures the model knows cat is the second token and sleeps is the third. Option A is incorrect, as positional encoding does not remove information but adds positional context. Option B is wrong because semantic meaning is captured by token embeddings, not positional encoding. Option D is also inaccurate, as the importance of tokens is determined by the attention mechanism, not positional encoding.
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:
+
+Q:
+A:

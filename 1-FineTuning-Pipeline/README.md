@@ -47,7 +47,7 @@
 ├── rank-training-data/
 │   ├── rank_classifier.joblib       ← sklearn E/D/C/B/S classifier (tracked)
 │   └── rank_classifier.metrics.json ← classifier performance
-├── tools/                  ← Utility scripts (format converters, corpus analyzers)
+├── tools/                  ← Pipeline tools: validate, strip, classify, extract, convert
 ├── etl_pipeline.py         ← Step 1
 ├── chunk_data.py           ← Step 2
 ├── train_v11.py            ← Step 3 (current — Unsloth + LoRA)

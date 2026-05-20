@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict
 
 # Paths
-BASE_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/1-GP-GLUE")
+BASE_DIR = Path(__file__).resolve().parent.parent
 CHUNKED_DIR = BASE_DIR / "03-chunked-untrained"
 CLEANED_DIR = BASE_DIR / "03-chunked-cleaned" # Store cleaned files here
 

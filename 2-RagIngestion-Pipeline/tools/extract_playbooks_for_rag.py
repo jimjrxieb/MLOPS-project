@@ -21,8 +21,9 @@ Reference material = things that change, need to be cited, or are looked up:
 import shutil
 from pathlib import Path
 
-GP_CONSULTING = Path("/home/jimmie/linkops-industries/GP-copilot/GP-CONSULTING")
-RAG_OUTPUT = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/2-RagIngestion-Pipeline/01-unprocessed/consulting-knowledge")
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+GP_CONSULTING = _REPO_ROOT / "GP-CONSULTING"
+RAG_OUTPUT = Path(__file__).resolve().parent.parent / "01-unprocessed" / "consulting-knowledge"
 
 # What goes to RAG (NOT training):
 # Pattern: (source_glob_relative_to_package, rag_subdirectory)

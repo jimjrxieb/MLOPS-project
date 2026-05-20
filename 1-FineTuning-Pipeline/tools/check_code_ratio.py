@@ -1,7 +1,8 @@
 import json
 from pathlib import Path
 
-path = Path("1-GP-GLUE/01-raw-data-lake/cks_training_batch_v1.jsonl")
+_PIPELINE_DIR = Path(__file__).resolve().parent.parent
+path = _PIPELINE_DIR / "01-raw-data-lake" / "cks_training_batch_v1.jsonl"
 
 with_yaml = 0
 without_yaml = 0

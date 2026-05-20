@@ -14,14 +14,15 @@ Extracts:
   - Falco rules              → "Given this syscall pattern, here's the detection"
   - ENGAGEMENT-GUIDE.md      → "Given this engagement stage, here's the decision tree"
 
-Output: 1-data-pipeline/01-raw-data-lake/consulting_playbooks_training.jsonl
+Output: 1-FineTuning-Pipeline/01-raw-data-lake/consulting_playbooks_training.jsonl
 """
 import json
 import re
 from pathlib import Path
 
-GP_CONSULTING = Path("/home/jimmie/linkops-industries/GP-copilot/GP-CONSULTING")
-OUTPUT_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/1-data-pipeline/01-raw-data-lake")
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+GP_CONSULTING = _REPO_ROOT / "GP-CONSULTING"
+OUTPUT_DIR = Path(__file__).resolve().parent.parent / "01-raw-data-lake"
 OUTPUT_FILE = OUTPUT_DIR / "consulting_playbooks_training.jsonl"
 
 SYSTEM_PROMPTS = {

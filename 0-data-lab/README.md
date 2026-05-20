@@ -88,7 +88,7 @@ Real operational experience turned into training signal:
 - `ci-evidence/` — notes from CI debugging sessions (pipeline failures, fix sequences)
 - `claudecode-fixes/` — Claude Code engagement sessions: AppSec FedRAMP work, Falco+JSON+Splunk tooling
 
-These are the raw material. Extract patterns with `tools/extract_playbooks_for_training.py`.
+These are the raw material. Extract patterns with `1-FineTuning-Pipeline/tools/extract_playbooks_for_training.py`.
 
 ---
 

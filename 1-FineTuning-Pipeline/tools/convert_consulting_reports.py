@@ -30,8 +30,9 @@ from pathlib import Path
 from datetime import datetime
 
 # ── Paths ──────────────────────────────────────────────────────────────────
-REPORTS_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-S3/5-consulting-reports")
-OUTPUT_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/1-data-pipeline/01-raw-data-lake")
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+REPORTS_DIR = _REPO_ROOT / "GP-S3" / "5-consulting-reports"
+OUTPUT_DIR = Path(__file__).resolve().parent.parent / "01-raw-data-lake"
 
 KATIE_SYSTEM_PROMPT = (
     "You are Katie, a CKA/CKS/CKAD/CNPA-certified autonomous Kubernetes engineer "

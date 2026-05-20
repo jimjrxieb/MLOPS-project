@@ -3,7 +3,8 @@ import re
 import yaml
 from pathlib import Path
 
-TRAINING_DATA_PATH = Path("1-GP-GLUE/01-raw-data-lake/8b-jade/checkov_terraform_400.jsonl")
+_PIPELINE_DIR = Path(__file__).resolve().parent.parent
+TRAINING_DATA_PATH = _PIPELINE_DIR / "01-raw-data-lake" / "8b-jade" / "checkov_terraform_400.jsonl"
 
 def validate_code_block(code_str, lang):
     if lang == "yaml":
