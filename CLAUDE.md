@@ -75,8 +75,8 @@ GP-MODEL-OPS/
 │ ── PIPELINE (the engine — code that does things) ────────────
 │
 ├── 0-data-lab/          → DATA SCIENTIST hat. Find, clean, generate raw data.
-├── 1-data-pipeline/     → DATA ENGINEER hat. ETL, chunk, train, merge, convert.
-├── 2-rag-ingestion/     → RAG ENGINEER hat. Embed, ingest, ChromaDB.
+├── 1-FineTuning-Pipeline/   → DATA ENGINEER hat. ETL, chunk, train, merge, convert.
+├── 2-RagIngestion-Pipeline/ → RAG ENGINEER hat. Embed, ingest, ChromaDB.
 ├── 3-model-registry/    → ARTIFACT STORE. Weights, GGUFs, Modelfiles, training_state.json.
 ├── 4-eval-clarify/      → EVAL ENGINEER hat. Benchmark runner, raw results.
 │
@@ -114,10 +114,10 @@ All CrewAI code lives in `10-crewai-mlops/`. Entry point pattern: `POST /run/<cr
 |----------|------|--------|----------|
 | `0-data-lab/synthetic-pipeline/` | 3-agent crew: Orchestrator → Quality Auditor → Report Generator | **DONE** | `10-crewai-mlops/synthetic_pipeline/` |
 | `BERU-AI/` | 6-agent pool across 3 sub-crews: beru_audit / ssp_to_poam / ac-access-control | **DONE** | `10-crewai-mlops/beru/` |
-| `2-rag-ingestion/02-preperation-factory/` | 4-agent crew: Quality Reviewer → Semantic Labeler → Routing Validator → Pipeline Reporter | **DONE** | `10-crewai-mlops/rag_ingestion/` |
+| `2-RagIngestion-Pipeline/02-preperation-factory/` | 4-agent crew: Quality Reviewer → Semantic Labeler → Routing Validator → Pipeline Reporter | **DONE** | `10-crewai-mlops/rag_ingestion/` |
 | `4-eval-clarify/` | 4-agent parallel crew: one per eval suite | PLANNED | `10-crewai-mlops/eval/` |
-| `1-local-pipeline/` ETL + Chunk only | Wrap as tools, not agents | PLANNED | `10-crewai-mlops/training_pipeline/` |
-| `1-local-pipeline/` Training/Merge/Convert | **DO NOT MIGRATE** — GPU subprocess, no benefit | N/A | — |
+| `1-FineTuning-Pipeline/` ETL + Chunk only | Wrap as tools, not agents | PLANNED | `10-crewai-mlops/training_pipeline/` |
+| `1-FineTuning-Pipeline/` Training/Merge/Convert | **DO NOT MIGRATE** — GPU subprocess, no benefit | N/A | — |
 
 **Port assignment:** synthetic_pipeline=8001, rag_ingestion=8002, beru=8089 (Docker), eval=TBD
 
@@ -126,7 +126,7 @@ All CrewAI code lives in `10-crewai-mlops/`. Entry point pattern: `POST /run/<cr
 ```
 Raw data → 0-data-lab (find/generate)
               ↓
-           1-data-pipeline (7-step closed loop):
+           1-FineTuning-Pipeline (7-step closed loop):
               etl_pipeline.py → chunk_data.py → train_v11.py → merge_model.py
               → convert_gguf.py → eval_bridge.py → feedback_loop.py (→ back to ETL)
               ↓
@@ -138,7 +138,7 @@ Raw data → 0-data-lab (find/generate)
               ↓
            ollama create katie:v2.0 -f Modelfile_llama3b
 
-RAG path:  docs → 2-rag-ingestion (7-stage NPC factory) → ChromaDB + knowledge graph
+RAG path:  docs → 2-RagIngestion-Pipeline (7-stage NPC factory) → ChromaDB + knowledge graph
 ```
 
 ## Common Commands
@@ -147,24 +147,24 @@ RAG path:  docs → 2-rag-ingestion (7-stage NPC factory) → ChromaDB + knowled
 # Validate training data (run BEFORE training)
 python3 -m pytest 8-tests/test_data_quality.py -v
 
-# Training pipeline (1-data-pipeline/)
-python3 1-data-pipeline/etl_pipeline.py          # Step 1: ETL
-python3 1-data-pipeline/chunk_data.py             # Step 2: Chunk (10k, 5% holdout)
-python3 1-data-pipeline/train_v11.py              # Step 3: LoRA fine-tune
-python3 1-data-pipeline/merge_model.py            # Step 4: Merge LoRA
-python3 1-data-pipeline/convert_gguf.py           # Step 5: GGUF conversion
-python3 1-data-pipeline/eval_bridge.py            # Step 6: Benchmark eval
-python3 1-data-pipeline/feedback_loop.py          # Step 7: Identify weak categories
+# Training pipeline (1-FineTuning-Pipeline/)
+python3 1-FineTuning-Pipeline/etl_pipeline.py          # Step 1: ETL
+python3 1-FineTuning-Pipeline/chunk_data.py             # Step 2: Chunk (10k, 5% holdout)
+python3 1-FineTuning-Pipeline/train_v11.py              # Step 3: LoRA fine-tune
+python3 1-FineTuning-Pipeline/merge_model.py            # Step 4: Merge LoRA
+python3 1-FineTuning-Pipeline/convert_gguf.py           # Step 5: GGUF conversion
+python3 1-FineTuning-Pipeline/eval_bridge.py            # Step 6: Benchmark eval
+python3 1-FineTuning-Pipeline/feedback_loop.py          # Step 7: Identify weak categories
 
-# RAG ingestion (2-rag-ingestion/)
-cd 2-rag-ingestion/02-preperation-factory/
+# RAG ingestion (2-RagIngestion-Pipeline/)
+cd 2-RagIngestion-Pipeline/02-preperation-factory/
 python3 -m stages.discover                        # Find files
 python3 -m stages.preprocess                      # Parse formats
 python3 -m stages.sanitize_npc                    # Quality gates + PII
 python3 -m stages.format_conversion_npc           # Normalize to JSONL
 python3 -m stages.labeling_npc                    # 3-tier security labeling
 python3 -m stages.validators                      # Validate
-python3 2-rag-ingestion/04-ingesting/ingest_to_chromadb.py  # Embed + ingest
+python3 2-RagIngestion-Pipeline/04-ingesting/ingest_to_chromadb.py  # Embed + ingest
 
 # MLflow (inference tracking)
 mlflow ui --backend-store-uri file:///path/to/GP-MODEL-OPS/mlruns
@@ -184,7 +184,7 @@ Every training run gets an experiment entry. Not optional.
 mkdir 5-experiments/exp-004-my-hypothesis/
 
 # 2. Copy and modify params
-cp 1-data-pipeline/config.yaml 5-experiments/exp-004-my-hypothesis/params.yaml
+cp 1-FineTuning-Pipeline/config.yaml 5-experiments/exp-004-my-hypothesis/params.yaml
 # Edit: change what you're testing
 
 # 3. Train using those params
@@ -200,7 +200,7 @@ cp 1-data-pipeline/config.yaml 5-experiments/exp-004-my-hypothesis/params.yaml
 
 **Embedding model:** `nomic-embed-text:latest` via Ollama, **768 dimensions**. Must always pass `embedding_function=ollama_ef` to ChromaDB. Dimension mismatch = silent failure.
 
-**ChromaDB:** `2-rag-ingestion/05-ragged-data/chroma/` — 33k+ docs across 7 collections.
+**ChromaDB:** `2-RagIngestion-Pipeline/05-ragged-data/chroma/` — 33k+ docs across 7 collections.
 
 **Knowledge graph:** `../GP-S3/knowledge-base/security_graph.pkl` (NetworkX DiGraph). Lives in GP-S3/, NOT inside GP-MODEL-OPS.
 
@@ -213,7 +213,7 @@ cp 1-data-pipeline/config.yaml 5-experiments/exp-004-my-hypothesis/params.yaml
 
 **BERU dual-citation requirement:** When the finding involves an AI system, BERU always cites both the 800-53 control AND the AI RMF subcategory. Single-framework citation for AI findings is incomplete. See `CAPSTONE-PROJECT/frameworks/crosswalk/800-53-to-ai-rmf.md`.
 
-**Training config:** `1-data-pipeline/config.yaml` — LoRA r=64/alpha=128, 4-bit quantized, 2 epochs/chunk, cosine LR scheduler.
+**Training config:** `1-FineTuning-Pipeline/config.yaml` — LoRA r=64/alpha=128, 4-bit quantized, 2 epochs/chunk, cosine LR scheduler.
 
 **Corpus:** v2 curated: 42,276 examples. Target: CKS 35%, CKA 30%, CKAD 20%, CNPA 10%, OPS 5%.
 
@@ -225,7 +225,7 @@ cp 1-data-pipeline/config.yaml 5-experiments/exp-004-my-hypothesis/params.yaml
 
 **MLflow tracking:** `JADE-AI/mlops/inference_tracker.py` logs every inference call (model, method, latency, RAG usage, rank decisions). Data in `JADE-AI/mlruns/`. Degrades gracefully — inference works without MLflow.
 
-**Rank classifier:** `1-data-pipeline/rank-training-data/rank_classifier.joblib` — sklearn, E/D/C/B/S routing.
+**Rank classifier:** `1-FineTuning-Pipeline/rank-training-data/rank_classifier.joblib` — sklearn, E/D/C/B/S routing.
 
 ## MLOps Playbook: 9-mlops-deploy
 
@@ -285,9 +285,9 @@ cp 1-data-pipeline/config.yaml 5-experiments/exp-004-my-hypothesis/params.yaml
 
 ## Directory Conventions
 
-- `1-data-pipeline/01-raw-data-lake/` — drop raw training data here (JSONL, JSON, MD, TXT, PDF)
-- `2-rag-ingestion/01-unprocessed/` — drop raw docs for RAG here
-- `2-rag-ingestion/01-unprocessed/claudecode-sessions/` — Claude CLI session extracts go here
+- `1-FineTuning-Pipeline/01-raw-data-lake/` — drop raw training data here (JSONL, JSON, MD, TXT, PDF)
+- `2-RagIngestion-Pipeline/01-unprocessed/` — drop raw docs for RAG here
+- `2-RagIngestion-Pipeline/01-unprocessed/claudecode-sessions/` — Claude CLI session extracts go here
 - `5-experiments/exp-NNN-short-name/` — one dir per experiment (params.yaml, metrics.json, notes.md)
 - `6-model-cards/champion/` — only promoted models. `6-model-cards/challenger/` for candidates.
 - Trained chunks move from `03-chunked-untrained/` → `04-trained-data/` automatically

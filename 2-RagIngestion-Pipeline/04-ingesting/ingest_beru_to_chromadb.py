@@ -2,7 +2,7 @@
 """
 BERU RAG ingest — populates the `beru-nist-800-53` ChromaDB collection.
 
-Lives in 2-rag-ingestion/04-ingesting/ alongside JADE's ingest_to_chromadb.py.
+Lives in 2-RagIngestion-Pipeline/04-ingesting/ alongside JADE's ingest_to_chromadb.py.
 Same pipeline tree, different script — the JADE 7-stage prep factory does not
 fit BERU's curated markdown source. See:
   CAPSTONE-PROJECT/beru-design-decisions.md  (D-008, D-011 for the rationale)
@@ -21,7 +21,7 @@ Sources (all curated, NOT synthetic):
  10. GP-CONSULTING/NIST-800-53/templates/*.md          one chunk per BERU output template
 
 Pointer index of where these sources live (for tree walkers):
-  2-rag-ingestion/01-unprocessed/beru-frameworks/README.md
+  2-RagIngestion-Pipeline/01-unprocessed/beru-frameworks/README.md
 
 Embedding: nomic-embed-text via Ollama (768-dim). Failed embeddings are quarantined,
 never inserted as zero-vectors.
@@ -32,9 +32,9 @@ or pre-embed query text. ChromaDB's default 384-dim sentence-transformers
 will silently mismatch this collection's 768-dim vectors otherwise.
 
 Usage:
-    python3 2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py --dry-run
-    python3 2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py
-    python3 2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py --reset
+    python3 2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py --dry-run
+    python3 2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py
+    python3 2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py --reset
 """
 
 from __future__ import annotations
@@ -55,15 +55,15 @@ from chromadb.config import Settings
 
 # Path layout from this script's location:
 #   parents[0] = 04-ingesting
-#   parents[1] = 2-rag-ingestion
+#   parents[1] = 2-RagIngestion-Pipeline
 #   parents[2] = GP-MODEL-OPS
 #   parents[3] = GP-copilot (repo root)
 REPO_ROOT = Path(__file__).resolve().parents[3]
 GP_MODEL_OPS = REPO_ROOT / "GP-MODEL-OPS"
 GP_S3 = REPO_ROOT / "GP-S3"
 
-CHROMA_PATH = GP_MODEL_OPS / "2-rag-ingestion" / "05-ragged-data" / "chroma"
-QUARANTINE = GP_MODEL_OPS / "2-rag-ingestion" / "05-ragged-data" / "embedding_quarantine.jsonl"
+CHROMA_PATH = GP_MODEL_OPS / "2-RagIngestion-Pipeline" / "05-ragged-data" / "chroma"
+QUARANTINE = GP_MODEL_OPS / "2-RagIngestion-Pipeline" / "05-ragged-data" / "embedding_quarantine.jsonl"
 REPORT_DIR = GP_S3 / "3-mlops-reports" / "1-rag-staging"
 
 CONTROLS_DIR = REPO_ROOT / "GP-CONSULTING" / "NIST-800-53" / "controls"

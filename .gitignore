@@ -21,11 +21,11 @@
 # knowledge graph pickle lives in GP-S3, not here, but guard anyway
 *.pkl
 # small sklearn models ARE versioned on purpose (rank classifier = source of truth)
-!1-local-pipeline/rank-training-data/*.joblib
+!1-FineTuning-Pipeline/rank-training-data/*.joblib
 
 # --- Training corpus (regenerable, large — do not push to GitHub) ---
-1-local-pipeline/01-raw-data-lake/*.jsonl
-1-local-pipeline/06-eval-holdout/
+1-FineTuning-Pipeline/01-raw-data-lake/*.jsonl
+1-FineTuning-Pipeline/06-eval-holdout/
 BERU-AI/training-data/chatml-examples/*.jsonl
 # eval suites (small, hand-authored) ARE tracked — only result dumps are excluded
 
@@ -36,7 +36,7 @@ unsloth_compiled_cache/
 **/unsloth_compiled_cache/
 
 # --- RAG / vector store data (regenerable, large) ---
-2-rag-ingestion/05-ragged-data/
+2-RagIngestion-Pipeline/05-ragged-data/
 **/chroma/
 *.chroma
 chroma.sqlite3
@@ -56,7 +56,7 @@ wandb/
 04-trained-data/
 03-chunked-untrained/
 # ETL intermediate corpora — regenerable, and some exceed GitHub's 100 MB file limit
-1-local-pipeline/02-ETL-data/
+1-FineTuning-Pipeline/02-ETL-data/
 **/02-ETL-data/
 
 # --- Eval result dumps (regenerable; keep the questions + scorers, not the runs) ---

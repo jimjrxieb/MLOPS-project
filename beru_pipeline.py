@@ -53,7 +53,7 @@ _BERU_AI_ROOT = _REPO_ROOT / "BERU-AI"
 sys.path.insert(0, str(_BERU_AI_ROOT))
 sys.path.insert(0, str(_REPO_ROOT))
 
-PIPELINE_DIR = _REPO_ROOT / "1-local-pipeline"
+PIPELINE_DIR = _REPO_ROOT / "1-FineTuning-Pipeline"
 EVAL_DIR = _REPO_ROOT / "4-eval-clarify"
 EXPERIMENTS_DIR = _REPO_ROOT / "5-experiments"
 REGISTRY_DIR = _REPO_ROOT / "3-model-registry"
@@ -451,7 +451,7 @@ def main() -> None:
     ap.add_argument("--exp-id", default="exp-013-beru-v1.7",
                     help="Experiment identifier (e.g. exp-013-beru-v1.7)")
     ap.add_argument("--corpus-path",
-                    default="1-local-pipeline/01-raw-data-lake/beru_training_exp012.jsonl",
+                    default="1-FineTuning-Pipeline/01-raw-data-lake/beru_training_exp012.jsonl",
                     help="Path to training corpus JSONL")
     ap.add_argument("--merged-model-path", default=None,
                     help="Path to already-merged HuggingFace model (skips training)")

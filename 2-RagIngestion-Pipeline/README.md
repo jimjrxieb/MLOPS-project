@@ -1,10 +1,10 @@
-# 2-rag-ingestion: RAG Pipeline
+# 2-RagIngestion-Pipeline: RAG Pipeline
 
 Retrieval-Augmented Generation pipeline for the JSA AI fleet (JADE, Katie, BERU). Ingests security knowledge into ChromaDB vector embeddings + NetworkX knowledge graph for contextual responses.
 
 **Two ingest paths live here:**
 - `04-ingesting/ingest_to_chromadb.py` — JADE's bulk ingest. Runs the 7-stage prep factory at `02-preperation-factory/stages/` (discover → preprocess → sanitize → format-conversion → labeling → validators → ingest). Used for messy bulk content (Claude Code sessions, scraped docs, YouTube transcripts, JSA logs).
-- `04-ingesting/ingest_beru_to_chromadb.py` — BERU's curated-corpus ingest. Reads hand-authored markdown directly from `GP-CONSULTING/NIST-800-53/controls/` and `CAPSTONE-PROJECT/frameworks/` — the JADE prep stages don't fit curated content. See `2-rag-ingestion/01-unprocessed/beru-frameworks/README.md` for the source-file pointer index. Rationale documented in `CAPSTONE-PROJECT/beru-design-decisions.md` D-008 + D-011.
+- `04-ingesting/ingest_beru_to_chromadb.py` — BERU's curated-corpus ingest. Reads hand-authored markdown directly from `GP-CONSULTING/NIST-800-53/controls/` and `CAPSTONE-PROJECT/frameworks/` — the JADE prep stages don't fit curated content. See `2-RagIngestion-Pipeline/01-unprocessed/beru-frameworks/README.md` for the source-file pointer index. Rationale documented in `CAPSTONE-PROJECT/beru-design-decisions.md` D-008 + D-011.
 
 Both write to the same ChromaDB store at `05-ragged-data/chroma/` but to different collections (`jade-*` vs `beru-nist-800-53`).
 

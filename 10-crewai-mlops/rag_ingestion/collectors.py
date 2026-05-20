@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Optional
 
 # Add the factory stages to sys.path
-_FACTORY_DIR = Path(__file__).parent.parent.parent / "2-rag-ingestion" / "02-preperation-factory"
+_FACTORY_DIR = Path(__file__).parent.parent.parent / "2-RagIngestion-Pipeline" / "02-preperation-factory"
 if str(_FACTORY_DIR) not in sys.path:
     sys.path.insert(0, str(_FACTORY_DIR))
 

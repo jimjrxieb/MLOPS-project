@@ -17,7 +17,7 @@ from stages.schema_enforcement import validate_rag_item
 # Import the correct embedding function (768-dim nomic-embed-text via Ollama)
 from ingest_to_chromadb import OllamaEmbeddingFunction
 
-CHROMA_PATH = "2-rag-ingestion/05-ragged-data/chroma"
+CHROMA_PATH = "2-RagIngestion-Pipeline/05-ragged-data/chroma"
 
 # CRITICAL: Always use OllamaEmbeddingFunction (768-dim nomic-embed-text).
 # Without this, ChromaDB defaults to all-MiniLM-L6-v2 (384-dim) which is

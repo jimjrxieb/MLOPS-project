@@ -14,8 +14,8 @@ A full MLOps pipeline for three AI agents — BERU, JADE, and Katie — plus the
 
 ```text
 0-data-lab/          ← Raw data. CI evidence, Claude Code sessions, synthetic generation.
-1-local-pipeline/    ← Training engine. ETL → chunk → LoRA fine-tune → merge → GGUF.
-2-rag-ingestion/     ← RAG pipeline. 7-stage prep factory → ChromaDB (33k+ docs).
+1-FineTuning-Pipeline/  ← Training engine. ETL → chunk → LoRA fine-tune → merge → GGUF.
+2-RagIngestion-Pipeline/ ← RAG pipeline. 7-stage prep factory → ChromaDB (33k+ docs).
 3-model-registry/    ← Artifact store. Weights, GGUFs, Modelfiles per version.
 4-eval-clarify/      ← Eval suites. knowledge-brain, pentest-brain, workflow-brain.
 5-experiments/       ← 14 tracked experiments. params.yaml + metrics.json + notes.md each.
@@ -35,7 +35,7 @@ CAPSTONE-PROJECT/    ← Design decisions, NIST AI RMF frameworks, intake templa
 Raw data (0-data-lab)
     │
     ▼
-ETL + chunk (1-local-pipeline)  ──► Data quality gate (8-tests/)
+ETL + chunk (1-FineTuning-Pipeline)  ──► Data quality gate (8-tests/)
     │
     ▼
 LoRA fine-tune on RTX 5080      ──► Hyperparams + metrics → MLflow (5-experiments/)
@@ -57,7 +57,7 @@ BERU-AI/  ──► FastAPI serving + MLflow inference tracking + drift monitori
 RAG path runs in parallel:
 
 ```text
-docs → 2-rag-ingestion/02-preperation-factory/ (7 stages)
+docs → 2-RagIngestion-Pipeline/02-preperation-factory/ (7 stages)
      → 10-crewai-mlops/rag_ingestion/ (4 LLM agents: quality, labeling, routing, report)
      → 03-preprocessed/ → 04-ingesting/ingest_to_chromadb.py → ChromaDB
 ```

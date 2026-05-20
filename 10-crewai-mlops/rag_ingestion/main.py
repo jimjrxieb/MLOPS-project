@@ -30,7 +30,7 @@ from .crews.prep_crew import build_prep_crew
 # Output goes here (same as existing preprocess_pipeline.py)
 _PREPROCESSED_DIR = (
     Path(__file__).parent.parent.parent
-    / "2-rag-ingestion"
+    / "2-RagIngestion-Pipeline"
     / "03-preprocessed"
 )
 

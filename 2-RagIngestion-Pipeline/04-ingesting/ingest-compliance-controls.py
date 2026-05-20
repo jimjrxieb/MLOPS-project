@@ -15,7 +15,7 @@ import sys
 
 # Configuration
 REPO_ROOT = Path("/home/jimmie/linkops-industries/GP-copilot")
-CHROMA_PATH = REPO_ROOT / "GP-MODEL-OPS/2-rag-ingestion/05-ragged-data/chroma"
+CHROMA_PATH = REPO_ROOT / "GP-MODEL-OPS/2-RagIngestion-Pipeline/05-ragged-data/chroma"
 NIST_CONTROLS = REPO_ROOT / "GP-CONSULTING/NIST-800-53/controls"
 AI_RMF_FRAMEWORKS = REPO_ROOT / "GP-MODEL-OPS/CAPSTONE-PROJECT/frameworks"
 

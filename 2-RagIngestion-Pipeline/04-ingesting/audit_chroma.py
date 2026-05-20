@@ -9,7 +9,7 @@ from pathlib import Path
 import json
 from collections import Counter
 
-CHROMA_PATH = "2-rag-ingestion/05-ragged-data/chroma"
+CHROMA_PATH = "2-RagIngestion-Pipeline/05-ragged-data/chroma"
 
 def audit_chroma():
     if not Path(CHROMA_PATH).exists():

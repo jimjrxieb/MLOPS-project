@@ -25,7 +25,7 @@ So the source files stay in their authored locations under git, and a BERU-speci
 ## What reads these source files
 
 ```
-2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py
+2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py
 ```
 
 This is BERU's ingest script. Lives in the same `04-ingesting/` directory as JADE's `ingest_to_chromadb.py`, but:
@@ -34,17 +34,17 @@ This is BERU's ingest script. Lives in the same `04-ingesting/` directory as JAD
 
 Run it:
 ```bash
-python3 2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py --dry-run     # verify parsers
-python3 2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py               # idempotent ingest
-python3 2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py --reset       # wipe + rebuild
+python3 2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py --dry-run     # verify parsers
+python3 2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py               # idempotent ingest
+python3 2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py --reset       # wipe + rebuild
 ```
 
 ## Where the output lands
 
 | Artifact | Location |
 |---|---|
-| ChromaDB collection `beru-nist-800-53` | `2-rag-ingestion/05-ragged-data/chroma/` |
-| Embedding failures (currently 0) | `2-rag-ingestion/05-ragged-data/embedding_quarantine.jsonl` |
+| ChromaDB collection `beru-nist-800-53` | `2-RagIngestion-Pipeline/05-ragged-data/chroma/` |
+| Embedding failures (currently 0) | `2-RagIngestion-Pipeline/05-ragged-data/embedding_quarantine.jsonl` |
 | Audit log per ingest run | `GP-S3/3-mlops-reports/1-rag-staging/rag-ingestion-{ts}-beru.md` |
 
 ## Verification

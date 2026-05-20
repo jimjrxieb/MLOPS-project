@@ -96,11 +96,11 @@ CrewAI crew (4 agents, sequential):
   routing_validator  → routing decisions → override misroutes / SKIPs
   pipeline_reporter  → stats + overrides → markdown report + go/no-go
         ↓
-2-rag-ingestion/03-preprocessed/processed_{timestamp}.jsonl
-2-rag-ingestion/03-preprocessed/crew-report_{timestamp}.md
+2-RagIngestion-Pipeline/03-preprocessed/processed_{timestamp}.jsonl
+2-RagIngestion-Pipeline/03-preprocessed/crew-report_{timestamp}.md
 ```
 
-**Source pipeline:** `2-rag-ingestion/02-preperation-factory/`
+**Source pipeline:** `2-RagIngestion-Pipeline/02-preperation-factory/`
 
 ```bash
 python3 -m crewai_mlops.rag_ingestion.main run --category compliance
