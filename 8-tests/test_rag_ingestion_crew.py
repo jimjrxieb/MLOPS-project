@@ -49,3 +49,95 @@ class TestCollectors:
         state = json.loads(state_file.read_text())
         assert result["run_id"] == state["run_id"]
         assert result["stats"] == state["stats"]
+
+
+class TestTools:
+    """tools.py: each tool reads/writes state correctly."""
+
+    def _make_state(self, tmp_path: Path) -> Path:
+        """Write a minimal state fixture to tmp_path/state.json."""
+        state = {
+            "run_id": "20260520T120000Z",
+            "stats": {"discovered": 5, "pass_count": 3, "repair_count": 1, "fail_count": 1,
+                      "labeled_count": 2, "unlabeled_count": 1, "total_chunks": 12, "preprocessed": 4},
+            "pass_batch": [],
+            "repair_batch": [
+                {"file": "a.md", "content_hash": "abc123", "category": "compliance",
+                 "quality_gate": "REPAIR", "chunks": [{"content": "x", "metadata": {"domain": []}}],
+                 "destination": "RAG", "rag_collection": "jade-general", "sql_table": None, "routing_reason": "default"}
+            ],
+            "unlabeled_batch": [
+                {"file": "b.md", "content_hash": "def456", "category": "domain-sme",
+                 "quality_gate": "PASS", "chunks": [{"content": "y", "metadata": {"domain": []}}],
+                 "destination": "RAG", "rag_collection": "jade-domain-sme", "sql_table": None, "routing_reason": "domain-sme"}
+            ],
+            "routing_decisions": [
+                {"file": "c.md", "content_hash": "ghi789", "category": "opa-policies",
+                 "destination": "RAG", "rag_collection": "jade-general", "sql_table": None, "reason": "default fallback"}
+            ],
+            "quality_overrides": {},
+            "label_overrides": {},
+            "routing_overrides": {},
+        }
+        sf = tmp_path / "state.json"
+        sf.write_text(json.dumps(state))
+        return sf
+
+    def test_get_repair_items_returns_repair_batch(self, tmp_path):
+        from crewai_mlops.rag_ingestion import tools
+        sf = self._make_state(tmp_path)
+        tools.set_state_file(sf)
+        result = tools.get_repair_items.func()
+        assert "repair_batch" in result
+        assert result["repair_batch"][0]["content_hash"] == "abc123"
+
+    def test_override_quality_gate_writes_to_overrides(self, tmp_path):
+        from crewai_mlops.rag_ingestion import tools
+        sf = self._make_state(tmp_path)
+        tools.set_state_file(sf)
+        tools.override_quality_gate.func("abc123", "FAIL", "content too short")
+        state = json.loads(sf.read_text())
+        assert "abc123" in state["quality_overrides"]
+        assert state["quality_overrides"]["abc123"]["decision"] == "FAIL"
+
+    def test_get_unlabeled_items_returns_unlabeled_batch(self, tmp_path):
+        from crewai_mlops.rag_ingestion import tools
+        sf = self._make_state(tmp_path)
+        tools.set_state_file(sf)
+        result = tools.get_unlabeled_items.func()
+        assert result["unlabeled_batch"][0]["content_hash"] == "def456"
+
+    def test_apply_labels_writes_to_label_overrides(self, tmp_path):
+        from crewai_mlops.rag_ingestion import tools
+        sf = self._make_state(tmp_path)
+        tools.set_state_file(sf)
+        tools.apply_labels.func("def456", ["kubernetes"], ["documentation"], "intermediate", ["pod", "rbac"])
+        state = json.loads(sf.read_text())
+        assert "def456" in state["label_overrides"]
+        assert state["label_overrides"]["def456"]["domain"] == ["kubernetes"]
+
+    def test_get_routing_decisions_returns_decisions(self, tmp_path):
+        from crewai_mlops.rag_ingestion import tools
+        sf = self._make_state(tmp_path)
+        tools.set_state_file(sf)
+        result = tools.get_routing_decisions.func()
+        assert any(d["destination"] == "RAG" for d in result["routing_decisions"])
+
+    def test_override_routing_writes_to_routing_overrides(self, tmp_path):
+        from crewai_mlops.rag_ingestion import tools
+        sf = self._make_state(tmp_path)
+        tools.set_state_file(sf)
+        tools.override_routing.func("ghi789", "RAG", "jade-policy-as-code", "rego file — belongs in policy collection")
+        state = json.loads(sf.read_text())
+        assert "ghi789" in state["routing_overrides"]
+        assert state["routing_overrides"]["ghi789"]["rag_collection"] == "jade-policy-as-code"
+
+    def test_get_pipeline_stats_returns_stats_dict(self, tmp_path):
+        from crewai_mlops.rag_ingestion import tools
+        sf = self._make_state(tmp_path)
+        tools.set_state_file(sf)
+        result = tools.get_pipeline_stats.func()
+        assert result["stats"]["discovered"] == 5
+        assert "quality_overrides_count" in result
+        assert "label_overrides_count" in result
+        assert "routing_overrides_count" in result
