@@ -22,6 +22,12 @@
 # small sklearn models ARE versioned on purpose (rank classifier = source of truth)
 !1-local-pipeline/rank-training-data/*.joblib
 
+# --- Training corpus (regenerable, large — do not push to GitHub) ---
+1-local-pipeline/01-raw-data-lake/*.jsonl
+1-local-pipeline/06-eval-holdout/
+BERU-AI/training-data/chatml-examples/*.jsonl
+# eval suites (small, hand-authored) ARE tracked — only result dumps are excluded
+
 # --- Vendored dependencies (clone these, don't commit) ---
 llama.cpp/
 **/llama.cpp/

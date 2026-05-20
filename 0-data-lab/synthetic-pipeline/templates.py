@@ -4,6 +4,7 @@ Training Scenario Templates
 Pre-defined templates for generating training examples from operational data.
 """
 
+from typing import Dict, List, Optional
 from .models import ScenarioTemplate, Domain, TaskType, SkillLevel
 
 
@@ -452,7 +453,7 @@ Actual (Runtime): {actual_value}
 
 Security Impact: {impact_description}""",
     output_template="""**Drift Analysis:**
-The runtime configuration for {resource_id} has drifted from the approved IaC baseline. 
+The runtime configuration for {resource_id} has drifted from the approved IaC baseline.
 **Impact:** {impact_description}
 
 **CCSP Compliance:** {ccsp_domain}

@@ -108,15 +108,15 @@ GP-MODEL-OPS/
 
 ## CrewAI Migration Status
 
-All CrewAI code lives in `crewai-mlops/`. Entry point pattern: `POST /run/<crew-name>` + `python3 -m crewai_mlops.<crew>.main run`.
+All CrewAI code lives in `10-crewai-mlops/`. Entry point pattern: `POST /run/<crew-name>` + `python3 -m crewai_mlops.<crew>.main run`.
 
 | Pipeline | Crew | Status | Location |
 |----------|------|--------|----------|
-| `0-data-lab/synthetic-pipeline/` | 3-agent crew: Orchestrator → Quality Auditor → Report Generator | **DONE** | `crewai-mlops/synthetic_pipeline/` |
-| `BERU-AI/` | 6-agent pool across 3 sub-crews: beru_audit / ssp_to_poam / ac-access-control | **DONE** | `crewai-mlops/beru/` |
-| `2-rag-ingestion/02-preperation-factory/` | 4-agent crew: Quality Reviewer → Semantic Labeler → Routing Validator → Pipeline Reporter | **DONE** | `crewai-mlops/rag_ingestion/` |
-| `4-eval-clarify/` | 4-agent parallel crew: one per eval suite | PLANNED | `crewai-mlops/eval/` |
-| `1-local-pipeline/` ETL + Chunk only | Wrap as tools, not agents | PLANNED | `crewai-mlops/training_pipeline/` |
+| `0-data-lab/synthetic-pipeline/` | 3-agent crew: Orchestrator → Quality Auditor → Report Generator | **DONE** | `10-crewai-mlops/synthetic_pipeline/` |
+| `BERU-AI/` | 6-agent pool across 3 sub-crews: beru_audit / ssp_to_poam / ac-access-control | **DONE** | `10-crewai-mlops/beru/` |
+| `2-rag-ingestion/02-preperation-factory/` | 4-agent crew: Quality Reviewer → Semantic Labeler → Routing Validator → Pipeline Reporter | **DONE** | `10-crewai-mlops/rag_ingestion/` |
+| `4-eval-clarify/` | 4-agent parallel crew: one per eval suite | PLANNED | `10-crewai-mlops/eval/` |
+| `1-local-pipeline/` ETL + Chunk only | Wrap as tools, not agents | PLANNED | `10-crewai-mlops/training_pipeline/` |
 | `1-local-pipeline/` Training/Merge/Convert | **DO NOT MIGRATE** — GPU subprocess, no benefit | N/A | — |
 
 **Port assignment:** synthetic_pipeline=8001, rag_ingestion=8002, beru=8089 (Docker), eval=TBD

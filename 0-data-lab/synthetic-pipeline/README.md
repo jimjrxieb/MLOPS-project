@@ -1,51 +1,74 @@
-# Phase 12: JADE Training Scenarios
+# Synthetic Data Pipeline — JADE/Katie Training Factory
 
-Automated training data generation system that converts operational security workflows into high-quality training examples for JADE fine-tuning.
-
-## Overview
-
-This module automates the creation of training data from real-world security operations:
-- **Scan results** → Training examples on vulnerability analysis
-- **Fix executions** → Training examples on remediation patterns
-- **Escalations** → Training examples on decision-making
-- **Workflow transitions** → Training examples on automation confidence
+Automated training data generation system that converts operational security workflows into high-quality training examples for JADE/Katie fine-tuning.
 
 ## Architecture
 
 ```
-Operational Data → Templates → Generator → Validator → Training Corpus
-     (Logs)       (Scenarios)  (Examples)  (Quality)   (Fine-tuning)
+GP-PROJECTS/{instance}/{slot}/jsa/inbox/  ←── real JSA findings
+              ↓
+    pipeline.py (5 phases)
+    ┌─────────────────────────────────────────┐
+    │  1. Discover  →  _discover_sources()    │
+    │  2. Generate  →  generator.py           │
+    │  3. Merge     →  _merge_batches()       │
+    │  4. Validate  →  quality_validator.py   │
+    │  5. Save      →  JSONL + stats + report │
+    └─────────────────────────────────────────┘
+              ↓
+    1-local-pipeline/01-raw-data-lake/   ←── training corpus
 ```
 
 ### Components
 
-1. **models.py**: Data models for training examples
-2. **templates.py**: Pre-defined scenario templates
-3. **generator.py**: Converts operational data to training examples
-4. **quality_validator.py**: Validates example quality
-5. **pipeline.py**: End-to-end orchestration
+| File | Role |
+|------|------|
+| `models.py` | Data models: TrainingExample, TrainingBatch, GenerationConfig |
+| `templates.py` | Scenario templates: trivy, gitleaks, kubescape, escalation, sast |
+| `generator.py` | Converts JSA findings + scan/fix/escalation logs to training examples |
+| `quality_validator.py` | Scores examples on instruction clarity, input completeness, output quality, metadata |
+| `pipeline.py` | 5-phase orchestrator: discover → generate → merge → validate → save |
+| `crew/` | CrewAI crew wrapping the pipeline (see below) |
 
 ## Quick Start
 
-### Run Full Pipeline
+### Direct (no LLM overhead)
 
 ```bash
-cd GP-SAGEMAKER/5-GP-TRAINING-SCENARIOS
+cd GP-MODEL-OPS/0-data-lab/synthetic-pipeline
 
-# Generate training data from all instances
+# Generate from all instances
 python3 -m pipeline
 
-# Generate from specific instance
-python3 -m pipeline --instance 02-instance
+# Generate from one instance
+python3 -m pipeline --instance 01-instance
 
 # Custom quality threshold
-python3 -m pipeline --min-quality 70.0
+python3 -m pipeline --min-quality 70.0 --max-examples 500
+```
+
+### Via CrewAI Crew (adds quality analysis + coverage report)
+
+```bash
+# CLI
+python3 -m crew.main run --min-quality 60 --max-examples 500
+
+# Single instance
+python3 -m crew.main run --instance 01-instance
+
+# API server (port 8001)
+python3 -m crew.main serve
+
+# curl
+curl -X POST http://localhost:8001/run/synthetic-pipeline \
+  -H 'Content-Type: application/json' \
+  -d '{"min_quality_score": 60, "max_examples": 500}'
 ```
 
 ### Programmatic Usage
 
 ```python
-from training_scenarios import TrainingPipeline
+from synthetic_pipeline.pipeline import TrainingPipeline
 
 # Run full pipeline
 pipeline = TrainingPipeline()
@@ -367,67 +390,106 @@ example.to_chatml()
 # ]
 ```
 
+## CrewAI Crew
+
+The `crew/` directory wraps the pipeline with a 3-agent CrewAI crew. The existing pipeline code is unchanged — the crew adds LLM-driven quality analysis and coverage reporting on top.
+
+```
+crew/
+├── tools.py              # 5 @tool functions wrapping pipeline phases
+├── agents.py             # 3 agents: Orchestrator, Quality Auditor, Report Generator
+├── main.py               # FastAPI (POST /run/synthetic-pipeline) + CLI
+├── requirements.txt      # crewai[tools]==0.80.0 + fastapi stack
+└── crews/
+    └── pipeline_crew.py  # Sequential crew: generate → validate → report
+```
+
+### What the crew adds over bare pipeline
+
+| Pipeline alone | + Crew |
+|---------------|--------|
+| pass/fail counts | Quality Auditor reasons about failure patterns |
+| raw stats JSON | Coverage report: actual vs. target rank distribution |
+| no recommendation | Go/No-Go for corpus inclusion |
+| no gap analysis | Concrete actions for next run to fix coverage gaps |
+
+### Agent roles
+
+| Agent | Tools | Decision |
+|-------|-------|----------|
+| Pipeline Orchestrator | `discover_sources`, `run_full_pipeline` | Runs discovery + generation |
+| Quality Auditor | `validate_output_file`, `get_batch_stats` | APPROVE / REVIEW / REJECT |
+| Report Generator | `get_batch_stats` | Go / No-Go / Conditional |
+
+### Import note
+
+The package dir is named `synthetic-pipeline` (hyphen), so `tools.py` registers it under the alias `synthetic_pipeline` via `importlib.util` before importing. This is transparent to callers — import via the crew, not directly from the hyphen-named dir.
+
+---
+
 ## Integration with Training Pipeline
 
 ### Directory Structure
 
 ```
-GP-SAGEMAKER/
-├── 1-GP-GLUE/
-│   ├── 2-formatted-data/          # Output from this pipeline
-│   │   ├── training_20260101.jsonl
-│   │   ├── training_20260101.stats.json
-│   │   └── training_20260101.report.md
-│   └── 3-untrained-chunks/        # Ready for fine-tuning
-├── 3-jade-model-versions/         # Model artifacts
-└── 5-GP-TRAINING-SCENARIOS/       # This module
-    ├── models.py
-    ├── templates.py
-    ├── generator.py
-    ├── quality_validator.py
-    └── pipeline.py
+GP-MODEL-OPS/
+├── 0-data-lab/
+│   └── synthetic-pipeline/     # This module
+│       ├── models.py
+│       ├── templates.py
+│       ├── generator.py
+│       ├── quality_validator.py
+│       ├── pipeline.py
+│       └── crew/               # CrewAI crew
+└── 1-local-pipeline/
+    └── 01-raw-data-lake/       # Output from this pipeline drops here
+        ├── training_YYYYMMDD_HHMMSS.jsonl
+        ├── training_YYYYMMDD_HHMMSS.stats.json
+        └── training_YYYYMMDD_HHMMSS.report.md
 ```
 
 ### Next Steps After Generation
 
 1. **Review Quality**:
    ```bash
-   python3 -m quality_validator training_20260101.jsonl
+   python3 -m crew.main run --min-quality 70
+   # crew Quality Auditor issues APPROVE/REVIEW/REJECT with gap analysis
    ```
 
 2. **Merge with Corpus**:
    ```bash
-   cat training_20260101.jsonl >> master_training_corpus.jsonl
+   cat 1-local-pipeline/01-raw-data-lake/training_*.jsonl >> master_corpus.jsonl
    ```
 
 3. **Create Training Chunks**:
    ```bash
-   cd GP-SAGEMAKER/1-GP-GLUE
-   python3 merge_and_convert.py
+   python3 1-local-pipeline/chunk_data.py
    ```
 
-4. **Fine-tune JADE**:
+4. **Fine-tune**:
    ```bash
-   cd GP-SAGEMAKER/3-jade-model-versions/v0.9
-   python3 train_v09.py
+   python3 1-local-pipeline/train_v11.py
    ```
 
 ## CLI Commands
 
-### Run Pipeline
+### Direct pipeline
 
 ```bash
-# Full pipeline
-python3 -m pipeline
+# From GP-MODEL-OPS/0-data-lab/synthetic-pipeline/
+python3 pipeline.py                          # all instances
+python3 pipeline.py --instance 01-instance   # one instance
+python3 pipeline.py --min-quality 70.0 --max-examples 1000
+python3 pipeline.py --output-dir /path/to/output
+```
 
-# Specific instance
-python3 -m pipeline --instance 02-instance
+### Crew CLI (adds quality report + go/no-go)
 
-# Custom quality threshold
-python3 -m pipeline --min-quality 70.0 --max-examples 1000
-
-# Custom output directory
-python3 -m pipeline --output-dir /path/to/output
+```bash
+python3 -m crew.main run                     # all instances
+python3 -m crew.main run --instance 01-instance
+python3 -m crew.main run --min-quality 70 --max-examples 500
+python3 -m crew.main serve                   # FastAPI on port 8001
 ```
 
 ### Validate Quality
@@ -681,12 +743,8 @@ for quality_level, items in validation['by_quality'].items():
     print(f"{quality_level}: {len(items)}")
 ```
 
-## Created: Phase 12
+## Feeds Into
 
-This training scenarios system was created as part of Phase 12 (January 2026).
+`1-local-pipeline/` → `chunk_data.py` → `train_v11.py` → `3-model-registry/`
 
-It completes the JADE training pipeline by automating the conversion of operational security data into high-quality training examples for fine-tuning.
-
-**Dependencies**: Phases 10.1-10.5 (logging, slot targeting, commander, reports, escalations)
-
-**Feeds into**: GP-SAGEMAKER training pipeline (Phases 1-4)
+Output JSONL drops to `1-local-pipeline/01-raw-data-lake/`. ETL picks it up on the next run.
