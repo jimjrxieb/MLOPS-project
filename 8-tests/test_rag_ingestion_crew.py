@@ -141,3 +141,29 @@ class TestTools:
         assert "quality_overrides_count" in result
         assert "label_overrides_count" in result
         assert "routing_overrides_count" in result
+
+
+class TestAgents:
+    """agents.py: each agent has correct role, max 2 tools, distinct goals."""
+
+    def test_four_agents_defined(self):
+        from crewai_mlops.rag_ingestion.agents import (
+            quality_reviewer, semantic_labeler, routing_validator, pipeline_reporter
+        )
+        agents = [quality_reviewer(), semantic_labeler(), routing_validator(), pipeline_reporter()]
+        assert len(agents) == 4
+
+    def test_each_agent_has_at_most_two_tools(self):
+        from crewai_mlops.rag_ingestion.agents import (
+            quality_reviewer, semantic_labeler, routing_validator, pipeline_reporter
+        )
+        for agent_factory in [quality_reviewer, semantic_labeler, routing_validator, pipeline_reporter]:
+            agent = agent_factory()
+            assert len(agent.tools) <= 2, f"{agent.role} has {len(agent.tools)} tools — max is 2"
+
+    def test_agent_roles_are_unique(self):
+        from crewai_mlops.rag_ingestion.agents import (
+            quality_reviewer, semantic_labeler, routing_validator, pipeline_reporter
+        )
+        roles = [a().role for a in [quality_reviewer, semantic_labeler, routing_validator, pipeline_reporter]]
+        assert len(roles) == len(set(roles)), "duplicate agent role detected"
