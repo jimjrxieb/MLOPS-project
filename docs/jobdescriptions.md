@@ -103,7 +103,7 @@
 | --- | --- |
 | Production Python | GP-MODEL-OPS pipeline: ETL, chunking, LoRA training, GGUF conversion, eval |
 | LLM integrations | Ollama provider at `JADE-AI/providers/ollama.py`, ChromaDB embedding |
-| RAG systems | `2-rag-ingestion/` — 7-stage NPC factory, 33k docs, semantic search |
+| RAG systems | `2-RagIngestion-Pipeline/` — 7-stage NPC factory, 33k docs, semantic search |
 | Structured + unstructured fusion | Scanner JSON output → NIST control mapping → structured POA&M |
 | Open-source AI project | GP-Copilot itself — public MSSP framework with OSS tools |
 | Testing + CI/CD | 48 tests, data quality gates, promotion criteria |

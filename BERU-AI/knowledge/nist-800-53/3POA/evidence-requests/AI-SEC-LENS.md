@@ -12,7 +12,7 @@ This request covers controls implemented in:
 - `GP-CONSULTING/AI-SEC-LENS/10-AI-SECURITY/` — Model supply chain, prompt injection,
   training data, inference security, adversarial testing
 - `GP-MODEL-OPS/JADE-AI/` + `GP-MODEL-OPS/KATIE-AI/` — Deployed model artifacts
-- `GP-MODEL-OPS/2-rag-ingestion/` — RAG pipeline + ChromaDB
+- `GP-MODEL-OPS/2-RagIngestion-Pipeline/` — RAG pipeline + ChromaDB
 
 **Note to assessor**: AI security controls span two frameworks. Part 1 covers NIST 800-53
 controls where AI-specific tooling provides the implementation. Part 2 covers NIST AI 600-1
@@ -309,7 +309,7 @@ ls GP-MODEL-OPS/4-eval-clarify/results/ 2>/dev/null | head -10
 
 ```bash
 # Show training data lineage:
-cat GP-MODEL-OPS/1-local-pipeline/data_lineage.json 2>/dev/null | python3 -c "
+cat GP-MODEL-OPS/1-FineTuning-Pipeline/data_lineage.json 2>/dev/null | python3 -c "
 import json, sys
 lineage = json.load(sys.stdin)
 print(f'Tracked sources: {len(lineage.get(\"sources\", []))}')
@@ -392,12 +392,12 @@ ls GP-S3/6-seclab-reports/ai-sec-evidence/ | grep -E "adversarial|counterfit|art
 # Show ChromaDB collection stats:
 python3 -c "
 import chromadb
-client = chromadb.PersistentClient(path='GP-MODEL-OPS/2-rag-ingestion/05-ragged-data/chroma/')
+client = chromadb.PersistentClient(path='GP-MODEL-OPS/2-RagIngestion-Pipeline/05-ragged-data/chroma/')
 for collection in client.list_collections():
     print(f'{collection.name}: {collection.count()} documents')
 "
 # Verify ChromaDB auth setting:
-grep -r "auth\|token\|CHROMA_SERVER_AUTH" GP-MODEL-OPS/2-rag-ingestion/ | grep -v ".pyc" | head -10
+grep -r "auth\|token\|CHROMA_SERVER_AUTH" GP-MODEL-OPS/2-RagIngestion-Pipeline/ | grep -v ".pyc" | head -10
 ```
 
 **Evidence artifact**: ChromaDB collection list + ingestion report from `GP-S3/3-mlops-reports/1-rag-staging/`
@@ -465,9 +465,9 @@ ls /tmp/garak-injection-test*.jsonl 2>/dev/null
 # Show MLflow auth config:
 grep -r "MLFLOW_TRACKING_USERNAME\|MLFLOW_TRACKING_PASSWORD\|auth" GP-MODEL-OPS/JADE-AI/ | grep -v ".pyc" | head -10
 # Show pinned requirements:
-cat GP-MODEL-OPS/1-local-pipeline/requirements.txt | head -20
+cat GP-MODEL-OPS/1-FineTuning-Pipeline/requirements.txt | head -20
 # Verify no unpinned versions:
-grep -E ">=|~=|[^=]=[^=]" GP-MODEL-OPS/1-local-pipeline/requirements.txt | grep -v "#"
+grep -E ">=|~=|[^=]=[^=]" GP-MODEL-OPS/1-FineTuning-Pipeline/requirements.txt | grep -v "#"
 ```
 
 **Evidence artifact**: requirements.txt (pinned versions) + MLflow auth config + experiment artifact list

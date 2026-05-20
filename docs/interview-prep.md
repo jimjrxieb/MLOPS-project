@@ -40,9 +40,9 @@ Companion to `resume-and-coverletter.md`. For every claim on the resume, this do
 > The pipeline has four stages: discover → preprocess → embed → ingest. Source documents land in `01-unprocessed/`, get cleaned and chunked in `03-preprocessed/`, then `ingest_to_chromadb.py` embeds with `nomic-embed-text` — a 768-dimension model running locally via Ollama — and writes to ChromaDB. Each chunk gets stable IDs so re-ingestion is idempotent, and provenance metadata travels with the chunk: source file, ingestion timestamp, lineage hash. Retrieval at inference time is hybrid — vector similarity from ChromaDB plus a knowledge graph in NetworkX for relationship-aware lookups. For BERU specifically, I built a dedicated `beru-nist-800-53` collection with 39 NIST controls, 38 AI RMF subcategories, and 16 MITRE ATLAS techniques.
 
 **Evidence:**
-- `GP-MODEL-OPS/2-rag-ingestion/04-ingesting/ingest_to_chromadb.py` — main ingest pipeline
-- `GP-MODEL-OPS/2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py` — BERU-specific ingest with stable IDs and lineage
-- `GP-MODEL-OPS/2-rag-ingestion/05-ragged-data/chroma/` — local ChromaDB store
+- `GP-MODEL-OPS/2-RagIngestion-Pipeline/04-ingesting/ingest_to_chromadb.py` — main ingest pipeline
+- `GP-MODEL-OPS/2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py` — BERU-specific ingest with stable IDs and lineage
+- `GP-MODEL-OPS/2-RagIngestion-Pipeline/05-ragged-data/chroma/` — local ChromaDB store
 - `GP-MODEL-OPS/JADE-AI/core/raggraph_engine.py` — hybrid retrieval engine
 - `GP-MODEL-OPS/4-eval-clarify/beru_eval_runner.py` — eval-time RAG retrieval
 
@@ -161,7 +161,7 @@ Companion to `resume-and-coverletter.md`. For every claim on the resume, this do
 
 **Evidence:**
 - `GP-MODEL-OPS/BERU-AI/training-data/chatml-examples/beru-training-examples.jsonl` — 523 training examples
-- `GP-MODEL-OPS/1-local-pipeline/01-raw-data-lake/beru_validation_v1.jsonl` — 75 validation examples
+- `GP-MODEL-OPS/1-FineTuning-Pipeline/01-raw-data-lake/beru_validation_v1.jsonl` — 75 validation examples
 - `GP-MODEL-OPS/BERU-AI/training-data/lineage-manifest.json` — D-005 evidence with SHA-256 per artifact
 - `GP-MODEL-OPS/8-tests/test_beru_training_data.py` — 25-test quality gate
 

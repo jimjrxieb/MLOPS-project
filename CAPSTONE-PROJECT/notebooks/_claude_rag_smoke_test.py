@@ -22,7 +22,7 @@ EVAL_DIR = GP_MODEL_OPS / '4-eval-clarify'
 KNOWLEDGE_FILE = EVAL_DIR / 'beru_knowledge_brain_v2.jsonl'
 
 # Same RAG setup as the eval runner
-sys.path.insert(0, str(GP_MODEL_OPS / '2-rag-ingestion' / '04-ingesting'))
+sys.path.insert(0, str(GP_MODEL_OPS / '2-RagIngestion-Pipeline' / '04-ingesting'))
 from ingest_beru_to_chromadb import (
     COLLECTION_NAME as RAG_COLLECTION,
     CHROMA_PATH as RAG_CHROMA_PATH,

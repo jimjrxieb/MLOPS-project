@@ -11,7 +11,7 @@ The active training corpus is being authored fresh per `CAPSTONE-PROJECT/beru-de
 | Phase 3 | `beru-validation-v1.jsonl` | pending — 75 held-out validation examples |
 | Final merged | `beru-training-examples.jsonl` | pending — Phase 1 + Phase 2, post-quality-gate |
 
-When Phase 1 + Phase 2 are complete, the per-category files are concatenated in deterministic order into `beru-training-examples.jsonl` and that becomes the input to `1-local-pipeline/01-raw-data-lake/`.
+When Phase 1 + Phase 2 are complete, the per-category files are concatenated in deterministic order into `beru-training-examples.jsonl` and that becomes the input to `1-FineTuning-Pipeline/01-raw-data-lake/`.
 
 ## Archived corpus — `_archived-200-rejected.jsonl`
 

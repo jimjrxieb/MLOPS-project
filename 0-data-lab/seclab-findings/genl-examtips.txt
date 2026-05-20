@@ -1,0 +1,1 @@
+Descriptive statistics is an EDA technique used to summarize and describe the essential characteristics of a dataset using numerical measures such as mean, median, mode, variance, standard deviation, minimum, maximum, and percentiles. These statistics provide insight into central tendency and data dispersion.

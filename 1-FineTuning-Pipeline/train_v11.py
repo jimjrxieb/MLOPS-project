@@ -36,10 +36,10 @@ except ImportError:
     HAS_TRAINING_DEPS = False
 
 # Directories
-# Anchor at this script's location so the pipeline directory rename (1-data-pipeline → 1-local-pipeline)
-# doesn't break this constant again. Adjust by one parent if this file moves.
+# Anchor at this script's location so the pipeline directory rename doesn't break this constant.
+# Adjust by one parent if this file moves.
 BASE_DIR = Path(__file__).resolve().parent
-GP_ROOT = BASE_DIR.parents[1]   # 1-local-pipeline/.. -> GP-MODEL-OPS/.. -> GP-copilot
+GP_ROOT = BASE_DIR.parents[1]   # 1-FineTuning-Pipeline/.. -> GP-MODEL-OPS/.. -> GP-copilot
 CHUNK_DIR = BASE_DIR / "03-chunked-untrained"
 HOLDOUT_DIR = BASE_DIR / "03-eval-holdout"
 TRAINED_DIR = BASE_DIR / "04-trained-data"

@@ -63,7 +63,7 @@ ollama_ef = embedding_functions.OllamaEmbeddingFunction(
     model_name="nomic-embed-text",
 )
 
-client = chromadb.PersistentClient(path="2-rag-ingestion/05-ragged-data/chroma/")
+client = chromadb.PersistentClient(path="2-RagIngestion-Pipeline/05-ragged-data/chroma/")
 collection = client.get_collection(
     name="beru-nist-800-53",
     embedding_function=ollama_ef,  # ← NEVER omit this
@@ -105,7 +105,7 @@ The `SSPParser` we built (`BERU-AI/tools/ssp_parser.py`) does exactly this — i
 
 ChromaDB organizes vectors into **collections** — one per use case. Think of collections like tables in a database.
 
-This repo's collections (from `2-rag-ingestion/`):
+This repo's collections (from `2-RagIngestion-Pipeline/`):
 - `jade-general` — 31,094 docs (broad security knowledge for JADE)
 - `jade-nist-800-53` — 144 docs (NIST controls for JADE)
 - `beru-nist-800-53` — **this is what M2 builds** (NIST controls + SSP examples for BERU)
@@ -125,7 +125,7 @@ client.get_or_create_collection(
 
 ## Concept 5 — The Ingestion Pipeline in This Repo
 
-The existing RAG pipeline lives in `2-rag-ingestion/`. The BERU ingestion will use it.
+The existing RAG pipeline lives in `2-RagIngestion-Pipeline/`. The BERU ingestion will use it.
 
 Source documents for `beru-nist-800-53`:
 1. `GP-CONSULTING/NIST-800-53/controls/` — one `.md` file per control, with evidence questions
@@ -135,7 +135,7 @@ Source documents for `beru-nist-800-53`:
 
 The ingestion script that already works:
 ```bash
-cd 2-rag-ingestion/04-ingesting/
+cd 2-RagIngestion-Pipeline/04-ingesting/
 python3 ingest_to_chromadb.py  # ← you will point this at the BERU source docs
 ```
 
@@ -143,7 +143,7 @@ Key config it needs:
 ```python
 EMBEDDING_MODEL = "nomic-embed-text"  # 768-dim — never change this mid-collection
 COLLECTION_NAME = "beru-nist-800-53"
-CHROMA_PATH = "2-rag-ingestion/05-ragged-data/chroma/"
+CHROMA_PATH = "2-RagIngestion-Pipeline/05-ragged-data/chroma/"
 ```
 
 ---
@@ -183,7 +183,7 @@ ollama_ef = embedding_functions.OllamaEmbeddingFunction(
     url='http://localhost:11434/api/embeddings',
     model_name='nomic-embed-text',
 )
-client = chromadb.PersistentClient(path='2-rag-ingestion/05-ragged-data/chroma/')
+client = chromadb.PersistentClient(path='2-RagIngestion-Pipeline/05-ragged-data/chroma/')
 col = client.get_collection('beru-nist-800-53', embedding_function=ollama_ef)
 results = col.query(query_texts=['least privilege'], n_results=3)
 print(results['metadatas'])

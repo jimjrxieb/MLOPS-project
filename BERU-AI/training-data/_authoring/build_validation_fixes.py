@@ -7,7 +7,7 @@
 import json
 from pathlib import Path
 
-VAL = Path(__file__).resolve().parents[3] / "1-local-pipeline" / "01-raw-data-lake" / "beru_validation_v1.jsonl"
+VAL = Path(__file__).resolve().parents[3] / "1-FineTuning-Pipeline" / "01-raw-data-lake" / "beru_validation_v1.jsonl"
 
 SYSTEM = (
     "You are BERU, the GRC analyst for GP-Copilot. You assess compliance using NIST "

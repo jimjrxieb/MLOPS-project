@@ -27,9 +27,9 @@ ADAPTER_OUT = GP_MODEL_OPS / '3-model-registry' / 'beru-v1.0-3b' / 'lora_adapter
 EXP_DIR     = GP_MODEL_OPS / '5-experiments' / 'exp-006-beru-v1.0'
 BASELINE_DIR= GP_MODEL_OPS / '5-experiments' / 'exp-005-beru-3b-baseline'
 EVAL_DIR    = GP_MODEL_OPS / '4-eval-clarify'
-CONFIG_PATH = GP_MODEL_OPS / '1-local-pipeline' / 'config_beru.yaml'
+CONFIG_PATH = GP_MODEL_OPS / '1-FineTuning-Pipeline' / 'config_beru.yaml'
 CORPUS_PATH = GP_MODEL_OPS / 'BERU-AI' / 'training-data' / 'chatml-examples' / 'beru-training-examples.jsonl'
-VAL_PATH    = GP_MODEL_OPS / '1-local-pipeline' / '01-raw-data-lake' / 'beru_validation_v1.jsonl'
+VAL_PATH    = GP_MODEL_OPS / '1-FineTuning-Pipeline' / '01-raw-data-lake' / 'beru_validation_v1.jsonl'
 
 EXP_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -62,7 +62,7 @@ FastLanguageModel.for_inference(model)
 print(f'Model loaded in {time.time()-load_start:.1f}s. Device: {model.device}')
 
 # RAG setup
-sys.path.insert(0, str(GP_MODEL_OPS / '2-rag-ingestion' / '04-ingesting'))
+sys.path.insert(0, str(GP_MODEL_OPS / '2-RagIngestion-Pipeline' / '04-ingesting'))
 from ingest_beru_to_chromadb import (  # noqa: E402
     COLLECTION_NAME as RAG_COLLECTION,
     CHROMA_PATH as RAG_CHROMA_PATH,
@@ -305,7 +305,7 @@ Base model `{config['model']['base_model']}` plus LoRA r={config['lora']['r']}/a
 - Adapter:        `{ADAPTER_OUT.relative_to(REPO_ROOT)}` (203 MB)
 - Merged model:   `{MERGED_OUT.relative_to(REPO_ROOT)}` (6.1 GB)
 - Training data:  `BERU-AI/training-data/chatml-examples/beru-training-examples.jsonl` ({corpus_size} examples)
-- Validation set: `1-local-pipeline/01-raw-data-lake/beru_validation_v1.jsonl` ({val_size} examples)
+- Validation set: `1-FineTuning-Pipeline/01-raw-data-lake/beru_validation_v1.jsonl` ({val_size} examples)
 - Eval suites:    `4-eval-clarify/beru_knowledge_brain_v2.jsonl` (30) + `beru_pentest_brain_v1.jsonl` (22)
 - Baseline:       `5-experiments/exp-005-beru-3b-baseline/metrics.json`
 '''

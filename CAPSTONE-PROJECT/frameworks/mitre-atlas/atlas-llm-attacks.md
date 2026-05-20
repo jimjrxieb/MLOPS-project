@@ -97,7 +97,7 @@ The LLM-specific tactic group is where AI security diverges from traditional app
 **BERU compensating controls:**
 - POA&M output is markdown, not JSON — limits the structural payload surface
 - CISO summary is required to be one paragraph in prose — structural anomalies stand out
-- BERU outputs go to files, not back into the RAG corpus, by default — `2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py` does NOT auto-ingest BERU findings (this is the architectural firewall)
+- BERU outputs go to files, not back into the RAG corpus, by default — `2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py` does NOT auto-ingest BERU findings (this is the architectural firewall)
 
 **Crosswalk:**
 - AI RMF: MEASURE 2.7, MAP 4.1 (component risk — outputs as inputs to next stage)

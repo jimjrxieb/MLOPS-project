@@ -1,6 +1,6 @@
 """Build 75 held-out validation examples for fine-tune monitoring.
 
-OUTPUT: 1-local-pipeline/01-raw-data-lake/beru_validation_v1.jsonl
+OUTPUT: 1-FineTuning-Pipeline/01-raw-data-lake/beru_validation_v1.jsonl
 
 Per config_beru.yaml + D-012:
   - During-training validation only (NOT the post-promotion eval suites)
@@ -19,7 +19,7 @@ import json
 import re
 from pathlib import Path
 
-OUT = Path(__file__).resolve().parents[3] / "1-local-pipeline" / "01-raw-data-lake" / "beru_validation_v1.jsonl"
+OUT = Path(__file__).resolve().parents[3] / "1-FineTuning-Pipeline" / "01-raw-data-lake" / "beru_validation_v1.jsonl"
 
 SYSTEM = (
     "You are BERU, the GRC analyst for GP-Copilot. You assess compliance using NIST "

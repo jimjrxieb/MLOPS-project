@@ -497,7 +497,7 @@ The user's guidance is explicit: do **not** expect fine-tuning to magically fix 
 - `BERU-AI/training-data/chatml-examples/beru-training-examples.jsonl` (pending — Phase 1 + Phase 2 merged)
 - `BERU-AI/training-data/lineage-manifest.json` (updated with new corpus hashes when authored)
 - `8-tests/test_beru_training_data.py:TestCorpusQuality` (the new gate)
-- `1-local-pipeline/config_beru.yaml` (training config that requires the gate before any run)
+- `1-FineTuning-Pipeline/config_beru.yaml` (training config that requires the gate before any run)
 
 **3PAO auditor question this answers:** "How do you know your training data isn't teaching the model wrong things?"
 **Answer:** "We caught a corpus that taught wrong things — 200 examples with hallucinated control names and cookie-cutter content. We discarded it, kept it as audit evidence, and added a corpus quality test that catches the same class of failures. The new corpus is hand-authored, hash-tracked in `lineage-manifest.json`, validated by `TestCorpusQuality` before any training run, and held out from the production eval suite. The discard decision is recorded in D-012 with a full audit table of what was wrong with the original."

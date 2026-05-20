@@ -4,7 +4,7 @@
 
 **Goal:** Scaffold BERU-AI as an independent security analyst model (LLaMA 3.1-8B) that ingests real scanner findings, learns CySA+/NIST triage patterns, and generates CISO-ready risk summaries.
 
-**Architecture:** BERU-AI is a sibling to JADE-AI and KATIE-AI in `GP-MODEL-OPS/`. Independent directory with its own core/, config/, providers/. Shares the training pipeline (`1-local-pipeline/`), data lab (`0-data-lab/`), and RAG ingestion (`2-rag-ingestion/`) infrastructure. No runtime imports between models.
+**Architecture:** BERU-AI is a sibling to JADE-AI and KATIE-AI in `GP-MODEL-OPS/`. Independent directory with its own core/, config/, providers/. Shares the training pipeline (`1-FineTuning-Pipeline/`), data lab (`0-data-lab/`), and RAG ingestion (`2-RagIngestion-Pipeline/`) infrastructure. No runtime imports between models.
 
 **Tech Stack:** Python 3.11, FastAPI, Ollama (LLaMA 3.1-8B-Instruct), ChromaDB (nomic-embed-text 768-dim), Unsloth (LoRA), Pydantic, PyYAML, pytest
 

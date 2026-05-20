@@ -25,8 +25,8 @@ from pathlib import Path
 
 # Paths
 SECLAB_DIR = Path(__file__).parent.parent / "seclab-findings"
-TRAINING_DIR = Path(__file__).parent.parent.parent / "1-local-pipeline" / "01-raw-data-lake"
-RAG_DIR = Path(__file__).parent.parent.parent / "2-rag-ingestion" / "01-unprocessed"
+TRAINING_DIR = Path(__file__).parent.parent.parent / "1-FineTuning-Pipeline" / "01-raw-data-lake"
+RAG_DIR = Path(__file__).parent.parent.parent / "2-RagIngestion-Pipeline" / "01-unprocessed"
 
 # Model tagging rules — keyword-based, not hardcoded
 # Add new models by extending this dict

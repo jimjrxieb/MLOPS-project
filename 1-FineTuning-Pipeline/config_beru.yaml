@@ -1,5 +1,5 @@
 # BERU Training Configuration — 3B base
-# Pipeline: 1-local-pipeline (formerly 1-data-pipeline)
+# Pipeline: 1-FineTuning-Pipeline
 # Authoritative decisions: CAPSTONE-PROJECT/beru-design-decisions.md
 #   D-001 + D-009: base model = LLaMA 3.2-3B-Instruct (rebaselined from 8B)
 #   D-005 + D-012: synthetic-only training data, fresh 500+75 corpus
@@ -49,7 +49,7 @@ training:
 # ── Validation split (D-012 — held-out from training, distinct from eval suites) ─
 validation:
   enabled: true
-  split_file: "1-local-pipeline/01-raw-data-lake/beru_validation_v1.jsonl"
+  split_file: "1-FineTuning-Pipeline/01-raw-data-lake/beru_validation_v1.jsonl"
   not_to_be_confused_with: |
     The 4-eval-clarify/beru_*_brain_v*.jsonl suites are the FINAL held-out evals
     (used post-fine-tune to compute promotion gate scores per D-010).
@@ -57,11 +57,11 @@ validation:
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 paths:
-  pipeline_dir: "1-local-pipeline"
-  raw_input: "1-local-pipeline/01-raw-data-lake/beru_training_v1.jsonl"
-  etl_output: "1-local-pipeline/02-ETL-data/beru_v1"
-  untrained_chunks: "1-local-pipeline/03-chunked-untrained/beru_v1"
-  trained_chunks: "1-local-pipeline/04-trained-data/beru_v1"
+  pipeline_dir: "1-FineTuning-Pipeline"
+  raw_input: "1-FineTuning-Pipeline/01-raw-data-lake/beru_training_v1.jsonl"
+  etl_output: "1-FineTuning-Pipeline/02-ETL-data/beru_v1"
+  untrained_chunks: "1-FineTuning-Pipeline/03-chunked-untrained/beru_v1"
+  trained_chunks: "1-FineTuning-Pipeline/04-trained-data/beru_v1"
   model_registry: "3-model-registry/beru-v1.0-3b"
   eval_dir: "4-eval-clarify"
   results_dir: "4-eval-clarify/3-results/beru"
@@ -98,7 +98,7 @@ promotion_gate:
 # ── Cross-references ─────────────────────────────────────────────────────────
 references:
   design_decisions: "CAPSTONE-PROJECT/beru-design-decisions.md"
-  rag_corpus_collection: "beru-nist-800-53"   # 94 docs in 2-rag-ingestion/05-ragged-data/chroma
+  rag_corpus_collection: "beru-nist-800-53"   # 94 docs in 2-RagIngestion-Pipeline/05-ragged-data/chroma
   baseline_experiment: "5-experiments/exp-005-beru-3b-baseline"
   fine_tune_experiment: "5-experiments/exp-006-beru-v1.0"   # to be created at training time
   model_card: "6-model-cards/challenger/beru-v1.md"

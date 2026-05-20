@@ -24,13 +24,13 @@ from sagemaker.estimator import Estimator
 
 # Paths
 REPO_ROOT = Path(__file__).resolve().parent.parent
-CHUNK_DIR = REPO_ROOT / "1-local-pipeline" / "03-chunked-untrained"
+CHUNK_DIR = REPO_ROOT / "1-FineTuning-Pipeline" / "03-chunked-untrained"
 REGISTRY_DIR = REPO_ROOT / "3-model-registry"
 SM_BUCKET = None  # Auto-detect from SageMaker session
 SM_ROLE = "arn:aws:iam::026090554981:role/service-role/AmazonSageMakerAdminIAMExecutionRole"
 ECR_IMAGE = None  # Set after build, or use HuggingFace DLC + pip install
 
-# Default hyperparameters (match 1-local-pipeline/config.yaml)
+# Default hyperparameters (match 1-FineTuning-Pipeline/config.yaml)
 DEFAULT_HPS = {
     "model_name": "unsloth/Llama-3.2-3B-Instruct",
     "lora_r": "64",

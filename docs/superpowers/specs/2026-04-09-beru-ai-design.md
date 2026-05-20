@@ -15,7 +15,7 @@ BERU is a CySA+ certified security analyst. Not a DevOps engineer (JADE), not a 
 BERU doesn't just know what Nessus is — BERU reads Nessus plugin output the way a human analyst does. Sees a GuardDuty finding and immediately thinks: what NIST control does this map to, what's the blast radius, what do I tell the CISO, and what's the fix.
 
 **Base model**: LLaMA 3.1-8B-Instruct (same base as JADE)
-**Training method**: LoRA fine-tune via `1-local-pipeline/` (r=64, alpha=128, 4-bit quant, Unsloth)
+**Training method**: LoRA fine-tune via `1-FineTuning-Pipeline/` (r=64, alpha=128, 4-bit quant, Unsloth)
 **Serving**: Ollama GGUF (`beru:v1.0`)
 
 ### What BERU Is NOT
@@ -105,9 +105,9 @@ GP-S3/6-seclab-reports/          <- Raw scanner exports from seclab
    generate_risk_summaries.py       - Findings batch -> CISO-ready summary
    generate_tool_navigation.py      - "Here's a Nessus scan, walk me through it"
         |
-        |-->  1-local-pipeline/01-raw-data-lake/  (training JSONL -> LoRA pipeline)
+        |-->  1-FineTuning-Pipeline/01-raw-data-lake/  (training JSONL -> LoRA pipeline)
         |
-        '-->  2-rag-ingestion/01-unprocessed/     (reference docs -> ChromaDB)
+        '-->  2-RagIngestion-Pipeline/01-unprocessed/     (reference docs -> ChromaDB)
 ```
 
 ### Training Data Categories

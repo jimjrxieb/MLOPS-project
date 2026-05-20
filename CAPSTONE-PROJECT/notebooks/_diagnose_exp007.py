@@ -39,7 +39,7 @@ print(f'Model loaded in {time.time()-load_start:.1f}s')
 
 
 # RAG setup
-sys.path.insert(0, str(GP_MODEL_OPS / '2-rag-ingestion' / '04-ingesting'))
+sys.path.insert(0, str(GP_MODEL_OPS / '2-RagIngestion-Pipeline' / '04-ingesting'))
 from ingest_beru_to_chromadb import (  # noqa: E402
     COLLECTION_NAME as RAG_COLLECTION,
     CHROMA_PATH as RAG_CHROMA_PATH,

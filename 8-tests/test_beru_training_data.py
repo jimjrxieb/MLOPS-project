@@ -28,7 +28,7 @@ CHATML_EXAMPLES = TRAINING_DATA_DIR / "chatml-examples" / "beru-training-example
 SSPS_DIR = TRAINING_DATA_DIR / "ssps"
 INTAKE_DIR = TRAINING_DATA_DIR / "intake-samples"
 
-CHROMA_PATH = REPO_ROOT / "GP-MODEL-OPS" / "2-rag-ingestion" / "05-ragged-data" / "chroma"
+CHROMA_PATH = REPO_ROOT / "GP-MODEL-OPS" / "2-RagIngestion-Pipeline" / "05-ragged-data" / "chroma"
 
 # Canonical NIST 800-53 control names — pulled from the source files used by the RAG ingest.
 # This keeps the test in sync with the source of truth: edit the .md, the test follows.

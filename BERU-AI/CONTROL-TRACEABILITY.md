@@ -36,7 +36,7 @@ Paths are relative to `GP-MODEL-OPS/BERU-AI/` unless prefixed.
 | Quantized GGUF | `../3-model-registry/beru-v1.4-3b/gguf/beru-v1.4-q8_0.gguf` | Deployment artifact (Q8_0, 3.4 GB) | Conversion log: `../3-model-registry/beru-v1.4-3b/gguf/convert.log` |
 | Deployment manifest | `Modelfile_beru_v14` | Ollama `Modelfile` — version, system prompt, params, stop tokens | Verify: `ollama show beru:v1.4 --modelfile` |
 | Inference server | Ollama 0.11.7 | Local OpenAI-compatible inference endpoint | `curl http://localhost:11434/api/tags` |
-| RAG corpus | `../2-rag-ingestion/05-ragged-data/chroma/` (collection `beru-nist-800-53`) | 166 docs: 42 controls + 57 AI RMF + 16 ATLAS + 33 SSP + crosswalk + audit playbooks | Ingestion: `../2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py` |
+| RAG corpus | `../2-RagIngestion-Pipeline/05-ragged-data/chroma/` (collection `beru-nist-800-53`) | 166 docs: 42 controls + 57 AI RMF + 16 ATLAS + 33 SSP + crosswalk + audit playbooks | Ingestion: `../2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py` |
 | Provider abstraction | `providers/ollama.py` | HTTP client; resolves model name via `BERU_MODEL` env or default `beru:v1.4` | grep `BERU_MODEL` |
 | Scanner ingestion | `core/findings_ingestion.py`, `core/tool_output_parser.py` | Normalizes 20 scanner formats into common finding dict | `config/scanner_mappings.yaml` |
 | Control tagger | `core/nist_mapper.py` | Deterministic mapping: scanner+keywords → 800-53 + AI RMF subcategories | `validate_control_id`, `validate_ai_rmf_id` |
@@ -54,7 +54,7 @@ Paths are relative to `GP-MODEL-OPS/BERU-AI/` unless prefixed.
 | CLI entry | `run_beru.py` | `audit`, `grade-ssp`, `ask`, `ciso-brief` subcommands | — |
 | Workflow eval | `../4-eval-clarify/beru_workflow_eval_v1.jsonl` (30 questions) + `workflow_scorer.py` | Tests analyst skill (SSP grading, evidence vs. claim, gap ID, authority, handoff) | `../5-experiments/exp-010-beru-v1.4/workflow_eval_results.json` |
 | Pentest eval | `../4-eval-clarify/beru_pentest_brain_v1.jsonl` (22 questions, OWASP-LLM-tagged) | Refusal under adversarial pressure; exp-010 = 81.8% | exp-010 metrics |
-| Promotion gate | `../1-local-pipeline/config_beru.yaml:promotion_gate` | Knowledge ≥ 70%, pentest ≥ 70%, must-beat-baseline, no-regression | `metrics.json:promotion_gate.decision` |
+| Promotion gate | `../1-FineTuning-Pipeline/config_beru.yaml:promotion_gate` | Knowledge ≥ 70%, pentest ≥ 70%, must-beat-baseline, no-regression | `metrics.json:promotion_gate.decision` |
 | Model card | `../6-model-cards/champion/` | Lineage, eval scores, limitations, intended use | — |
 | Experiment record | `../5-experiments/exp-010-beru-v1.4/{params.yaml, metrics.json, notes.md}` | Reproducible training run record | — |
 
@@ -106,7 +106,7 @@ Lower row = strongest claim. Verification refers to commands in §6.
 | Prompt injection | Training-corpus adversarial floor (22%+); pentest_brain eval gates promotion | exp-010 metrics |
 | Jailbreak | Same as prompt injection; refusal in fine-tune (exp-010 pentest 81.8%) | — |
 | Data poisoning (training) | Synthetic-only corpus via `SSPParser._validate_source` | V-4 |
-| RAG poisoning (retrieval) | ChromaDB ingestion is offline + provenance-stamped; per-doc `source_file` retained | `2-rag-ingestion/04-ingesting/ingest_beru_to_chromadb.py` |
+| RAG poisoning (retrieval) | ChromaDB ingestion is offline + provenance-stamped; per-doc `source_file` retained | `2-RagIngestion-Pipeline/04-ingesting/ingest_beru_to_chromadb.py` |
 | Output bias | Per-type workflow scoring; per-OWASP pentest scoring | — |
 | Model supply chain | Modelfile pins the GGUF by absolute path; sha256 logged at `ollama create` | V-3 |
 | Training data integrity | `lineage-manifest.json`; experiment records | `training-data/lineage-manifest.json` |

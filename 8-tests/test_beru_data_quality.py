@@ -2,7 +2,7 @@
 
 Maps to OWASP LLM Top 10 — LLM04 (Data and Model Poisoning) and LLM02 (Sensitive
 Information Disclosure in training data). Validates every ChatML corpus before it
-can be merged + trained. CI runs this on every PR touching BERU-AI or 1-local-pipeline.
+can be merged + trained. CI runs this on every PR touching BERU-AI or 1-FineTuning-Pipeline.
 
 What this checks per corpus file:
   - ChatML schema:  each line a JSON object with {"messages": [{role, content}, ...]},
@@ -35,9 +35,9 @@ CORPUS_PATHS = [
     GP_MODEL_OPS / "BERU-AI" / "training-data" / "chatml-examples" / "beru-training-examples.jsonl",
     GP_MODEL_OPS / "BERU-AI" / "training-data" / "chatml-examples" / "exp011_ssp_grading.jsonl",
     GP_MODEL_OPS / "BERU-AI" / "training-data" / "chatml-examples" / "exp012_ssp_grading.jsonl",
-    GP_MODEL_OPS / "1-local-pipeline" / "01-raw-data-lake" / "beru_training_v1.jsonl",
-    GP_MODEL_OPS / "1-local-pipeline" / "01-raw-data-lake" / "beru_training_exp011.jsonl",
-    GP_MODEL_OPS / "1-local-pipeline" / "01-raw-data-lake" / "beru_training_exp012.jsonl",
+    GP_MODEL_OPS / "1-FineTuning-Pipeline" / "01-raw-data-lake" / "beru_training_v1.jsonl",
+    GP_MODEL_OPS / "1-FineTuning-Pipeline" / "01-raw-data-lake" / "beru_training_exp011.jsonl",
+    GP_MODEL_OPS / "1-FineTuning-Pipeline" / "01-raw-data-lake" / "beru_training_exp012.jsonl",
 ]
 
 # Secret-shape detectors. Anchored / strict so we don't false-positive on the

@@ -53,7 +53,7 @@ MEASURE is the evaluation layer. GOVERN created the policies. MAP identified the
 **In plain English:** Anyone can reproduce your evaluation from the documentation alone
 **BERU Evidence Required:**
 - Eval suite JSONL files in `4-eval-clarify/`: `beru_knowledge_brain_v2.jsonl` (30 questions), `beru_pentest_brain_v1.jsonl` (22 questions, 10 OWASP LLM categories)
-- Validation set held-out at `1-local-pipeline/01-raw-data-lake/beru_validation_v1.jsonl` (75 examples)
+- Validation set held-out at `1-FineTuning-Pipeline/01-raw-data-lake/beru_validation_v1.jsonl` (75 examples)
 - Lineage manifest at `BERU-AI/training-data/lineage-manifest.json` records SHA-256 per eval suite
 
 **Auditor Question:** "Hand me your eval set. Can I run it against the model and get the same number you reported?"
@@ -181,7 +181,7 @@ MEASURE is the evaluation layer. GOVERN created the policies. MAP identified the
 **Subcategory:** Feedback gathered from operators and users about negative AI impact
 **BERU Evidence Required:**
 - Feedback endpoint in `GP-INFRA/GP-API/routes/feedback.py` collects user-reported BERU errors
-- Feedback loop in `1-local-pipeline/feedback_loop.py` identifies categories where BERU underperforms
+- Feedback loop in `1-FineTuning-Pipeline/feedback_loop.py` identifies categories where BERU underperforms
 - HITL approver disagreement rates tracked; sustained disagreement triggers a re-evaluation of the rank assignment logic
 
 ---

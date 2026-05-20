@@ -29,7 +29,7 @@ except ImportError:
     HAS_TRAINING_DEPS = False
 
 # Directories
-BASE_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/1-local-pipeline")
+BASE_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/1-FineTuning-Pipeline")
 GP_ROOT = Path("/home/jimmie/linkops-industries/GP-copilot")
 CHUNK_DIR = BASE_DIR / "03-chunked-untrained"
 HOLDOUT_DIR = BASE_DIR / "03-eval-holdout"

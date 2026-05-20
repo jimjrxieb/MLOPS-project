@@ -5,7 +5,7 @@ GP-CONSULTING Reference → RAG Ingestion Extractor
 Extracts reference materials (configs, templates, examples) from
 GP-CONSULTING 01-03 into the RAG ingestion pipeline.
 
-Copies files to: 2-rag-ingestion/01-unprocessed/consulting-knowledge/
+Copies files to: 2-RagIngestion-Pipeline/01-unprocessed/consulting-knowledge/
 The RAG pipeline (preprocess → sanitize → chunk → label → embed) handles the rest.
 
 Reference material = things that change, need to be cited, or are looked up:
@@ -22,7 +22,7 @@ import shutil
 from pathlib import Path
 
 GP_CONSULTING = Path("/home/jimmie/linkops-industries/GP-copilot/GP-CONSULTING")
-RAG_OUTPUT = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/2-rag-ingestion/01-unprocessed/consulting-knowledge")
+RAG_OUTPUT = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/2-RagIngestion-Pipeline/01-unprocessed/consulting-knowledge")
 
 # What goes to RAG (NOT training):
 # Pattern: (source_glob_relative_to_package, rag_subdirectory)
@@ -116,11 +116,11 @@ def main():
     print(f"Output: {RAG_OUTPUT}")
     print(f"{'='*60}")
     print(f"\nNext: Run the RAG prep factory stages:")
-    print(f"  cd GP-MODEL-OPS/2-rag-ingestion/02-preperation-factory/")
+    print(f"  cd GP-MODEL-OPS/2-RagIngestion-Pipeline/02-preperation-factory/")
     print(f"  python -m stages.discover")
     print(f"  python -m stages.preprocess")
     print(f"  # ... through stages.validators")
-    print(f"  python 2-rag-ingestion/04-ingesting/ingest_to_chromadb.py")
+    print(f"  python 2-RagIngestion-Pipeline/04-ingesting/ingest_to_chromadb.py")
 
 
 if __name__ == "__main__":

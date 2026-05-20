@@ -575,7 +575,7 @@ print(f'Entities found: {[r.entity_type for r in results]}')
 # Expected: ['PHONE_NUMBER']
 ```
 
-**Evidence artifact**: Presidio scan log per RAG ingestion run in `GP-MODEL-OPS/2-rag-ingestion/`
+**Evidence artifact**: Presidio scan log per RAG ingestion run in `GP-MODEL-OPS/2-RagIngestion-Pipeline/`
 
 ---
 

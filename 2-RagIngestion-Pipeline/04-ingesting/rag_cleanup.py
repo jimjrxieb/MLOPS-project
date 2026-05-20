@@ -23,7 +23,7 @@ import argparse
 
 # Paths
 SCRIPT_DIR = Path(__file__).parent
-RAG_ROOT = SCRIPT_DIR.parent  # GP-MODEL-OPS/2-rag-ingestion/
+RAG_ROOT = SCRIPT_DIR.parent  # GP-MODEL-OPS/2-RagIngestion-Pipeline/
 CHROMA_PATH = RAG_ROOT / "05-ragged-data" / "chroma"
 
 # Basic definitions JADE v0.9 already knows from training

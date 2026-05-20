@@ -16,7 +16,7 @@ GP-PROJECTS/{instance}/{slot}/jsa/inbox/  ←── real JSA findings
     │  5. Save      →  JSONL + stats + report │
     └─────────────────────────────────────────┘
               ↓
-    1-local-pipeline/01-raw-data-lake/   ←── training corpus
+    1-FineTuning-Pipeline/01-raw-data-lake/   ←── training corpus
 ```
 
 ### Components
@@ -441,7 +441,7 @@ GP-MODEL-OPS/
 │       ├── quality_validator.py
 │       ├── pipeline.py
 │       └── crew/               # CrewAI crew
-└── 1-local-pipeline/
+└── 1-FineTuning-Pipeline/
     └── 01-raw-data-lake/       # Output from this pipeline drops here
         ├── training_YYYYMMDD_HHMMSS.jsonl
         ├── training_YYYYMMDD_HHMMSS.stats.json
@@ -458,17 +458,17 @@ GP-MODEL-OPS/
 
 2. **Merge with Corpus**:
    ```bash
-   cat 1-local-pipeline/01-raw-data-lake/training_*.jsonl >> master_corpus.jsonl
+   cat 1-FineTuning-Pipeline/01-raw-data-lake/training_*.jsonl >> master_corpus.jsonl
    ```
 
 3. **Create Training Chunks**:
    ```bash
-   python3 1-local-pipeline/chunk_data.py
+   python3 1-FineTuning-Pipeline/chunk_data.py
    ```
 
 4. **Fine-tune**:
    ```bash
-   python3 1-local-pipeline/train_v11.py
+   python3 1-FineTuning-Pipeline/train_v11.py
    ```
 
 ## CLI Commands
@@ -745,6 +745,6 @@ for quality_level, items in validation['by_quality'].items():
 
 ## Feeds Into
 
-`1-local-pipeline/` → `chunk_data.py` → `train_v11.py` → `3-model-registry/`
+`1-FineTuning-Pipeline/` → `chunk_data.py` → `train_v11.py` → `3-model-registry/`
 
-Output JSONL drops to `1-local-pipeline/01-raw-data-lake/`. ETL picks it up on the next run.
+Output JSONL drops to `1-FineTuning-Pipeline/01-raw-data-lake/`. ETL picks it up on the next run.

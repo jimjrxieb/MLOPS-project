@@ -7,7 +7,7 @@
 
 ## Summary
 
-Build the RAG ingestion prep crew for `2-rag-ingestion/02-preperation-factory/` and consolidate **all CrewAI/AI automation code** into a new top-level directory `GP-MODEL-OPS/crewai-mlops/`.
+Build the RAG ingestion prep crew for `2-RagIngestion-Pipeline/02-preperation-factory/` and consolidate **all CrewAI/AI automation code** into a new top-level directory `GP-MODEL-OPS/crewai-mlops/`.
 
 Two things happen in parallel:
 1. **Reorganization:** Move existing crews (`synthetic-pipeline/crew/` and `BERU-AI/crew/`) into `crewai-mlops/` — one home for all CrewAI work.
@@ -145,7 +145,7 @@ python3 -m crewai_mlops.rag_ingestion.main run --min-quality 70
 
 ### Output Files
 
-Written to `2-rag-ingestion/03-preprocessed/`:
+Written to `2-RagIngestion-Pipeline/03-preprocessed/`:
 - `processed_{timestamp}.jsonl` — clean JSONL ready for `04-ingesting/ingest_to_chromadb.py`
 - `crew-report_{timestamp}.md` — human-readable: quality gate distribution, labeling coverage, collection routing table, agent overrides, go/no-go
 

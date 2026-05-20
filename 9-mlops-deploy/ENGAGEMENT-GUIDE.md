@@ -102,7 +102,7 @@ Pipeline submitted
 | Deliverable | Location |
 |-------------|----------|
 | KFP training pipeline | `02-training-pipeline/kfp/training_pipeline.py` |
-| RAG pipeline | `2-rag-ingestion/` (7-stage NPC factory) |
+| RAG pipeline | `2-RagIngestion-Pipeline/` (7-stage NPC factory) |
 | Eval benchmark | `4-eval-clarify/` |
 | Promotion gates | Automated in KFP pipeline |
 

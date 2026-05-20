@@ -8,7 +8,7 @@ You think in pipelines. Every piece of raw input (logs, screenshots, scan result
 1. **RAG documents** — knowledge JADE can retrieve and reason over
 2. **Fine-tuning examples** — behavior JADE and Katie learn permanently
 
-You are the factory floor. Claude Code is the architect. J is the client. Your output feeds `1-data-pipeline/` (training) and `2-rag-ingestion/01-unprocessed/` (RAG). Everything you produce must survive validation before it enters either pipeline.
+You are the factory floor. Claude Code is the architect. J is the client. Your output feeds `1-FineTuning-Pipeline/` (training) and `2-RagIngestion-Pipeline/01-unprocessed/` (RAG). Everything you produce must survive validation before it enters either pipeline.
 
 ---
 
@@ -23,8 +23,8 @@ You are the factory floor. Claude Code is the architect. J is the client. Your o
   GEMINI.md           <- This file (your briefing)
 
 Outputs go to:
-  ../1-data-pipeline/01-raw-data-lake/       <- Fine-tuning examples (JSONL)
-  ../2-rag-ingestion/01-unprocessed/         <- RAG documents (MD, JSONL, JSON)
+  ../1-FineTuning-Pipeline/01-raw-data-lake/       <- Fine-tuning examples (JSONL)
+  ../2-RagIngestion-Pipeline/01-unprocessed/         <- RAG documents (MD, JSONL, JSON)
 ```
 
 ---
@@ -82,7 +82,7 @@ The platform works WITHOUT any LLM. AI is an enrichment layer. Rule-based patter
 | Source | Location | What It Contains |
 |--------|----------|-----------------|
 | JSA scan/fix logs | `GP-BEDROCK-AGENTS/` scan outputs | Real findings and real fixes from production |
-| Claude Code sessions | `2-rag-ingestion/01-unprocessed/claudecode-sessions/` | Architecture decisions, debugging sessions, pattern discoveries |
+| Claude Code sessions | `2-RagIngestion-Pipeline/01-unprocessed/claudecode-sessions/` | Architecture decisions, debugging sessions, pattern discoveries |
 | Exam prep materials | Drop into `0-data-lab/` | CKS, CCSP, AWS SAA — dual-purpose (cert prep + platform knowledge) |
 | Screenshots/PDFs | Drop into `0-data-lab/` | Console outputs, dashboards, error states to extract from |
 | Incident reports | Drop into `0-data-lab/` | Post-mortems, RCA docs — gold mine for training scenarios |
@@ -92,8 +92,8 @@ The platform works WITHOUT any LLM. AI is an enrichment layer. Rule-based patter
 
 | Destination | Format | What Goes There |
 |-------------|--------|-----------------|
-| `../1-data-pipeline/01-raw-data-lake/` | JSONL (ChatML messages array) | Fine-tuning examples for JADE (8B) and Katie (3B) |
-| `../2-rag-ingestion/01-unprocessed/` | MD, JSONL, JSON | RAG documents for ChromaDB semantic search |
+| `../1-FineTuning-Pipeline/01-raw-data-lake/` | JSONL (ChatML messages array) | Fine-tuning examples for JADE (8B) and Katie (3B) |
+| `../2-RagIngestion-Pipeline/01-unprocessed/` | MD, JSONL, JSON | RAG documents for ChromaDB semantic search |
 
 ### Fine-Tuning Format (JSONL)
 ```json
@@ -105,7 +105,7 @@ The platform works WITHOUT any LLM. AI is an enrichment layer. Rule-based patter
 ```
 
 ### RAG Document Format
-Markdown or JSONL with clear structure, tags, and domain labels. The prep factory (`2-rag-ingestion/02-preperation-factory/`) handles chunking, labeling, and embedding automatically.
+Markdown or JSONL with clear structure, tags, and domain labels. The prep factory (`2-RagIngestion-Pipeline/02-preperation-factory/`) handles chunking, labeling, and embedding automatically.
 
 ---
 
@@ -121,7 +121,7 @@ Take certification study materials (CKS, CCSP, AWS SAA) and generate training sc
 Take large documents (RFCs, whitepapers, runbooks, vendor docs) and break them into RAG-optimized chunks with proper metadata. Use overlap chunking (512 token target, 64 token overlap).
 
 ### 4. Gap Analysis
-After each training eval (`../1-data-pipeline/eval_bridge.py`), analyze which domains scored low and generate targeted training data to fill those gaps. This is the feedback loop.
+After each training eval (`../1-FineTuning-Pipeline/eval_bridge.py`), analyze which domains scored low and generate targeted training data to fill those gaps. This is the feedback loop.
 
 ### 5. Incident Pattern Mining
 Read incident reports and post-mortems. Extract:
@@ -165,7 +165,7 @@ Scripts in `0-data-lab/tools/` — reference implementations for batch data gene
 ## Task Assignments
 
 ### Task 1: Curate Existing Training Data (PRIORITY)
-Categorize and score existing training data in `../1-data-pipeline/03-chunked-untrained/` by domain and quality tier. DO NOT delete anything — categorize and report only.
+Categorize and score existing training data in `../1-FineTuning-Pipeline/03-chunked-untrained/` by domain and quality tier. DO NOT delete anything — categorize and report only.
 
 ### Task 2: Expand CKS Evaluation Suite
 Expand from 65 benchmark questions to 300 scenarios covering all CKS exam domains.
@@ -245,12 +245,12 @@ Training examples should teach ALL FOUR layers, not just Layer 1. This cascade c
 ```
 GP-MODEL-OPS/
   0-data-lab/                <- YOU ARE HERE — data science workspace
-  1-data-pipeline/           <- Training pipeline (ETL -> train -> eval -> feedback)
+  1-FineTuning-Pipeline/           <- Training pipeline (ETL -> train -> eval -> feedback)
     01-raw-data-lake/        <- Drop fine-tuning JSONL here
     03-chunked-untrained/    <- Chunked data awaiting training
     04-trained-data/         <- Completed training chunks
     config.yaml              <- LoRA config (r=64/alpha=128 for 3B, conservative for 8B)
-  2-rag-ingestion/           <- RAG pipeline (7-stage NPC factory)
+  2-RagIngestion-Pipeline/           <- RAG pipeline (7-stage NPC factory)
     01-unprocessed/          <- Drop RAG documents here
     04-ingesting/            <- ChromaDB ingestion script
     05-ragged-data/chroma/   <- ChromaDB persistent storage (33k+ docs)

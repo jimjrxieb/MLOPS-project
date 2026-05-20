@@ -1,4 +1,4 @@
-# 1-local-pipeline — Training Engine
+# 1-FineTuning-Pipeline — Training Engine
 
 7-step LoRA fine-tuning pipeline for BERU, JADE, and Katie running on local GPU (RTX 5080). Data flows forward through numbered directories. Files archive after each step. Includes a closed feedback loop from eval gaps back to training.
 
@@ -38,7 +38,7 @@
 ## Directory Structure
 
 ```text
-1-local-pipeline/
+1-FineTuning-Pipeline/
 ├── 01-raw-data-lake/       ← Raw input (gitignored — drop JSONL here)
 ├── 02-ETL-data/            ← Cleaned JSONL output from etl_pipeline.py (gitignored)
 ├── 03-chunked-untrained/   ← 5k-10k chunks ready for training (gitignored)
@@ -64,7 +64,7 @@
 ## Quick Start
 
 ```bash
-cd GP-MODEL-OPS/1-local-pipeline
+cd GP-MODEL-OPS/1-FineTuning-Pipeline
 
 # Step 1: ETL — normalize and deduplicate
 python3 etl_pipeline.py --dry-run   # preview first

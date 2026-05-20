@@ -29,8 +29,8 @@ import yaml
 GP_MODEL_OPS  = Path('/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS')
 REPO_ROOT     = GP_MODEL_OPS.parent
 CORPUS_PATH   = GP_MODEL_OPS / 'BERU-AI' / 'training-data' / 'chatml-examples' / 'beru-training-examples.jsonl'
-VAL_PATH      = GP_MODEL_OPS / '1-local-pipeline' / '01-raw-data-lake' / 'beru_validation_v1.jsonl'
-CONFIG_PATH   = GP_MODEL_OPS / '1-local-pipeline' / 'config_beru.yaml'
+VAL_PATH      = GP_MODEL_OPS / '1-FineTuning-Pipeline' / '01-raw-data-lake' / 'beru_validation_v1.jsonl'
+CONFIG_PATH   = GP_MODEL_OPS / '1-FineTuning-Pipeline' / 'config_beru.yaml'
 BASELINE_DIR  = GP_MODEL_OPS / '5-experiments' / 'exp-005-beru-3b-baseline'
 EXP007_DIR    = GP_MODEL_OPS / '5-experiments' / 'exp-007-beru-v1.1'
 EXP_DIR       = GP_MODEL_OPS / '5-experiments' / 'exp-008-beru-v1.2'
@@ -232,7 +232,7 @@ print('=' * 70); print('Phase 7 — Eval with RAG top_k=2'); print('=' * 70)
 
 FastLanguageModel.for_inference(model)
 
-sys.path.insert(0, str(GP_MODEL_OPS / '2-rag-ingestion' / '04-ingesting'))
+sys.path.insert(0, str(GP_MODEL_OPS / '2-RagIngestion-Pipeline' / '04-ingesting'))
 from ingest_beru_to_chromadb import (
     COLLECTION_NAME as RAG_COLLECTION,
     CHROMA_PATH as RAG_CHROMA_PATH,
@@ -458,7 +458,7 @@ Fix #5 (adversarial floor 30→25%) was **DEFERRED** to isolate variables — if
 - Adapter:        `{ADAPTER_OUT.relative_to(REPO_ROOT)}`
 - Merged model:   `{MERGED_OUT.relative_to(REPO_ROOT)}`
 - Training data:  `BERU-AI/training-data/chatml-examples/beru-training-examples.jsonl` ({len(corpus)} examples, unchanged)
-- Validation:     `1-local-pipeline/01-raw-data-lake/beru_validation_v1.jsonl` ({len(val)} examples)
+- Validation:     `1-FineTuning-Pipeline/01-raw-data-lake/beru_validation_v1.jsonl` ({len(val)} examples)
 - Eval suites:    `4-eval-clarify/beru_knowledge_brain_v2.jsonl` (30) + `beru_pentest_brain_v1.jsonl` (22)
 - Baseline:       `5-experiments/exp-005-beru-3b-baseline/metrics.json`
 - Prior exp:      `5-experiments/exp-006-beru-v1.0/metrics.json`

@@ -36,7 +36,7 @@ import requests
 
 EVAL_DIR = Path(__file__).resolve().parent
 RESULTS_ROOT = EVAL_DIR / "3-results" / "beru"
-INGEST_DIR = EVAL_DIR.parent / "2-rag-ingestion" / "04-ingesting"
+INGEST_DIR = EVAL_DIR.parent / "2-RagIngestion-Pipeline" / "04-ingesting"
 
 # Import RAG access objects from BERU's ingest script so retrieval at
 # eval time uses the exact same embedding function and collection name.

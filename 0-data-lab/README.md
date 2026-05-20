@@ -2,7 +2,7 @@
 
 Raw data goes in. Training-ready JSONL comes out.
 
-This is where the corpus gets built — one gap at a time. Every time an eval run shows a weak category, the fix starts here: write a generator, produce examples, validate them, drop them into `1-local-pipeline/01-raw-data-lake/`.
+This is where the corpus gets built — one gap at a time. Every time an eval run shows a weak category, the fix starts here: write a generator, produce examples, validate them, drop them into `1-FineTuning-Pipeline/01-raw-data-lake/`.
 
 ---
 
@@ -34,7 +34,7 @@ Each script builds a specific batch of ChatML training examples for one domain o
 | Hardening | `generate_hardening_batch.py`, `generate_netpol_batch.py` |
 | Eval repair | `generate_eval_corrections.py` — fixes wrong answers caught in live eval |
 
-All generators write to `1-local-pipeline/01-raw-data-lake/` (gitignored).
+All generators write to `1-FineTuning-Pipeline/01-raw-data-lake/` (gitignored).
 
 ```bash
 python3 tools/generate_cks_scenarios.py
@@ -77,7 +77,7 @@ mlops-loop-training/
     finding-accuracy-30.jsonl  ← 30 SSP-claim-vs-evidence grading examples
 ```
 
-Once validated with `8-tests/test_beru_data_quality.py`, move to `1-local-pipeline/01-raw-data-lake/`.
+Once validated with `8-tests/test_beru_data_quality.py`, move to `1-FineTuning-Pipeline/01-raw-data-lake/`.
 
 ---
 
@@ -101,7 +101,7 @@ Real findings (seclab-findings/, claudecode-fixes/, ci-evidence/)
           ↓
     Validate: python3 -m pytest 8-tests/test_beru_data_quality.py -v
           ↓
-    1-local-pipeline/01-raw-data-lake/   ← training corpus (gitignored)
+    1-FineTuning-Pipeline/01-raw-data-lake/   ← training corpus (gitignored)
           ↓
-    1-local-pipeline/etl_pipeline.py     ← ETL → chunk → train
+    1-FineTuning-Pipeline/etl_pipeline.py     ← ETL → chunk → train
 ```
