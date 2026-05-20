@@ -167,3 +167,28 @@ class TestAgents:
         )
         roles = [a().role for a in [quality_reviewer, semantic_labeler, routing_validator, pipeline_reporter]]
         assert len(roles) == len(set(roles)), "duplicate agent role detected"
+
+
+class TestCrew:
+    """prep_crew.py: crew has 4 tasks in correct dependency order."""
+
+    def test_build_prep_crew_returns_crew_with_four_tasks(self):
+        from crewai_mlops.rag_ingestion.crews.prep_crew import build_prep_crew
+        crew = build_prep_crew()
+        assert len(crew.tasks) == 4
+
+    def test_tasks_have_correct_agent_assignments(self):
+        from crewai_mlops.rag_ingestion.crews.prep_crew import build_prep_crew
+        crew = build_prep_crew()
+        roles = [task.agent.role for task in crew.tasks]
+        assert roles[0] == "RAG Quality Gatekeeper"
+        assert roles[1] == "Semantic Domain Classifier"
+        assert roles[2] == "Collection Routing Auditor"
+        assert roles[3] == "RAG Coverage Analyst"
+
+    def test_report_task_has_context_from_all_prior_tasks(self):
+        from crewai_mlops.rag_ingestion.crews.prep_crew import build_prep_crew
+        crew = build_prep_crew()
+        report_task = crew.tasks[3]
+        assert report_task.context is not None
+        assert len(report_task.context) == 3
