@@ -6,7 +6,7 @@ Extract, Transform, Load data from MULTIPLE sources to 02-ETL-data
 
 BEHAVIOR:
 - Processes ALL .jsonl files from BOTH:
-  - 00-processed/ (benchmark training data, gap data)
+  - 04-processed/ (benchmark training data, gap data)
   - 01-raw-data-lake/ (raw session data, scraped content)
 - Deduplicates examples via MD5 hash
 - Labels examples based on subdirectory (policy, compliance, benchmark-training, etc.)
@@ -57,7 +57,7 @@ ETL_DIR = BASE_DIR / "02-ETL-data"
 
 # Source directories to process (in order)
 SOURCE_DIRS = [
-    BASE_DIR / "00-processed",      # Benchmark training data, gap training
+    BASE_DIR / "04-processed",      # Benchmark training data, gap training
     BASE_DIR / "01-raw-data-lake",  # Raw session data, scraped content
 ]
 
