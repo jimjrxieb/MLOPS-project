@@ -1,0 +1,170 @@
+name: cmmc-level2
+version: "1.0"
+description: >
+  BERU crew for CMMC 2.0 Level 2 compliance assessment.
+  Collects evidence via kubectl + AWS CLI (no LLM) for API-assessable domains,
+  assigns MET/NOT MET/NOT APPLICABLE per domain with SPRS score estimate,
+  then produces a Security Assessment Report and POA&M registry.
+  Domains that require process artifacts (AT, MA, MP, PE, PS) are flagged
+  for C3PAO document review — crew never hallucinating a determination
+  for items it cannot verify via API.
+
+framework: CMMC 2.0
+baseline: Level 2  # 110 practices — NIST SP 800-171 Rev 2
+assessment_body: C3PAO  # Certified Third-Party Assessment Organization
+scoring_system: SPRS   # Supplier Performance Risk System, 0–110 range
+
+domains:
+  AC:
+    name: Access Control
+    total_practices: 22
+    breakdown: "4 L1 + 18 L2"
+  AT:
+    name: Awareness and Training
+    total_practices: 3
+    breakdown: "3 L2"
+  AU:
+    name: Audit and Accountability
+    total_practices: 9
+    breakdown: "9 L2"
+  CA:
+    name: Security Assessment
+    total_practices: 4
+    breakdown: "4 L2"
+  CM:
+    name: Configuration Management
+    total_practices: 9
+    breakdown: "9 L2"
+  IA:
+    name: Identification and Authentication
+    total_practices: 11
+    breakdown: "2 L1 + 9 L2"
+  IR:
+    name: Incident Response
+    total_practices: 3
+    breakdown: "3 L2"
+  MA:
+    name: Maintenance
+    total_practices: 6
+    breakdown: "6 L2"
+  MP:
+    name: Media Protection
+    total_practices: 9
+    breakdown: "9 L2"
+  PE:
+    name: Physical Protection
+    total_practices: 6
+    breakdown: "6 L1"
+  PS:
+    name: Personnel Security
+    total_practices: 2
+    breakdown: "2 L2"
+  RA:
+    name: Risk Assessment
+    total_practices: 3
+    breakdown: "3 L2"
+  SC:
+    name: System and Communications Protection
+    total_practices: 16
+    breakdown: "2 L1 + 14 L2"
+  SI:
+    name: System and Information Integrity
+    total_practices: 7
+    breakdown: "5 L1 + 2 L2"
+  SR:
+    name: Supply Chain Risk Management
+    total_practices: 3
+    breakdown: "3 L2"
+
+architecture:
+  step_1_collect:
+    type: python
+    module: collectors.py
+    function: run_cmmc_collectors
+    description: >
+      Pure Python collectors — no LLM, no CrewAI.
+      kubectl + AWS CLI evidence gathering for API-assessable domains.
+  step_2_assess:
+    type: crewai_agent
+    agent: assessor
+    output: domain_assessments_and_sprs_estimate
+    description: >
+      CMMC assessor agent — assigns MET/NOT MET/NOT APPLICABLE per domain
+      with SPRS score contribution estimate.
+  step_3_sar:
+    type: crewai_agent
+    agent: sar_writer
+    output: security_assessment_report
+    description: >
+      SAR writer — structured Security Assessment Report with SPRS score
+      summary and dedicated section for items requiring C3PAO process review.
+  step_4_poam:
+    type: crewai_agent
+    agent: poam_writer
+    output: poam_registry
+    description: >
+      POA&M writer — practice-level remediation items for each NOT MET finding.
+
+cannot_assess_via_api:
+  - "AT domain: Security awareness training records — requires HR/LMS documentation review"
+  - "MA domain: Maintenance procedures and authorized maintenance personnel — requires policy/procedure review"
+  - "MP domain: Media sanitization and transport records — requires physical controls documentation review"
+  - "PE domain: Physical access controls, visitor logs, physical security records — requires on-site review"
+  - "PS domain: Personnel screening and termination procedures — requires HR records review"
+  - "IR.L2-3.6.3: Incident response test records — requires after-action reports from tabletop exercises"
+  - "CA.L2-3.12.1: Formal security assessment methodology — requires SSP and policy document review"
+  - "CA.L2-3.12.4: SSP completeness — requires document review and stakeholder interview"
+
+api_assessable_domains:
+  - AC    # Access Control — RBAC, network policies, IAM
+  - AU    # Audit and Accountability — CloudTrail, EKS audit logging, log shippers
+  - CA    # Security Assessment — partial (3.12.2 and 3.12.3 via API proxy)
+  - CM    # Configuration Management — policy engine, GitOps, container security
+  - IA    # Identification and Authentication — MFA, credential report, IRSA
+  - IR    # Incident Response — partial (3.6.1 and 3.6.2 via API proxy)
+  - RA    # Risk Assessment — Trivy scanning, vulnerability management
+  - SC    # System and Communications Protection — NetworkPolicy, encryption, mTLS
+  - SI    # System and Information Integrity — Falco, security contexts, GuardDuty
+  - SR    # Supply Chain Risk Management — image registries, signing, ECR scanning
+
+key_practices_by_domain:
+  AC: [AC.L2-3.1.1, AC.L2-3.1.5, AC.L2-3.1.12, AC.L2-3.1.13]
+  AU: [AU.L2-3.3.1, AU.L2-3.3.2, AU.L2-3.3.4, AU.L2-3.3.8]
+  CA: [CA.L2-3.12.1, CA.L2-3.12.2, CA.L2-3.12.3, CA.L2-3.12.4]
+  CM: [CM.L2-3.4.1, CM.L2-3.4.2, CM.L2-3.4.3, CM.L2-3.4.6]
+  IA: [IA.L2-3.5.3, IA.L2-3.5.7, IA.L2-3.5.8, IA.L2-3.5.10]
+  IR: [IR.L2-3.6.1, IR.L2-3.6.2, IR.L2-3.6.3]
+  RA: [RA.L2-3.11.1, RA.L2-3.11.2, RA.L2-3.11.3]
+  SC: [SC.L2-3.13.6, SC.L2-3.13.8, SC.L2-3.13.11, SC.L2-3.13.16]
+  SI: [SI.L1-3.14.1, SI.L1-3.14.2, SI.L2-3.14.6, SI.L2-3.14.7]
+  SR: [SR.L2-3.17.1, SR.L2-3.17.2, SR.L2-3.17.3]
+  AT: []  # requires process review
+  MA: []  # requires process review
+  MP: []  # requires process review
+  PE: []  # requires process review
+  PS: []  # requires process review
+
+sprs_scoring:
+  max_score: 110
+  note: >
+    Actual SPRS uses DoD-specific weighting table (some practices weighted higher).
+    This crew uses a conservative planning estimate of 1 point per practice.
+    Official SPRS score requires DoD assessment table and C3PAO validation.
+  cannot_assess_practices: 8
+  note_on_cannot_assess: >
+    8 practices/domains require C3PAO process review. These are excluded from
+    the automated SPRS estimate. Final SPRS score may differ after process review.
+
+rationale: >
+  CMMC 2.0 Level 2 has 110 practices across 15 domains. Many practices require
+  physical access, HR records, policy documents, or tabletop exercise artifacts
+  that cannot be verified via kubectl or AWS CLI. This crew strictly enforces
+  the API vs. process boundary — agents use MET/NOT MET/NA only for API-assessable
+  evidence, and flag process-only items for C3PAO review rather than hallucinating
+  a determination. This is the same pattern used by the AI Safety M-23-07 crew.
+
+rank_boundaries:
+  automated: D
+  propose: C
+  escalate: B
+  human_only: S

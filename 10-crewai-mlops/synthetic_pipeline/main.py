@@ -11,6 +11,7 @@ Endpoints:
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -18,7 +19,15 @@ import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-from .crews.pipeline_crew import build_pipeline_crew
+os.environ.setdefault("CREWAI_STORAGE_DIR", "/tmp/crewai-storage")
+
+if __package__:
+    from .crews.pipeline_crew import build_pipeline_crew
+else:
+    _PACKAGE_ROOT = Path(__file__).resolve().parents[1]
+    if str(_PACKAGE_ROOT) not in sys.path:
+        sys.path.insert(0, str(_PACKAGE_ROOT))
+    from synthetic_pipeline.crews.pipeline_crew import build_pipeline_crew
 
 app = FastAPI(
     title="Synthetic Data Pipeline Crew",

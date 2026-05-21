@@ -1,0 +1,75 @@
+name: icam-m24-04
+version: "1.0"
+description: >
+  BERU crew for M-24-04 ICAM compliance assessment.
+  Collects identity/credential/access evidence via kubectl + AWS CLI (no LLM),
+  then runs assessor → sar_writer → poam_writer against ICAM service requirements.
+
+controls:
+  - IA-2    # Multi-Factor Authentication
+  - IA-4    # Identifier Management (Identity Proofing)
+  - IA-5    # Authenticator Management (Credentialing)
+  - AC-2    # Account Management (Authorization lifecycle)
+  - AC-6    # Least Privilege (Authorization)
+  - AC-17   # Remote Access (Federation)
+  - SC-8    # Transmission Confidentiality (Federation/encryption)
+
+framework: M-24-04
+baseline: ICAM-Mandate  # phishing-resistant MFA + no long-lived static credentials
+
+playbook: GP-CONSULTING/07-OMB-LENS/playbooks/M-24-04-playbooks/01-implement-icam-authentication.md
+
+architecture:
+  step_1_collect:
+    type: python
+    module: collectors.py
+    function: run_icam_collectors
+  step_2_assess:
+    type: crewai_agent
+    agent: assessor
+    output: icam_service_determinations
+  step_3_sar:
+    type: crewai_agent
+    agent: sar_writer
+    output: icam_compliance_report
+  step_4_poam:
+    type: crewai_agent
+    agent: poam_writer
+    output: poam_registry
+
+icam_services:
+  Authentication:
+    controls: [IA-2]
+    mandate: "Phishing-resistant MFA (FIDO2/WebAuthn or PIV/CAC) for all users by FY2024"
+    non_compliant: "TOTP, SMS, push-notification MFA"
+    compliant: "FIDO2 hardware tokens, PIV/CAC smart cards"
+  Identity_Proofing:
+    controls: [IA-4]
+    mandate: "IAL2 identity proofing before privileged account creation"
+    non_compliant: "Self-attested identity, no proofing record"
+    compliant: "Government-issued ID verification, documented proofing record"
+  Credentialing:
+    controls: [IA-5]
+    mandate: "No long-lived static credentials; automated rotation required"
+    non_compliant: "IAM users with long-term access keys, static passwords"
+    compliant: "IRSA, instance profiles, managed identities, automated rotation"
+  Authorization:
+    controls: [AC-2, AC-6]
+    mandate: "Full account lifecycle; least privilege; quarterly review for privileged"
+    non_compliant: "Manual provisioning, no review cycle, standing privileged access"
+    compliant: "Automated lifecycle, RBAC least-privilege, periodic access reviews"
+  Federation:
+    controls: [AC-17, SC-8]
+    mandate: "SAML/OIDC federation; encrypted auth flows; no proprietary SSO silos"
+    non_compliant: "Local accounts for cross-agency access, HTTP auth flows"
+    compliant: "OIDC/SAML IdP, TLS-only auth, cross-agency federation capability"
+
+rationale: >
+  IAM and kubectl data is structured. Collectors produce deterministic ICAM evidence;
+  agents reason about service compliance and produce the mandate gap report.
+
+rank_boundaries:
+  automated: D
+  propose: C
+  escalate: B
+  human_only: S

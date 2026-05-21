@@ -1,0 +1,114 @@
+name: au-logging-maturity
+version: "1.0"
+description: >
+  BERU crew for M-21-31 (OMB Memorandum on Improving the Federal Government's
+  Investigative and Remediation Capabilities Related to Cybersecurity Incidents)
+  logging maturity assessment. Collects evidence via AWS CLI + kubectl (no LLM),
+  then runs assessor -> sar_writer -> poam_writer.
+
+controls:
+  - AU-2   # Event Logging
+  - AU-3   # Content of Audit Records
+  - AU-6   # Audit Record Review, Analysis, and Reporting
+  - AU-7   # Audit Record Reduction and Report Generation
+  - AU-9   # Protection of Audit Information
+  - AU-11  # Audit Record Retention
+  - AU-12  # Audit Record Generation
+
+framework: M-21-31
+baseline: EL2   # Minimum mandate — agencies were required to reach EL2 by August 2022
+
+# Human playbook this crew encodes
+playbook: GP-CONSULTING/07-OMB-LENS/playbooks/M-21-31-playbooks/01-assess-logging-maturity.md
+
+# Evidence output (SecLAB crewai-runner writes here; crew output supplements it)
+evidence_path: GP-CONSULTING/AU/evidence/
+
+# Architecture pattern
+architecture:
+  step_1_collect:
+    type: python          # pure AWS CLI + kubectl, no LLM
+    module: collectors.py
+    function: run_au_collectors
+  step_2_assess:
+    type: crewai_agent
+    agent: assessor       # from BERU-AI/crew/agents.py
+    output: control_determinations_with_el_level
+  step_3_sar:
+    type: crewai_agent
+    agent: sar_writer
+    output: m21_31_compliance_report
+  step_4_poam:
+    type: crewai_agent
+    agent: poam_writer
+    output: poam_registry
+
+# M-21-31 Maturity Model (Event Logging tiers)
+maturity_model:
+  EL0:
+    name: "Not Logging"
+    description: >
+      No centralized logging. No CloudTrail. No Kubernetes audit policy.
+      Agency cannot reconstruct events after an incident.
+  EL1:
+    name: "Basic Logging"
+    description: >
+      CloudTrail enabled (management events). EKS control plane logging enabled
+      (API, audit, authenticator, controllerManager, scheduler). Kubernetes audit
+      policy configured. Minimum 12-month retention. No centralized aggregation required.
+    nist_mapping: AU-2, AU-3, AU-11
+  EL2:
+    name: "Intermediate Logging"
+    description: >
+      EL1 requirements met PLUS: Centralized log aggregation pipeline running
+      (Fluent Bit or equivalent DaemonSet on all nodes). Log storage system
+      available (Loki, OpenSearch, or Splunk). 90-day hot retention minimum.
+      CloudTrail log file validation enabled. Log pipeline covers both
+      infrastructure and application layers.
+    nist_mapping: AU-6, AU-7, AU-9, AU-12
+    mandate: "Required by August 2022 (M-21-31 Section III.B)"
+  EL3:
+    name: "Advanced Logging"
+    description: >
+      EL2 requirements met PLUS: SIEM integration with cross-system correlation.
+      12-month hot retention. Runtime threat detection (Falco or equivalent)
+      forwarding to log pipeline. Automated alerting on anomalous activity.
+      Capability to correlate events across cloud, cluster, and application layers.
+    nist_mapping: AU-6, AU-7, SI-4
+
+# M-21-31 mandate summary
+m21_31_mandate:
+  memo_date: "August 2021"
+  issuing_authority: "Office of Management and Budget (OMB)"
+  reference: "M-21-31: Improving the Federal Government's Investigative and Remediation Capabilities"
+  key_requirements:
+    - "All CFO-Act agencies must achieve EL2 by August 27, 2022"
+    - "All CFO-Act agencies must achieve EL3 within 18 months (February 2023)"
+    - "FISMA agencies follow agency-level implementation plans"
+    - "Logs must be retained in a manner that supports forensic investigation"
+    - "Agencies must be able to retrieve logs within 72 hours of an incident request"
+  enforcement: >
+    OMB uses FISMA reporting and CISA coordination for compliance tracking.
+    Non-compliance is reported in annual FISMA submissions.
+
+# Why Step 1 is Python, not an agent
+rationale: >
+  AWS CLI and kubectl output is structured data. An LLM adds hallucination risk to
+  data collection without adding value. The collector runs deterministically and hands
+  clean EL signals to the agents. BERU-family agents are reserved for reasoning tasks
+  (assess, write, cite) not data retrieval tasks (list, describe, check-status).
+
+# Rank boundaries
+rank_boundaries:
+  automated: D          # E/D findings collected and reported without human
+  propose:   C          # C-rank findings proposed to human for approval
+  escalate:  B          # B-rank escalated (e.g. no logging at all = B-rank risk)
+  human_only: S         # S-rank: AO decision on EL exemption
+
+# Relationship to SecLAB crewai-runner
+seclab_runner: >
+  GP-SECLAB/SecLAB-setup/03-n8n/crewai-runner/ is the production evidence collector.
+  This BERU-AI crew is the training/development version that uses CrewAI agents
+  for the assessment + reporting phases (instead of direct Ollama API calls).
+  Use the SecLAB runner for live evidence collection. Use this crew for
+  agent training data generation and offline analysis.

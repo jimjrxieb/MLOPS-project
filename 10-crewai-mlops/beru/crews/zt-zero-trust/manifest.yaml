@@ -1,0 +1,97 @@
+name: zt-zero-trust
+version: "1.0"
+description: >
+  BERU crew for M-22-09 Zero Trust Architecture compliance assessment.
+  Collects ZT evidence via kubectl + AWS CLI (no LLM), then runs
+  assessor → sar_writer → poam_writer against ZT pillar requirements.
+
+controls:
+  - SC-7    # Boundary Protection (Networks pillar)
+  - SC-8    # Transmission Confidentiality/Integrity (Networks + Data)
+  - SC-28   # Protection of Information at Rest (Data pillar)
+  - AC-2    # Account Management (Identity pillar)
+  - AC-3    # Access Enforcement (Applications pillar)
+  - AC-6    # Least Privilege (Identity pillar)
+  - AC-17   # Remote Access (Networks pillar)
+  - IA-2    # MFA (Identity pillar)
+  - IA-3    # Device Identification (Devices pillar)
+  - IA-5    # Authenticator Management (Identity pillar)
+  - CM-8    # System Component Inventory (Devices pillar)
+  - SI-4    # System Monitoring (Applications pillar)
+  - CA-7    # Continuous Monitoring (cross-pillar)
+
+framework: M-22-09
+baseline: ZT-Initial   # minimum viable -- Traditional is non-compliant
+
+playbook: GP-CONSULTING/07-OMB-LENS/playbooks/M-22-09-playbooks/01-assess-zt-network-pillar.md
+
+architecture:
+  step_1_collect:
+    type: python
+    module: collectors.py
+    function: run_zt_collectors
+  step_2_assess:
+    type: crewai_agent
+    agent: assessor
+    output: zt_pillar_determinations
+  step_3_sar:
+    type: crewai_agent
+    agent: sar_writer
+    output: zt_compliance_report
+  step_4_poam:
+    type: crewai_agent
+    agent: poam_writer
+    output: poam_registry
+
+zt_pillars:
+  Identity:
+    controls: [AC-2, AC-6, IA-2, IA-5]
+    description: Enterprise-managed identities, phishing-resistant MFA, least privilege
+    maturity_stages:
+      Traditional: "Per-app accounts, passwords, static credentials, no MFA"
+      Initial: "Centralized IdP, MFA deployed, some least-privilege enforcement"
+      Advanced: "Phishing-resistant MFA for all, JIT access, no standing privilege"
+      Optimal: "Continuous identity validation, risk-based authentication, full attribute-based access"
+  Devices:
+    controls: [IA-3, CM-8]
+    description: Device inventory, health validation, endpoint detection
+    maturity_stages:
+      Traditional: "No asset inventory, unmanaged devices access resources"
+      Initial: "Asset inventory exists, some device health checks"
+      Advanced: "All devices enrolled, compliance enforced before access"
+      Optimal: "Real-time device posture, continuous compliance validation"
+  Networks:
+    controls: [SC-7, SC-8, AC-17]
+    description: Micro-segmentation, encrypted traffic, no implicit trust
+    maturity_stages:
+      Traditional: "Flat network, perimeter trust, unencrypted internal traffic"
+      Initial: "Basic segmentation (VPC/namespace), TLS on ingress"
+      Advanced: "Per-workload NetworkPolicy, mTLS everywhere, encrypted inter-pod traffic"
+      Optimal: "Dynamic micro-segmentation, automated policy enforcement, no lateral movement paths"
+  Applications:
+    controls: [AC-3, SI-4]
+    description: Per-session access, workload identity, application monitoring
+    maturity_stages:
+      Traditional: "Implicit internal trust, no workload identity, minimal monitoring"
+      Initial: "Basic authorization, some application logging"
+      Advanced: "Per-request authorization, SPIFFE/SVID workload identity, full monitoring"
+      Optimal: "Continuous authorization, zero standing access, behavioral analytics"
+  Data:
+    controls: [SC-28]
+    description: Data classification, encryption at rest, need-to-know access
+    maturity_stages:
+      Traditional: "No data classification, encryption inconsistent"
+      Initial: "Encryption at rest for sensitive data, basic classification"
+      Advanced: "All data classified, encrypted, access tied to classification"
+      Optimal: "Data-centric access control, DLP enforcement, automated classification"
+
+rationale: >
+  Network and kubectl data is structured. An LLM adds hallucination risk to data collection
+  without adding value. Collectors produce deterministic ZT evidence; agents reason about
+  pillar maturity and produce the compliance report.
+
+rank_boundaries:
+  automated: D
+  propose: C
+  escalate: B
+  human_only: S

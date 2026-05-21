@@ -26,11 +26,11 @@ def build_audit_crew(finding: str) -> Crew:
             "Produce a CISO-ready summary with control citation and remediation timeline."
         ),
         expected_output=(
-            "A structured audit output containing: "
-            "NIST 800-53 control ID + enhancement, "
-            "AI RMF subcategory (if AI system in scope), "
-            "POA&M item (weakness, detection method, scheduled completion, responsible role), "
-            "and a 3-sentence CISO briefing."
+            "A JSON object compatible with crewai_mlops.beru.schemas.AuditFinding. "
+            "It must include: finding, control_id, control_name, ai_rmf_subcategory "
+            "(null if not applicable), status, determination, evidence_reviewed, "
+            "evidence_gap, likelihood, impact, rank, control_owner, poam_item, "
+            "and ciso_summary. POA&M dates must use YYYY-MM-DD."
         ),
         agent=auditor,
         context=[triage_task],

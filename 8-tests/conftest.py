@@ -6,11 +6,21 @@ so tests can do: from crewai_mlops.rag_ingestion.collectors import ...
 """
 import importlib
 import importlib.util
+import os
 import sys
 from pathlib import Path
 
 _ROOT = Path(__file__).parent.parent
 _CREWAI_DIR = _ROOT / "10-crewai-mlops"
+
+# CrewAI initializes OpenTelemetry exporters on import unless these are set.
+# In CI/sandboxed test runs that can leave pytest waiting on exporter threads
+# after all assertions have already passed.
+os.environ.setdefault("CREWAI_DISABLE_TELEMETRY", "true")
+os.environ.setdefault("CREWAI_DISABLE_TRACKING", "true")
+os.environ.setdefault("CREWAI_TESTING", "true")
+os.environ.setdefault("CREWAI_STORAGE_DIR", "/tmp/crewai-storage")
+os.environ.setdefault("OTEL_SDK_DISABLED", "true")
 
 
 def _register_crewai_mlops():

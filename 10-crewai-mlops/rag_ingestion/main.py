@@ -14,6 +14,7 @@ CLI:
 import argparse
 import asyncio
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -23,9 +24,19 @@ import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from . import tools as _tools
-from .collectors import run_prep_collectors
-from .crews.prep_crew import build_prep_crew
+os.environ.setdefault("CREWAI_STORAGE_DIR", "/tmp/crewai-storage")
+
+if __package__:
+    from . import tools as _tools
+    from .collectors import run_prep_collectors
+    from .crews.prep_crew import build_prep_crew
+else:
+    _PACKAGE_ROOT = Path(__file__).resolve().parents[1]
+    if str(_PACKAGE_ROOT) not in sys.path:
+        sys.path.insert(0, str(_PACKAGE_ROOT))
+    from rag_ingestion import tools as _tools
+    from rag_ingestion.collectors import run_prep_collectors
+    from rag_ingestion.crews.prep_crew import build_prep_crew
 
 # Output goes here (same as existing preprocess_pipeline.py)
 _PREPROCESSED_DIR = (

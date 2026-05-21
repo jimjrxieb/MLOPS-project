@@ -13,6 +13,8 @@ CLI:
 
 import sys
 import asyncio
+import argparse
+import os
 from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -23,6 +25,8 @@ from typing import Optional
 _HERE = Path(__file__).parent
 if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
+
+os.environ.setdefault("CREWAI_STORAGE_DIR", "/tmp/crewai-storage")
 
 app = FastAPI(title="BERU CrewAI Service", version="1.0.0")
 
@@ -39,6 +43,43 @@ class SSPRequest(BaseModel):
 
 def _run_crew(crew):
     return crew.kickoff()
+
+
+def _cli():
+    parser = argparse.ArgumentParser(description="BERU CrewAI CLI")
+    sub = parser.add_subparsers(dest="command")
+
+    audit_p = sub.add_parser("audit", help="Run BERU audit crew for a finding")
+    audit_p.add_argument("finding", nargs="+", help="Finding text to assess")
+
+    ssp_p = sub.add_parser("ssp", help="Run SSP to SAR/POA&M crew")
+    ssp_p.add_argument("ssp_path", help="Path to SSP text or markdown")
+    ssp_p.add_argument("system_name", nargs="?", default="Target System")
+    ssp_p.add_argument("findings_path", nargs="?")
+
+    args = parser.parse_args()
+
+    if args.command == "audit":
+        from crews.beru_audit import build_audit_crew
+
+        crew = build_audit_crew(" ".join(args.finding))
+        result = crew.kickoff()
+        print("\n=== AUDIT RESULT ===\n")
+        print(result)
+        return
+
+    if args.command == "ssp":
+        from crews.ssp_to_poam import build_ssp_to_poam_crew
+
+        ssp_text = Path(args.ssp_path).read_text()
+        findings = Path(args.findings_path).read_text() if args.findings_path else ""
+        crew = build_ssp_to_poam_crew(ssp_text, args.system_name, findings)
+        result = crew.kickoff()
+        print("\n=== SSP -> POA&M RESULT ===\n")
+        print(result)
+        return
+
+    parser.print_help()
 
 
 @app.get("/health")
@@ -77,41 +118,4 @@ async def run_ssp_to_poam(req: SSPRequest):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("Usage:")
-        print('  python main.py audit "finding text"')
-        print('  python main.py ssp path/to/ssp.txt [SystemName] [path/to/findings.txt]')
-        sys.exit(1)
-
-    command = sys.argv[1]
-
-    if command == "audit":
-        finding = " ".join(sys.argv[2:])
-        from crews.beru_audit import build_audit_crew
-        crew = build_audit_crew(finding)
-        result = crew.kickoff()
-        print("\n=== AUDIT RESULT ===\n")
-        print(result)
-
-    elif command == "ssp":
-        ssp_path = sys.argv[2]
-        system_name = sys.argv[3] if len(sys.argv) > 3 else "Target System"
-        findings_path = sys.argv[4] if len(sys.argv) > 4 else None
-
-        with open(ssp_path) as f:
-            ssp_text = f.read()
-
-        findings = ""
-        if findings_path:
-            with open(findings_path) as f:
-                findings = f.read()
-
-        from crews.ssp_to_poam import build_ssp_to_poam_crew
-        crew = build_ssp_to_poam_crew(ssp_text, system_name, findings)
-        result = crew.kickoff()
-        print("\n=== SSP → POA&M RESULT ===\n")
-        print(result)
-
-    else:
-        print(f"Unknown command: {command}. Use 'audit' or 'ssp'.")
-        sys.exit(1)
+    _cli()

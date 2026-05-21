@@ -141,3 +141,5 @@ tmp/
 *.tmp
 *.bak
 *.orig
+# --- Local/generated docs ---
+/docs/

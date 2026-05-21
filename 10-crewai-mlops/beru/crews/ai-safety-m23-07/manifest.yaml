@@ -1,0 +1,83 @@
+name: ai-safety-m23-07
+version: "1.0"
+description: >
+  BERU crew for M-23-07 / EO 14110 AI Safety compliance assessment.
+  Detects AI workloads via kubectl + AWS CLI (no LLM), assesses against
+  EO 14110 sections 4.1/4.2/4.3, then produces SAR + POA&M.
+  Note: some EO requirements (red-teaming records, AI use case inventory)
+  cannot be assessed via API — crew flags these for process review.
+
+controls:
+  - SA-11   # Developer Testing (EO 4.1 — pre-deployment safety evaluation)
+  - RA-3    # Risk Assessment (EO 4.2 — AI-specific risk)
+  - SI-4    # System Monitoring (EO 4.3 — AI output monitoring)
+  - CA-7    # Continuous Monitoring (EO 4.3 — ongoing AI risk tracking)
+  - AC-6    # Least Privilege (EO 4.1 — AI system access control)
+  - SC-28   # Protection at Rest (EO 4.2 — model weights and training data)
+
+framework: M-23-07
+baseline: EO-14110-Section-4   # pre-deployment evaluation + risk assessment + monitoring
+
+playbook: GP-CONSULTING/07-OMB-LENS/playbooks/M-23-07-playbooks/01-assess-ai-security-baseline.md
+
+architecture:
+  step_1_collect:
+    type: python
+    module: collectors.py
+    function: run_ai_safety_collectors
+  step_2_assess:
+    type: crewai_agent
+    agent: assessor
+    output: eo_section_determinations
+  step_3_sar:
+    type: crewai_agent
+    agent: sar_writer
+    output: ai_safety_compliance_report
+  step_4_poam:
+    type: crewai_agent
+    agent: poam_writer
+    output: poam_registry
+
+eo_14110_sections:
+  "4.1":
+    title: AI Safety and Security
+    mandate: "Pre-deployment safety evaluation including red-teaming for dual-use AI"
+    controls: [SA-11, AC-6]
+    api_assessable: false   # red-teaming records are process artifacts, not API-queryable
+    api_assessable_proxy: "Check for AI workload security context, least privilege, and CI/CD gates"
+  "4.2":
+    title: AI Risk Assessment
+    mandate: "AI-specific risk assessment using NIST AI RMF; model/data protection"
+    controls: [RA-3, SC-28]
+    api_assessable: partial  # data/model protection is API-assessable; risk docs are not
+  "4.3":
+    title: AI Transparency and Monitoring
+    mandate: "AI use case inventory; monitoring of AI systems in consequential decisions"
+    controls: [SI-4, CA-7]
+    api_assessable: partial  # monitoring infrastructure is API-assessable; inventory is not
+
+nist_ai_rmf_phases:
+  GOVERN: "Establish AI risk governance — policies, roles, accountability"
+  MAP: "Identify AI context, use cases, and risk categories"
+  MEASURE: "Analyze and evaluate AI risks — testing, monitoring, metrics"
+  MANAGE: "Prioritize and treat AI risks — mitigations, response, recovery"
+
+nist_ai_600_1_risks:
+  - Hallucination and fabrication
+  - Prompt injection and jailbreaking
+  - Training data poisoning
+  - Model inversion and extraction
+  - Insecure output handling
+  - CBRN uplift potential (dual-use)
+
+rationale: >
+  AI workload detection and infrastructure checks are deterministic (kubectl/AWS CLI).
+  Red-teaming records, AI use case inventories, and risk documentation cannot be assessed
+  via API — crew explicitly flags these as "requires process review" rather than
+  hallucinating a determination. Agents assess only what the collectors can verify.
+
+rank_boundaries:
+  automated: D
+  propose: C
+  escalate: B
+  human_only: S

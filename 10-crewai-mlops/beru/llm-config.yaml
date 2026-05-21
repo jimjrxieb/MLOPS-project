@@ -1,0 +1,29 @@
+# GP-Copilot BERU CrewAI — LLM Configuration
+# Fill in provider + model. API key is prompted at runtime if left blank (Ollama never needs one).
+#
+# Supported providers:
+#   ollama     — local models via Ollama. No API key needed. Set base_url.
+#   openai     — GPT-4o, GPT-4-turbo. Requires OPENAI_API_KEY or api_key below.
+#   anthropic  — Claude Sonnet/Opus. Requires ANTHROPIC_API_KEY or api_key below.
+#   gemini     — Gemini Pro/Flash. Requires GOOGLE_API_KEY or api_key below.
+#   azure      — Azure OpenAI. Requires endpoint + api_key.
+#
+# Model name format follows crewai LLM conventions:
+#   ollama:    just the model name  →  llama3.2
+#   openai:    gpt-4o, gpt-4-turbo-preview
+#   anthropic: claude-sonnet-4-6, claude-opus-4-7
+#   gemini:    gemini/gemini-1.5-pro, gemini/gemini-1.5-flash
+
+llm:
+  provider: ollama
+  model: llama3.2
+  base_url: http://localhost:11434   # Ollama only — ignored for cloud providers
+  api_key: ""                        # Leave blank to be prompted at runtime
+  azure_endpoint: ""                 # Azure only
+
+engagement:
+  system_name: "My Federal System"
+  cluster: ""          # auto-detected from kubectl current-context if blank
+  aws_region: us-east-1
+  analyst: beru:v1.6
+  output_dir: ""       # defaults to GP-CONSULTING/07-OMB-LENS/evidence/ if blank

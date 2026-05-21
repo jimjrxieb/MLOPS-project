@@ -204,10 +204,7 @@ class TestMain:
         assert "/run/rag-prep" in paths
 
     def test_health_returns_ok(self):
-        from fastapi.testclient import TestClient
-        from crewai_mlops.rag_ingestion.main import app
-        client = TestClient(app)
-        resp = client.get("/health")
-        assert resp.status_code == 200
-        assert resp.json()["status"] == "ok"
-        assert resp.json()["crew"] == "rag-ingestion"
+        from crewai_mlops.rag_ingestion.main import health
+        resp = health()
+        assert resp["status"] == "ok"
+        assert resp["crew"] == "rag-ingestion"

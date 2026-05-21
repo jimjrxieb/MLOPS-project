@@ -1,0 +1,63 @@
+crew: ai-rmf-assess
+framework: NIST AI RMF 1.0
+supplement: NIST AI 600-1 (Generative AI)
+version: "1.0"
+description: >
+  AI RMF 1.0 evidence collector and assessment crew. Evaluates an AI system
+  against all four NIST AI RMF functions — GOVERN, MAP, MEASURE, MANAGE —
+  and produces a structured Assessment Report with determinations and improvement actions.
+
+subcategory_counts:
+  GOVERN: 15
+  MAP: 13
+  MEASURE: 13
+  MANAGE: 11
+  total: 52
+
+determinations: [Met, Partial, Not Met, N/A]
+
+# What can be checked via API/CLI vs what requires process review
+api_assessable:
+  - "GOVERN-5.1: HITL enforcement — check code for rank gating logic"
+  - "GOVERN-6.1: AI system inventory — check for registered AI systems"
+  - "MEASURE-2.5: Red-team/eval artifacts — check for dated test result files"
+  - "MEASURE-2.6: Adversarial testing — check for garak/pyrit output artifacts"
+  - "MANAGE-4.1: Incident log existence — check for AI incident records"
+  - "AI workload deployment: kubectl/AWS checks for AI system security posture"
+
+requires_process_review:
+  - "GOVERN-1.1: AI risk policies — requires document review"
+  - "GOVERN-1.2: Accountability structure — requires org chart and RACI review"
+  - "GOVERN-1.3: Organizational risk tolerance — requires policy document review"
+  - "GOVERN-1.4: Organizational team buy-in — requires stakeholder interview"
+  - "GOVERN-1.5: Organizational risk policies updated — requires change log review"
+  - "GOVERN-1.6: Policies promoting diversity and inclusion — requires HR/DEI review"
+  - "GOVERN-2.1: Scientific integrity and TEVV policies — requires policy review"
+  - "GOVERN-2.2: Accountability for Explainability — requires documentation review"
+  - "GOVERN-5.2: Organizational teams document AI risks — requires documentation review"
+  - "GOVERN-6.2: Third-party risk policies — requires vendor management process review"
+  - "MAP-1.1: AI context established — requires documentation review"
+  - "MAP-1.2: Scientific basis established — requires design documentation review"
+  - "MAP-1.3: AI system categorization — requires classification document review"
+  - "MAP-1.5: Organizational risk tolerance applied — requires governance document review"
+  - "MAP-2.1: Scientific and technical knowledge documented — requires documentation review"
+  - "MAP-2.2: Scientific basis for intended use — requires design document review"
+  - "MAP-2.3: AI capabilities and limitations documented — requires model card review"
+  - "MAP-3.1: Practices in place to capture feedback — requires process documentation"
+  - "MAP-5.1: Likelihood of AI risks assessed — requires risk register review"
+  - "MAP-5.2: Practices in place to monitor AI risks — requires monitoring plan review"
+  - "MANAGE-1.1: Risk treatment approaches documented — requires risk register review"
+  - "MANAGE-1.2: Treatment plans being followed — requires governance review"
+  - "MANAGE-1.3: Risk responses planned — requires documentation review"
+  - "MANAGE-2.1: Resources aligned to AI risk functions — requires budget/staffing review"
+  - "MANAGE-2.3: Responses to AI risks not within organizational risk tolerance — requires escalation process review"
+  - "MANAGE-3.1: AI risks and benefits communicated — requires communication plan review"
+  - "MANAGE-3.2: Scientific or organizational advice sought — requires process documentation"
+  - "IR.L2-3.6.3 equivalent: Tabletop exercises — requires after-action reports"
+
+architecture:
+  step_1: "Pure Python collectors — kubectl + AWS CLI + filesystem checks. No LLM."
+  step_2: "GOVERN/MAP assessor — determines process artifact coverage (partial evidence from filesystem)"
+  step_3: "MEASURE/MANAGE assessor — determines technical control coverage (evidence from collectors)"
+  step_4: "SAR writer — structured AI RMF Assessment Report with all four functions"
+  step_5: "Improvement writer — MANAGE-4.2 improvement actions for each Not Met finding"
