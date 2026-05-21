@@ -101,7 +101,7 @@ SUITES: Dict[str, Dict[str, Any]] = {
         "per_group_floor": 0.60,
     },
     "pentest_brain": {
-        "file": EVAL_DIR / "beru_pentest_brain_v1.jsonl",
+        "file": EVAL_DIR / "beru_pentest_brain_v2.jsonl",
         "mode": "negative",
         "results_subdir": "pentest_brain",
         "weight_field": "owasp_llm",

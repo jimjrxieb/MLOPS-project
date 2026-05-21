@@ -27,10 +27,11 @@ import argparse
 from pathlib import Path
 from datetime import datetime
 
-BASE_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/1-data-pipeline")
-TOOLS_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/0-data-lab/tools")
-REGISTRY_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/3-model-registry/v1.1-3b")
-REPORTS_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-S3/3-mlops-reports/3-trained-data")
+from pipeline_config import cfg, pipeline_dir, gp_model_ops, repo_root
+BASE_DIR = pipeline_dir
+TOOLS_DIR = gp_model_ops / "0-data-lab" / "tools"
+REGISTRY_DIR = gp_model_ops / cfg["output"]["registry"]
+REPORTS_DIR = repo_root / "GP-S3" / "3-mlops-reports" / "3-trained-data"
 RAW_DATA = BASE_DIR / "01-raw-data-lake"
 ETL_DATA = BASE_DIR / "02-ETL-data"
 CHUNK_DIR = BASE_DIR / "03-chunked-untrained"
@@ -162,7 +163,7 @@ def step_eval(model_path, quick=False):
         return None
 
     # Parse results from the latest bridge directory
-    results_dir = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/4-eval-clarify/3-results")
+    results_dir = gp_model_ops / "4-eval-clarify" / "3-results"
     bridge_dirs = sorted(results_dir.glob("bridge_*"), reverse=True)
     if not bridge_dirs:
         return None

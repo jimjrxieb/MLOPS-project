@@ -25,12 +25,15 @@ from pathlib import Path
 from datetime import datetime
 
 # Directories
-MODEL_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/3-jade-model-versions/v1.0")
+from pipeline_config import cfg, gp_model_ops
+_model_name = cfg["run"]["model_name"]
+_version = cfg["run"]["version"]
+MODEL_DIR = gp_model_ops / "3-model-registry" / _model_name / _version
 STATE_FILE = MODEL_DIR / "training_state.json"
-MERGED_DIR = MODEL_DIR / "jade-v1.0-merged"
+MERGED_DIR = MODEL_DIR / f"{_model_name}-merged"
 
 # llama.cpp location
-LLAMA_CPP = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/llama.cpp")
+LLAMA_CPP = gp_model_ops / "llama.cpp"
 CONVERT_SCRIPT = LLAMA_CPP / "convert_hf_to_gguf.py"
 QUANTIZE_BIN = LLAMA_CPP / "build" / "bin" / "llama-quantize"
 

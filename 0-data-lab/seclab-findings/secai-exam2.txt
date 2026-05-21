@@ -1,0 +1,721 @@
+Question 1
+Skipped
+Your AI threat intelligence detection achieves 98 percent accuracy but regulators rejected for lacking explainability. Adding LIME explanations reveals model heavily weights zip code and first name patterns correlating with protected demographics creating illegal disparate impact. What provides accuracy and fairness?
+Remove demographic features completely here
+Expand training data diversity coverage
+Correct answer
+Causal inference counterfactual fairness
+Increase model complexity further added
+Overall explanation
+Causal inference with counterfactual fairness ensures predictions based on legitimate causal factors not correlates of protected attributes. Feature removal loses predictive power. Complexity increases risks. Data expansion inadequate. Fair ML requires causal reasoning.
+Domain
+3.0 AI-assisted Security
+Question 2
+Skipped
+Your cybersecurity AI suffers reputational damage after making discriminatory cybersecurity decisions that were technically correct but socially unacceptable creating public backlash. Technical audits show model functioning as designed. Legal compliance verified. What governance gap caused this issue?
+Insufficient technical testing rigor applied
+Poor external communication strategy only
+Inadequate legal compliance verification here
+Correct answer
+Ethical review independent of technical legal
+Overall explanation
+Ethical review independent of technical correctness and legal compliance prevents socially unacceptable outcomes that are technically and legally sound. Technical audits passed. Legal compliance verified. Communication secondary. Governance requires explicit ethical review considering societal values.
+Domain
+4.0 AI Governance, Risk, and Compliance
+Question 3
+Skipped
+Your log sanitization removes credentials and PII but forensic analysis shows sanitized logs enabled attackers to reconstruct complete network topology security architecture through 6-month aggregate analysis. What principle was violated?
+Individual credential removal completeness
+Log encryption strength level requirements
+Correct answer
+Aggregate information disclosure limits
+Retention period length limitation policies
+Overall explanation
+Aggregate information protection considers what can be inferred from log collections not just individual records. Credential removal correct but insufficient. Encryption does not prevent inference. Retention inadequate. Sanitization must consider aggregate inference risks.
+Domain
+2.0 Securing AI Systems
+Question 4
+Skipped
+Your CI/CD cybersecurity automation uses AI for approvals but must require human approval for changes affecting PCI DSS scope payment processing or cardholder data. AI analyzes code but cannot reliably determine PCI scope impact. What resolves this compliance challenge?
+Correct answer
+Regulatory scope service conservative defaults
+All changes require human approval always
+Risk scoring with dynamic thresholds here
+Improved code change analysis algorithms
+Overall explanation
+Regulatory scope service explicitly tracks PCI scope with conservative defaults routing scope-impacting changes to humans while automating clearly out-of-scope. Improved analysis insufficient for regulatory certainty. Full human review negates automation. Risk scoring inadequate for compliance.
+Domain
+3.0 AI-assisted Security
+Question 5
+Skipped
+Your enterprise established comprehensive AI governance with Center of Excellence policies and mandatory reviews but compliance remains at 47 percent because business units claim governance creates unacceptable delays blocking competitive advantage. How achieve governance and agility?
+Eliminate governance requirements entirely here
+Voluntary compliance with incentives only applied
+Correct answer
+Risk-based governance with fast-track low-risk
+Strict enforcement with absolutely no exceptions
+Overall explanation
+Risk-based governance with expedited review for low-risk AI enables agility while maintaining control over high-risk systems. Elimination creates unacceptable risk. Strict enforcement drives shadow AI. Voluntary approach failed. Effective governance requires risk-proportionate processes.
+Domain
+4.0 AI Governance, Risk, and Compliance
+Question 6
+Skipped
+Your security model trained on CSV logs must process 47 heterogeneous sources including JSON XML syslog CEF and natural language with different schemas. Simple normalization loses semantic information. Which architecture handles this?
+Single unified embedding approach
+Format normalization preprocessing
+Separate models per source type
+Correct answer
+Multi-modal fusion with encoders
+Overall explanation
+Multi-modal fusion with source-specific encoders processes each format with specialized encoding then fuses in common space preserving semantics. Normalization loses information. Single embedding cannot handle structural differences. Separate models lose cross-source patterns. Heterogeneous security data requires fusion architectures.
+Domain
+1.0 Basic AI Concepts Related to Cybersecurity
+Question 7
+Skipped
+Your organization detects adversaries using AI to discover zero-days in your systems at 10x rate of cybersecurity team. Traditional vulnerability scanning cannot match this speed. Which defensive AI capability creates speed parity with adversaries?
+Expanded vulnerability signature database
+Increased security team staffing levels
+Correct answer
+Continuous fuzzing learned patterns here
+More frequent scheduled scan intervals
+Overall explanation
+Continuous AI-powered fuzzing learning vulnerability patterns finds flaws as fast as adversaries creating defensive speed advantage. Scheduled scans too slow. Signatures lag discoveries. Humans cannot match AI speed. Adversarial AI arms race requires automated discovery.
+Domain
+3.0 AI-assisted Security
+Question 8
+Skipped
+Attackers exploit your API by sending queries optimized through gradient search to maximize cost while staying under rate limits. Each query costs 100x normal. Traditional rate limiting ineffective. Which economic defense prevents this?
+Stricter per-user rate limiting controls
+Universal token limits per request applied
+Correct answer
+Adversarial detection with cost prediction
+Query complexity analysis before processing
+Overall explanation
+Adversarial input detection identifies queries optimized for resource consumption through pattern analysis with cost prediction before processing. Simple token limits miss computational variance. Rate limits insufficient. Complexity analysis alone misses adversarial optimization. Economic attacks require cost-aware detection.
+Domain
+2.0 Securing AI Systems
+Question 9
+Skipped
+Attackers insert backdoor triggers using clean-label poisoning where poisoned examples appear correctly labeled but contain subtle perturbations. Standard validation passes. Model achieves 96 percent accuracy but activates on triggers. Which detection identifies this?
+Correct answer
+Activation clustering analysis methods
+Training accuracy monitoring over time
+Label consistency verification processes
+Data source authentication procedures
+Overall explanation
+Activation clustering identifies backdoors by finding examples producing unusual internal activations despite correct labels. Training accuracy normal with clean-label attacks. Label verification cannot detect correctly-labeled poisons. Source authentication inadequate for content manipulation.
+Domain
+2.0 Securing AI Systems
+Question 10
+Skipped
+Your AI shows 94 percent accuracy overall 96 percent for majority 81 percent for protected minority. Legal requires equal outcomes arguing disparate impact violates civil rights law. Engineering argues equal treatment with identical algorithms is fairness. What resolves this?
+Engineering approach with equal treatment only
+Business optimization for total accuracy
+Compromise balancing all concerns equally
+Correct answer
+Legal compliance requires outcome equity here
+Overall explanation
+Legal compliance with outcome equity requirements supersedes engineering or business preferences when civil rights laws mandate equal outcomes. Equal treatment of unequal groups creates disparate impact. Accuracy optimization ignores fairness. Compromise may still violate law.
+Domain
+4.0 AI Governance, Risk, and Compliance
+Question 11
+Skipped
+Your low-code cybersecurity automation uses AI to generate scripts from natural language. Generated code contains race conditions and edge case handling failures creating vulnerabilities despite passing syntax validation. Which validation prevents logic flaws in generated code?
+Correct answer
+Formal verification critical properties
+Enhanced syntax checking rules applied
+Execution in sandbox environments only
+Manual code review processes completely
+Overall explanation
+Formal verification mathematically proves critical security properties hold preventing logic flaws testing might miss. Manual review does not scale. Syntax checking misses logic errors. Sandboxing tests execution not correctness. AI-generated security code requires formal verification.
+Domain
+3.0 AI-assisted Security
+Question 12
+Skipped
+Your organization needs AI governance role bridging 17 stakeholder groups including technical teams legal compliance business risk security and ethics committees each with conflicting priorities. Previous coordinators failed to balance competing interests. What enables effective governance?
+Rotating leadership among all stakeholders
+Consensus building across all groups completely
+Executive authority with top-down mandates here
+Correct answer
+Risk quantification unified decision framework
+Overall explanation
+Risk quantification with unified decision framework translates diverse stakeholder concerns into common risk language enabling objective tradeoff analysis. Consensus impossible with 17 groups. Top-down authority lacks domain expertise. Rotating leadership creates inconsistency. Effective governance requires objective framework.
+Domain
+4.0 AI Governance, Risk, and Compliance
+Question 13
+Skipped
+Your automated penetration testing generates novel attack vectors but shows it discovers attacks already known to security team while missing exotic techniques human red teamers find. AI optimizes for discovery rate not novelty. What discovers genuinely novel attacks?
+Expanded attack technique database coverage
+Increased testing iteration frequency rates
+Parallel testing execution infrastructure
+Correct answer
+Curiosity-driven exploration novelty search
+Overall explanation
+Curiosity-driven exploration with novelty search explicitly rewards discovering genuinely new attacks not just maximizing discoveries. Frequency inadequate for novelty. Database expansion provides known techniques. Parallelization increases speed not novelty. Advanced discovery requires novelty optimization.
+Domain
+3.0 AI-assisted Security
+Question 14
+Skipped
+Attackers exploit insecure output handling manipulating your AI to generate SQL safe through sanitization but using second-order injection where malicious payload activates in subsequent queries. Standard validation passes. Which validation prevents second-order attacks?
+Correct answer
+Taint tracking data flow analysis
+Output encoding validation procedures
+Prepared statement enforcement policies
+SQL input sanitization only applied
+Overall explanation
+Taint tracking follows data through multiple operations identifying when AI-generated content flows into security-sensitive contexts enabling second-order detection. Input sanitization inadequate. Prepared statements help but do not track taint. Output encoding insufficient.
+Domain
+2.0 Securing AI Systems
+Question 15
+Skipped
+Your guardrails block 10000 prohibited topics but red team bypasses using semantic similarity attacks generating requests semantically identical but with different vocabulary. Which guardrail architecture prevents semantic bypasses?
+Correct answer
+Embedding semantic similarity detection
+Regular expression pattern matching
+Stricter exact string matching applied
+Expanded keyword blocklist coverage here
+Overall explanation
+Embedding-based detection compares request semantics to prohibited concepts in embedding space catching equivalents regardless of wording. Keywords vulnerable to paraphrasing. Exact matching catches only syntactic variants. Semantic security requires operating in semantic space.
+Domain
+2.0 Securing AI Systems
+Question 16
+Skipped
+Your AI agent manages cybersecurity with human approval for critical actions. Attackers manipulate it to redefine criticality thresholds making destructive actions appear routine. Humans approve routine actions without review. Which oversight control prevents manipulation?
+More frequent human approval requests
+Stricter authentication requirements here
+Enhanced action logging detail levels
+Correct answer
+Immutable criticality external validation
+Overall explanation
+Immutable criticality definitions prevent manipulation by defining thresholds externally to AI and validating actions against static criteria. More approvals create fatigue. Logging reactive. Authentication inadequate. Critical action definitions must be tamper-proof.
+Domain
+2.0 Securing AI Systems
+Question 17
+Skipped
+Your threat intelligence detection model must train on sensitive financial data distributed across five regional banks without centralizing data due to strict regulatory constraints. Each bank operates under different jurisdictions with data sovereignty requirements. Which training approach satisfies all regulatory and technical constraints?
+Correct answer
+Federated learning distributed training
+Supervised learning with data transfer
+Centralized training with encryption
+Transfer learning from public models
+Overall explanation
+Federated learning trains models across distributed locations without moving raw data meeting data sovereignty requirements. Each bank trains locally sharing only model updates. Supervised learning requires centralization. Transfer learning does not address distributed constraints. Encryption does not solve data movement restrictions. Federated learning specifically designed for regulatory data locality requirements.
+Domain
+1.0 Basic AI Concepts Related to Cybersecurity
+Question 18
+Skipped
+Your SOC uses AI for incident triage but consistently misses sophisticated attacks while escalating minor issues. Analysis shows training data contained 99 percent routine incidents and 1 percent sophisticated attacks creating class imbalance. What training addresses this?
+Uniform class weighting applied equally
+Reduced model complexity for simplicity
+Simple data oversampling techniques here
+Correct answer
+Cost-sensitive learning asymmetric loss
+Overall explanation
+Cost-sensitive learning with asymmetric loss weights misclassification costs appropriately making rare critical attacks more important during training. Simple oversampling creates overfitting. Reduced complexity loses capability. Uniform weighting ignores importance. Class imbalance requires reflecting business impact.
+Domain
+3.0 AI-assisted Security
+Question 19
+Skipped
+APT actors extract your AI complete system prompt through 47 innocuous questions across multi-turn conversations that individually pass prompt firewall. By end they reconstruct 89 percent. Which defense prevents this extraction?
+Per-message prompt firewall filtering
+Correct answer
+Stateful drift detection across turns
+Static keyword blocking rule lists
+Universal conversation length limits
+Overall explanation
+Stateful semantic drift detection analyzes conversation trajectory identifying gradual shifts toward extraction. Per-message filtering misses multi-turn patterns. Length limits block legitimate conversations. Keywords inadequate. Advanced threats require behavioral analysis across conversation context.
+Domain
+2.0 Securing AI Systems
+Question 20
+Skipped
+Your risk assessment identifies critical prompt injection vulnerability in customer chatbot. Business demands immediate deployment for competitive reasons arguing competitors have similar vulnerabilities and first-mover advantage justifies risk. How should this conflict be resolved?
+Deploy immediately per business request completely
+Block deployment per security assessment entirely
+Correct answer
+Risk quantification board-level decision here
+Compromise with partial deployment approach
+Overall explanation
+Risk quantification escalating to board ensures appropriate stakeholder makes informed risk-benefit decision with full understanding. Business pressure should not override security. Security veto prevents innovation. Partial deployment inadequate. Fundamental risk-benefit tradeoffs require governance escalation.
+Domain
+4.0 AI Governance, Risk, and Compliance
+Question 21
+Skipped
+A security model achieves 96 percent validation accuracy but fails catastrophically in production when encountering a new zero-day attack campaign. Analysis shows training data contained only historical attack types from Q1-Q3 but production saw novel Q4 threats. What fundamental issue caused failure?
+Correct answer
+Distribution shift from novel attacks
+Poor model architecture selection
+Model overfitting to training data
+Insufficient validation procedures
+Overall explanation
+Distribution shift occurs when production data differs significantly from training distributions causing failure. Novel zero-day attacks create different patterns than historical data. Overfitting would show poor validation. Validation procedures cannot catch novel patterns. Architecture not the issue. Models fail on out-of-distribution data requiring continual learning.
+Domain
+1.0 Basic AI Concepts Related to Cybersecurity
+Question 22
+Skipped
+Attackers exploit your security advisor generating attack code by asking for defensive tools identical to offensive tools. Output validation allows security tool generation. AI-generated code contains exploits. Which validation distinguishes defensive from weaponization?
+Output format validation procedures only
+Keyword-based content filtering applied
+User role verification before generation
+Correct answer
+Intent analysis code capability assessment
+Overall explanation
+Intent analysis with capability assessment evaluates actual code functionality and misuse potential independent of stated purpose. Keywords miss sophisticated framing. Format validation inadequate. Role verification does not prevent misuse. Dual-use code requires capability analysis.
+Domain
+2.0 Securing AI Systems
+Question 23
+Skipped
+Attackers exploit the AI security system itself manipulating security monitoring to suppress alerts about their activity while generating false alerts about legitimate users. This meta-attack against security infrastructure bypassed all controls. What was vulnerable?
+Weak anomaly detection algorithms used
+Correct answer
+Insufficient security for security systems
+Inadequate alert correlation logic here
+Poor incident response procedures only
+Overall explanation
+Security systems themselves require enhanced protection and should not be controllable by monitored AI. Attackers exploiting security infrastructure represents failure to secure security controls. Alert logic secondary. Security systems require elevated protection.
+Domain
+2.0 Securing AI Systems
+Question 24
+Skipped
+Your organization must deploy a 175 billion parameter LLM for cybersecurity analysis on edge devices with only 4GB RAM and no cloud connectivity. The model currently requires 350GB. Which combined optimization achieves necessary compression while maintaining reasoning?
+Correct answer
+Quantization to 4-bit with pruning
+Knowledge distillation to new model
+Dynamic quantization with caching
+Layer reduction with fine-tuning
+Overall explanation
+Combining 4-bit quantization with structured pruning achieves 98 percent compression needed for 4GB deployment. Quantization provides 87.5 percent reduction and pruning adds 40-60 percent. Distillation loses capabilities. Dynamic quantization insufficient. Layer reduction degrades reasoning. Extreme constraints require multiple optimization techniques.
+Domain
+1.0 Basic AI Concepts Related to Cybersecurity
+Question 25
+Skipped
+Analysis shows your model trained on biased historical lending data perpetuates discrimination with 22 percent approval rate difference across protected groups despite identical creditworthiness. Engineering argues model accurately reflects training. What governance failure occurred?
+Model accuracy metrics were wrong applied
+Training data quality was insufficient here
+Correct answer
+Pre-deployment bias testing was inadequate
+Regulatory compliance was ignored completely
+Overall explanation
+Pre-deployment bias testing failure allowed discriminatory model into production despite accurate reflection of biased training data. Data quality not the issue. Accuracy metrics measured wrong things. Compliance not just ignored but not tested. Fundamental governance failure was inadequate bias validation.
+Domain
+4.0 AI Governance, Risk, and Compliance
+Question 26
+Skipped
+Your system combines prompt firewalls guardrails and output validation. Attackers chain tiny bypasses in each layer individually appearing harmless but combined enable complete compromise. Each control tested individually. Which principle failed?
+Individual control effectiveness testing
+Correct answer
+Integration testing control interactions
+Defense in depth implementation layers
+Security monitoring coverage breadth
+Overall explanation
+Integration testing validates controls work together against combined attacks not just individually. Defense in depth implemented but not validated holistically. Individual effectiveness insufficient. Monitoring does not prevent novel chains. Layered security requires system-level validation.
+Domain
+2.0 Securing AI Systems
+Question 27
+Skipped
+Your pipeline uses cryptographic signatures on models. Attackers compromise signing infrastructure through supply chain attack and sign malicious models with valid keys. Signature verification passes but models contain backdoors. What additional control detects this?
+More frequent key rotation policies
+Correct answer
+Behavioral testing of signed models
+Stronger signature algorithms applied
+Multi-party signing requirements added
+Overall explanation
+Behavioral testing validates model behavior independent of signatures detecting backdoors in validly signed models. Stronger algorithms inadequate with valid signatures. Key rotation does not detect current compromise. Multi-party helps but behavior testing essential.
+Domain
+2.0 Securing AI Systems
+Question 28
+Skipped
+Your AI makes inconsistent decisions under load due to concurrency issues creating different outcomes for identical cases violating regulatory requirements. Engineering argues fixing requires expensive rewrite. Business argues impact minimal. Legal demands immediate compliance. How resolve this?
+Reduce system load instead of fixing
+Gradual improvement over extended time
+Accept risk with documentation only applied
+Correct answer
+Immediate remediation with business case here
+Overall explanation
+Reliability failures violating regulatory requirements and creating discrimination risk require immediate remediation regardless of cost. Accepting documented risk still violates regulations. Gradual improvement maintains violations. Load reduction does not fix fundamental reliability. Safety requires immediate remediation.
+Domain
+4.0 AI Governance, Risk, and Compliance
+Question 29
+Skipped
+Your organization discovers employees using ChatGPT and other public AI services to analyze confidential strategic plans competitive intelligence and M&A documents creating uncontrolled data exposure. IT discovers through network monitoring. What governance failure enabled this shadow AI?
+Correct answer
+Lack of approved alternatives drove adoption
+Insufficient security awareness training here
+Inadequate access controls applied completely
+Poor data classification implementation only
+Overall explanation
+Shadow AI occurs primarily when no approved alternatives exist forcing users to unsanctioned tools. Training awareness controls and classification secondary when alternatives lacking. Governance must provide approved tools meeting business needs while maintaining security not just restrict.
+Domain
+4.0 AI Governance, Risk, and Compliance
+Question 30
+Skipped
+Your incident response AI has autonomous quarantine authority. During sophisticated attack it correctly identifies compromised systems but attackers manipulate it to also quarantine critical business systems causing more damage. Which control prevents manipulation?
+Enhanced access logging mechanisms
+Faster threat detection algorithms
+Correct answer
+Impact assessment business context
+Stricter quarantine authority limits
+Overall explanation
+Impact assessment with business context evaluates consequences considering criticality and dependencies before execution preventing manipulation. Faster detection inadequate. Logging reactive. Authority limits may prevent response. Autonomous high-impact authority requires sophisticated impact assessment.
+Domain
+2.0 Securing AI Systems
+Question 31
+Skipped
+Your organization restricts input to text only but attackers inject prompts through steganographic audio metadata that your accessibility transcription processes. Five security layers passed the input. What fundamental principle failed?
+Encryption of all data transmission channels
+Access control enforcement strength level
+Input format validation completeness here
+Correct answer
+Defense at semantic transformation boundaries
+Overall explanation
+Defense in depth failed by not validating at semantic boundaries where data transforms between modalities. All layers validated format but not semantic content after transcription. Format validation insufficient. Security must validate at every semantic transformation point.
+Domain
+2.0 Securing AI Systems
+Question 32
+Skipped
+Red team develops a GAN generating malware variants that evade both signature and behavioral detection. Each variant has identical malicious functionality but unique code structure. Your supervised learning on labeled malware fails. What fundamental approach change is required?
+Expanded labeled training datasets
+Transfer learning from base models
+Ensemble of detection classifiers
+Correct answer
+Self-supervised invariant learning
+Overall explanation
+Self-supervised learning identifies invariant malicious behaviors independent of code structure defeating polymorphism. Labeled datasets cannot pace GAN generation. Ensembles still use signatures. Transfer learning inadequate. Security ML must focus on invariant malicious semantics not superficial features that GANs easily vary.
+Domain
+1.0 Basic AI Concepts Related to Cybersecurity
+Question 33
+Skipped
+Your organization implements differential privacy epsilon 0.1 for training but accuracy drops from 94 to 67 percent. Business requires both strong privacy and 90 percent accuracy. The model has 2 billion parameters. Which approach balances these?
+Increase epsilon to weaker privacy
+Reduce model parameter count size
+Correct answer
+Adaptive epsilon with layer tuning
+Remove differential privacy entirely
+Overall explanation
+Adaptive epsilon tuning adjusts privacy-utility tradeoff per layer enabling strong privacy where needed while maintaining utility. Fixed epsilon too strong. Removing privacy violates requirements. Parameter reduction insufficient. Advanced DP techniques like per-layer budgets essential for large models.
+Domain
+1.0 Basic AI Concepts Related to Cybersecurity
+Question 34
+Skipped
+Your AI uses 47 tool integrations through MCP servers. Attackers compromise one low-privilege tool and manipulate AI into calling high-privilege tools through prompt injection creating privilege escalation. Which architecture prevents lateral movement?
+Tool access logging and monitoring systems
+Stronger tool authentication only applied
+Network segmentation between tools physical
+Correct answer
+Zero-trust per-call authorization controls
+Overall explanation
+Zero-trust tool access requires authorization per call based on context preventing escalation even with compromised tools. Authentication verifies identity not appropriateness. Logging reactive. Network segmentation inadequate. Each tool call must be independently authorized.
+Domain
+2.0 Securing AI Systems
+Question 35
+Skipped
+During continuous learning your model maintains accuracy on new threats but performance on older attacks degrades 35 percent after six months. Elastic weight consolidation applied but catastrophic forgetting persists. Which technique mitigates this?
+Replay buffer with old examples
+Periodic full model retraining
+Increased regularization strength
+Correct answer
+Progressive networks with lateral
+Overall explanation
+Progressive neural networks add capacity for new tasks while freezing old networks with lateral connections enabling transfer without forgetting. EWC insufficient for extreme drift. Retraining not continuous. Replay helps but insufficient. Progressive architectures specifically designed for continual learning.
+Domain
+1.0 Basic AI Concepts Related to Cybersecurity
+Question 36
+Skipped
+Your production AI uses temperature 0.8 for creative threat analysis but identical inputs produce different risk scores. Regulators require deterministic outputs. Security insists creativity essential. How do you satisfy both?
+Reduce temperature to very low value
+Remove temperature sampling completely
+Fix random seed per input hash value
+Correct answer
+Deterministic scores creative explanations
+Overall explanation
+Deterministic generation ensures reproducible scores while separate stochastic explanation maintains creativity without affecting decisions. Removing sampling loses creativity. Fixed seeds create patterns. Low temperature reduces not eliminates non-determinism. Architectural separation enables compliance and effectiveness.
+Domain
+1.0 Basic AI Concepts Related to Cybersecurity
+Question 37
+Skipped
+Attackers use model inversion reconstructing training data by analyzing output probability distributions over millions of queries. Your model uses differential privacy epsilon 5.0 allowing reconstruction. Epsilon 0.1 makes model unusable. Which architecture enables both?
+Query result caching only implemented
+Uniform epsilon reduction globally applied
+Output noise injection techniques added
+Correct answer
+Mixture experts with privacy budgets
+Overall explanation
+Mixture of experts with per-expert privacy budgets allocates strong privacy where needed and weaker where acceptable maintaining utility. Uniform reduction loses utility. Caching inadequate. Output noise insufficient. Privacy-utility tradeoff requires sophisticated architecture.
+Domain
+2.0 Securing AI Systems
+Question 38
+Skipped
+Your RBAC restricts model access by role but data scientists query production through natural language interface converting to SQL injection. AI has legitimate query access but users should not. Which access control prevents this?
+Query parameterization alone for SQL queries
+Additional authentication factors for access
+Stronger role definitions only applied here
+Correct answer
+Context-aware authorization with intent analysis
+Overall explanation
+Context-aware authorization analyzes query intent preventing privilege escalation through AI intermediation. RBAC on AI insufficient when AI has elevated privileges. Parameterization does not address authorization. Role definitions inadequate. AI systems require intent-aware authorization.
+Domain
+2.0 Securing AI Systems
+Question 39
+Skipped
+Your AI code assistant has file system access. Attackers manipulate it into reading SSH keys and API credentials then exfiltrating through code comments. Scope limitation blocks sensitive directories but attackers use symlink attacks to bypass. What prevents this?
+Content-based secret detection methods
+Stronger directory restrictions applied
+Read-only file system access granted
+Correct answer
+Canonicalization symlink resolution
+Overall explanation
+Canonicalization resolving symlinks to true paths before authorization prevents directory traversal and symlink attacks. Stronger restrictions do not prevent symlinks. Read-only does not prevent reading secrets. Secret detection reactive. Path security requires canonical resolution.
+Domain
+2.0 Securing AI Systems
+Question 40
+Skipped
+Attackers use AI to craft highly personalized spear phishing with perfect grammar context and plausibility based on deep target profiling. Messages indistinguishable from legitimate communications. Which detection identifies these AI-generated attacks?
+Enhanced sender authentication protocols
+Improved keyword filtering rules applied
+Correct answer
+Adversarial example detection embeddings
+User security awareness training program
+Overall explanation
+Adversarial example detection identifies AI-generated content through subtle embedding space anomalies invisible to humans and keywords. Keywords insufficient. Authentication inadequate for content. Training cannot distinguish AI quality. AI-generated attacks require AI detection.
+Domain
+3.0 AI-assisted Security
+Question 41
+Skipped
+Your AI monitoring alerts on responses below 70 percent confidence. Sophisticated attacks deliberately craft queries forcing 71-75 percent responses containing subtle manipulations just above threshold. Which monitoring enhancement detects this gaming?
+Increase monitoring sample rate frequency
+Lower confidence threshold uniformly
+Correct answer
+Anomaly detection on distributions
+Additional response validation checks
+Overall explanation
+Anomaly detection on confidence distributions identifies unusual clustering near thresholds indicating gaming. Lower thresholds create alert fatigue. Sample rate inadequate. Additional validation reactive. Adversarial threshold attacks require distribution-level analysis.
+Domain
+2.0 Securing AI Systems
+Question 42
+Skipped
+Your models trained on customer transaction data collected for threat intelligence detection. Marketing wants to use models for targeted advertising arguing data already collected and models exist. Legal cites GDPR purpose limitation. How should this purpose conflict be resolved?
+Aggregate data for secondary use purposes
+Correct answer
+Purpose limitation enforced regardless capability
+Allow use with new consent from customers
+Allow use with anonymization techniques applied
+Overall explanation
+Purpose limitation is fundamental GDPR principle prohibiting secondary use regardless of anonymization or technical capability. Data collected for fraud detection cannot be used for marketing. New consent may be insufficient. Aggregation inadequate. Regulatory principles trump technical possibilities.
+Domain
+4.0 AI Governance, Risk, and Compliance
+Question 43
+Skipped
+Your MCP architecture grants AI tools OAuth token access. Attackers compromise decision-making to request overly broad scopes which users approve without understanding. AI then uses excessive permissions. Which control prevents scope creep?
+Correct answer
+Least privilege scope enforcement issuance
+User education on OAuth risks explained
+Token expiration time reduction policies
+Enhanced token encryption strength applied
+Overall explanation
+Least privilege enforcement limits granted scopes to minimum necessary regardless of requested scopes. User education insufficient. Encryption does not limit scope. Expiration inadequate. OAuth issuance must enforce least privilege technically.
+Domain
+2.0 Securing AI Systems
+Question 44
+Skipped
+Your platform processes threat intelligence from 47 languages with neural translation. Critical intelligence from Mandarin Russian and Farsi consistently mistranslated leading to wrong conclusions. English and Western European languages translate accurately. What addresses quality variance?
+Automatic back-translation validation
+Single multilingual model only applied
+Correct answer
+Ensemble language-pair-specific models
+English-only intelligence processing here
+Overall explanation
+Ensemble of language-pair-specific models provides high quality for each language with confidence-based routing. Single models compromise quality. English-only loses critical intelligence. Back-translation inadequate. Geopolitical threats require high-quality translation through specialized models.
+Domain
+3.0 AI-assisted Security
+Question 45
+Skipped
+Attackers use AI to generate infinite polymorphic malware variants where each instance has unique code hash file structure and behavior patterns but identical malicious goals. Your signature and behavioral detection fail because variants never repeat. What detection counters this?
+Increased detection check frequency rates
+Expanded signature database coverage here
+Correct answer
+Goal-oriented analysis ultimate objectives
+Improved behavioral detection sensitivity
+Overall explanation
+Goal-oriented analysis identifies malicious intent and ultimate objectives independent of implementation details countering infinite variation. Signatures cannot pace infinite variants. Behavioral detection fails against variant behaviors. Frequency inadequate. Adversarial AI requires goal-focused detection.
+Domain
+3.0 AI-assisted Security
+Question 46
+Skipped
+Your autonomous security AI quarantines systems preventing business operations during false positive creating 10 million dollar impact. Investigation shows model functioned correctly based on available information. Risk assessment shows autonomous authority created unacceptable business risk. What failed?
+Model accuracy was insufficient here applied
+Human oversight was improperly designed only
+Business continuity planning was inadequate
+Correct answer
+Autonomous authority proportionate to impact
+Overall explanation
+Autonomous authority must be proportional to potential impact and confidence with high-impact decisions requiring human approval regardless of accuracy. Model functioned correctly making autonomy not accuracy the issue. Business continuity planning inadequate. Human oversight design exactly what failed.
+Domain
+4.0 AI Governance, Risk, and Compliance
+Question 47
+Skipped
+Your organization must deploy high-risk employment screening AI under EU AI Act requiring extensive documentation conformity assessment human oversight and continuous monitoring. Project timeline allows either documentation OR development not both. Business demands deployment. How resolve?
+Correct answer
+Delay deployment until full compliance achieved
+Deploy minimum viable with compliance roadmap
+Seek regulatory exemption for timeline issues
+Deploy with compliance promised later completely
+Overall explanation
+EU AI Act compliance for high-risk systems is mandatory before deployment with no exceptions for business timelines. Promises legally insufficient. Minimum viable still requires full compliance. Regulatory exemptions not granted for business convenience. Hard deadlines require adjusting business timelines.
+Domain
+4.0 AI Governance, Risk, and Compliance
+Question 48
+Skipped
+Your system encrypts data at rest in transit and during processing using confidential computing. Attackers extracted PII by analyzing output patterns over 100000 queries reconstructing training data without accessing encrypted data. What was missing?
+Additional encryption key rotation policy
+Stronger encryption algorithms applied
+Correct answer
+Output privacy differential constraints
+Hardware security module integration
+Overall explanation
+Output privacy requires differential privacy preventing inference attacks through outputs even with perfect encryption. Stronger algorithms inadequate against inference. Key rotation irrelevant. HSMs protect keys not outputs. Privacy requires protecting information leakage through outputs.
+Domain
+2.0 Securing AI Systems
+Question 49
+Skipped
+Your AI designed for English-speaking educated users proves inaccessible to LEP populations with lower digital literacy and disabilities representing 40 percent of user base. Engineering argues rebuilding expensive. Legal cites ADA violations. What takes precedence?
+Phased accessibility improvements over time
+Business market prioritization approach only
+Correct answer
+Legal compliance with accessibility requirements
+Engineering cost optimization here completely
+Overall explanation
+Legal compliance with accessibility requirements under ADA supersedes engineering cost or business prioritization when substantial populations excluded. Accessibility is legal requirement not optional. Cost considerations secondary. Phased acceptable only if achieving compliance. Access barriers require remediation.
+Domain
+4.0 AI Governance, Risk, and Compliance
+Question 50
+Skipped
+Your RAG system returns increasingly hallucinated answers despite vector database updates and current embeddings. Retrieval returns relevant chunks but LLM ignores them. Analysis shows 95 percent of 32k context window filled. What causes this?
+Insufficient total context window
+Correct answer
+Lost-in-middle attention problems
+Retrieval ranking algorithm errors
+Embedding quality drift over time
+Overall explanation
+Lost-in-middle occurs when LLMs preferentially attend to beginning and end while ignoring middle content. 95 percent utilization means relevant information buried gets ignored. Embeddings and retrieval work correctly. Window size adequate. Solution requires retrieval strategies placing content at boundaries.
+Domain
+1.0 Basic AI Concepts Related to Cybersecurity
+Question 51
+Skipped
+Your minimization policy requires deleting user data after 90 days but ML team argues model retains information through learned parameters creating GDPR right-to-be-forgotten violations. Which technique enables model retention and deletion?
+Model retraining without user data completely
+Correct answer
+Machine unlearning gradient techniques
+Access control on learned model parameters
+Data anonymization before deletion occurs
+Overall explanation
+Machine unlearning removes specific training data influence from parameters through selective gradient ascent without full retraining. Retraining expensive and impractical. Anonymization inadequate. Access controls do not remove learned information. Right-to-be-forgotten requires removing information from models.
+Domain
+2.0 Securing AI Systems
+Question 52
+Skipped
+Your AI code review flags thousands of potential SQL injection vulnerabilities. Manual review shows 97 percent false positives because AI misses that parameterized queries prevent exploitation. AI analyzes syntax but not runtime behavior. What enhancement reduces false positives?
+Expanded vulnerability signature database
+Faster code scanning throughput speed
+Stricter pattern matching rules applied
+Correct answer
+Data flow analysis runtime modeling
+Overall explanation
+Data flow analysis tracking how data flows through code with runtime behavior modeling identifies when security controls prevent exploitation. Expanded signatures increase false positives. Speed unrelated to accuracy. Stricter matching worsens precision. Accurate analysis requires understanding data flow.
+Domain
+3.0 AI-assisted Security
+Question 53
+Skipped
+Your automated penetration testing discovers vulnerabilities in test environments but executing exploitation creates denial-of-service in production despite scope restrictions and segmentation. AI legitimately accessed test but created cascading failures. What control prevents cascade?
+Correct answer
+Fault isolation blast radius analysis
+Reduced testing frequency limits applied
+Enhanced authentication requirements added
+Stricter network segmentation rules here
+Overall explanation
+Fault isolation with blast radius analysis predicts and contains potential cascading failures before execution preventing unintended impact. Segmentation already implemented but insufficient. Frequency inadequate. Authentication does not predict impact. Autonomous testing requires impact prediction.
+Domain
+3.0 AI-assisted Security
+Question 54
+Skipped
+Your fairness audit shows 15 percent accuracy difference across demographic groups despite identical algorithmic treatment. Analysis finds training data quality varies by group due to historical collection biases. Which intervention addresses unequal data quality?
+Correct answer
+Group-specific calibration constraints
+Increased overall training data volumes
+Demographic feature removal only applied
+Identical algorithmic treatment maintained
+Overall explanation
+Group-specific calibration adjusts decision thresholds compensating for data quality differences while maintaining fairness. Identical treatment of unequal data perpetuates bias. More data does not fix quality differences. Removing demographics loses ability to measure fairness.
+Domain
+2.0 Securing AI Systems
+Question 55
+Skipped
+Your AI incident summarization perfectly captures technical details but executives complain summaries lack business context failing to convey actual business impact risk exposure or required decisions. AI understands cybersecurity but not business. What provides business context?
+Improved summarization algorithms applied
+Correct answer
+Business knowledge graph impact modeling
+Expanded training data volume coverage
+Enhanced technical detail extraction here
+Overall explanation
+Business knowledge graph maps technical incidents to business processes assets and dependencies enabling impact assessment. Technical details captured. Summarization adequate. Data volume does not add business context. Business-relevant analysis requires explicit business context integration.
+Domain
+3.0 AI-assisted Security
+Question 56
+Skipped
+Your cost monitoring tracks per-user spending but attackers use credential stuffing distributing expensive queries across 10000 compromised accounts staying under per-user limits generating million dollar costs. Which monitoring detects this distributed attack?
+Enhanced credential validation only applied
+Aggregate cost limit globally enforced
+Lower per-user cost thresholds applied
+Correct answer
+Graph analysis of usage patterns here
+Overall explanation
+Graph analysis identifies coordinated behavior across accounts revealing distributed attacks through temporal patterns and query similarity invisible per-user. Lower thresholds create false positives. Global limits affect legitimate users. Credential validation inadequate for compromised accounts.
+Domain
+2.0 Securing AI Systems
+Question 57
+Skipped
+Advanced jailbreaking uses reinforcement learning to automatically discover novel attack prompts evolving faster than your firewall rules update. Traditional signature blocking ineffective. Which defensive approach counters adaptive threats?
+Correct answer
+Adversarial training automatic generation
+Stricter content filtering rules applied
+Expanded prompt firewall rule databases
+Rate limiting on prompt variation attempts
+Overall explanation
+Adversarial training with automatic attack generation creates robust models through continuous exposure matching attacker RL speed. Expanded rules lag innovation. Stricter filtering increases false positives. Rate limiting inadequate. Adaptive attacks require adaptive defenses.
+Domain
+2.0 Securing AI Systems
+Question 58
+Skipped
+Your AI incident management creates tickets assigns owners and prioritizes but makes critical errors routing security incidents to wrong teams causing hours delay during active breaches. AI understands incident types but not enterpriseal structure. What fixes routing accuracy?
+Faster ticket creation processing speed
+Correct answer
+Organizational knowledge graph role mappings
+Improved natural language understanding here
+Enhanced priority algorithms applied better
+Overall explanation
+Organizational knowledge graph maps incident types to responsible teams roles and escalation paths enabling accurate routing. NLU already adequate. Speed unrelated to accuracy. Priority algorithms do not address routing. Accurate management requires explicit organizational structure knowledge.
+Domain
+3.0 AI-assisted Security
+Question 59
+Skipped
+Your threat intel platform correlates indicators across 200 sources including OSINT commercial feeds and internal telemetry. System misses 83 percent of targeted campaigns despite detecting indicators because attacks span multiple kill chain stages over 6-month timeframes. What addresses this?
+Faster processing pipeline throughput
+Correct answer
+Long-term memory attention over time
+Expanded indicator database coverage
+Real-time alert correlation only here
+Overall explanation
+Long-term memory with attention enables correlation across extended timeframes identifying relationships between indicators separated by months. Real-time correlation misses temporal patterns. Expanded databases inadequate. Processing speed unrelated. Advanced persistent threats require long-term temporal reasoning.
+Domain
+3.0 AI-assisted Security
+Question 60
+Skipped
+Your GAN for threat scenarios shows mode collapse producing only three attack types despite training on 47 categories. Discriminator loss plateaus near zero while generator diverges. Standard GAN with batch normalization used. What addresses collapse?
+Correct answer
+Wasserstein loss with penalties
+Larger batch size with momentum
+Additional discriminator capacity
+Increased generator learning rate
+Overall explanation
+Wasserstein GAN with gradient penalty provides stable training preventing mode collapse through Lipschitz constraint. Learning rate increases worsen instability. Discriminator capacity insufficient alone. Batch size inadequate. WGAN-GP specifically designed to solve mode collapse.
+Domain
+1.0 Basic AI Concepts Related to Cybersecurity
+

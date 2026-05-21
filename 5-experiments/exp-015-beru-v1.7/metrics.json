@@ -1,0 +1,74 @@
+{
+  "experiment_id": "exp-015",
+  "model": "beru:v1.7",
+  "date": "2026-05-20",
+  "training": {
+    "final_loss": 1.7671,
+    "loss_curve": [
+      {"step": 10,  "loss": 3.1849, "epoch": 0.17},
+      {"step": 20,  "loss": 2.5166, "epoch": 0.35},
+      {"step": 30,  "loss": 2.0597, "epoch": 0.52},
+      {"step": 40,  "loss": 1.7944, "epoch": 0.70},
+      {"step": 50,  "loss": 1.6466, "epoch": 0.87},
+      {"step": 60,  "loss": 1.5282, "epoch": 1.03},
+      {"step": 70,  "loss": 1.4174, "epoch": 1.21},
+      {"step": 80,  "loss": 1.4187, "epoch": 1.38},
+      {"step": 90,  "loss": 1.3736, "epoch": 1.56},
+      {"step": 100, "loss": 1.3573, "epoch": 1.73},
+      {"step": 116, "loss": 1.3938, "epoch": 2.00}
+    ],
+    "samples_per_second": 2.946,
+    "runtime_seconds": 1243.9
+  },
+  "eval": {
+    "knowledge_brain_norag": {
+      "overall": 0.341,
+      "promoted": false,
+      "groups": {
+        "finding_accuracy": 0.488,
+        "poam_drafting": 0.396,
+        "tool_output_interpretation": 0.393,
+        "evidence_gap_detection": 0.292,
+        "dual_citation": 0.242,
+        "atlas_mapped_ai_risk": 0.238
+      }
+    },
+    "knowledge_brain_rag": {
+      "overall": 0.351,
+      "promoted": false,
+      "note": "RAG marginally helpful for dual_citation and evidence_gap; hurt tool_output_interpretation (-17%). Fine-tuning is the right lever, not retrieval.",
+      "groups": {
+        "finding_accuracy": 0.514,
+        "poam_drafting": 0.424,
+        "evidence_gap_detection": 0.383,
+        "dual_citation": 0.339,
+        "atlas_mapped_ai_risk": 0.221,
+        "tool_output_interpretation": 0.227
+      }
+    },
+    "pentest_brain_v1_norag": {
+      "overall": 0.548,
+      "promoted": false,
+      "note": "Old suite tested raw refusal behavior. Wrong framing for BERU's production context."
+    },
+    "pentest_brain_v2_norag": {
+      "overall": 0.630,
+      "promoted": false,
+      "note": "Rebuilt suite — evidence-in/finding-out framing. 8/10 LLM categories passing at 70%.",
+      "groups": {
+        "LLM02": 0.70,
+        "LLM03": 0.70,
+        "LLM04": 0.70,
+        "LLM05": 0.70,
+        "LLM06": 0.70,
+        "LLM07": 0.70,
+        "LLM08": 0.70,
+        "LLM10": 0.70,
+        "LLM01": 0.35,
+        "LLM09": 0.35
+      }
+    }
+  },
+  "promotion_decision": "CHALLENGER",
+  "promotion_gate": "knowledge_brain >= 0.70 overall, >= 0.60 per group — not met"
+}

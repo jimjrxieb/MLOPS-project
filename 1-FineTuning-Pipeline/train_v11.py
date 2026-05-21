@@ -36,24 +36,24 @@ except ImportError:
     HAS_TRAINING_DEPS = False
 
 # Directories
-# Anchor at this script's location so the pipeline directory rename doesn't break this constant.
-# Adjust by one parent if this file moves.
-BASE_DIR = Path(__file__).resolve().parent
-GP_ROOT = BASE_DIR.parents[1]   # 1-FineTuning-Pipeline/.. -> GP-MODEL-OPS/.. -> GP-copilot
+from pipeline_config import cfg, pipeline_dir, gp_model_ops, repo_root
+BASE_DIR = pipeline_dir
 CHUNK_DIR = BASE_DIR / "03-chunked-untrained"
 HOLDOUT_DIR = BASE_DIR / "03-eval-holdout"
 TRAINED_DIR = BASE_DIR / "04-trained-data"
-MODEL_BASE_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/3-model-registry")
-LLAMA_CPP_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/llama.cpp")
-CLARIFY_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/4-eval-clarify")
-REPORTS_DIR = GP_ROOT / "GP-S3" / "3-mlops-reports" / "3-trained-data"
+MODEL_BASE_DIR = gp_model_ops / "3-model-registry"
+LLAMA_CPP_DIR = gp_model_ops / "llama.cpp"
+CLARIFY_DIR = gp_model_ops / "4-eval-clarify"
+REPORTS_DIR = repo_root / "GP-S3" / "3-mlops-reports" / "3-trained-data"
 
-# Default version
-DEFAULT_VERSION = "v1.1"
+# Default version (read from pipeline.yaml)
+DEFAULT_VERSION = cfg["run"]["version"]
 
-# Base model - JADE v1.0 or fallback
-V10_CHECKPOINT = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/3-model-registry/v1.0/jade-v1.0-merged")
-FALLBACK_MODEL = "unsloth/Llama-3.1-8B-Instruct"
+# Base model (read from pipeline.yaml — change there, not here)
+_model_name = cfg["run"]["model_name"]
+_prior_ver = cfg["run"].get("prior_checkpoint")
+V10_CHECKPOINT = MODEL_BASE_DIR / _model_name / _prior_ver / f"{_model_name}-merged" if _prior_ver else None
+FALLBACK_MODEL = cfg["base_model"]
 
 # Model configuration
 MAX_SEQ_LENGTH = 4096
@@ -75,7 +75,7 @@ JADE_SYSTEM_V11 = "You are JADE (Junior Automated DevSecOps Engineer), a securit
 
 
 def get_model_dir(version: str) -> Path:
-    return MODEL_BASE_DIR / version
+    return MODEL_BASE_DIR / _model_name / version
 
 
 def get_state_file(version: str) -> Path:
@@ -167,7 +167,7 @@ def get_checkpoint_path(state: Dict, version: str) -> Path:
     if state.get("last_merged") and Path(state["last_merged"]).exists():
         return Path(state["last_merged"])
 
-    if V10_CHECKPOINT.exists():
+    if V10_CHECKPOINT is not None and V10_CHECKPOINT.exists():
         return V10_CHECKPOINT
 
     return Path(FALLBACK_MODEL)

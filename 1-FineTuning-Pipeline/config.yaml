@@ -1,14 +1,13 @@
-# JADE Training Configuration
-# Pipeline: 1-data-pipeline
+# Default hyperparameters — used when config_file is not set in pipeline.yaml
+# Model identity and active run: see pipeline.yaml
 
 project:
-  name: "JADE-Copilot"
-  version: "v1.1-3b"
+  name: "GP-MODEL-OPS"
   author: "LinkOps Industries"
 
 model:
   base_model: "unsloth/Llama-3.2-3B-Instruct"
-  max_seq_length: 2048
+  max_seq_length: 8192
   load_in_4bit: true
 
 lora:
@@ -28,8 +27,8 @@ training:
   logging_steps: 1
 
 paths:
-  pipeline_dir: "1-data-pipeline"
-  untrained_chunks: "1-data-pipeline/03-chunked-untrained"
-  trained_chunks: "1-data-pipeline/04-trained-data"
+  pipeline_dir: "1-FineTuning-Pipeline"
+  untrained_chunks: "1-FineTuning-Pipeline/03-chunked-untrained"
+  trained_chunks: "1-FineTuning-Pipeline/04-trained-data"
   model_registry: "3-model-registry"
   eval_dir: "4-eval-clarify"

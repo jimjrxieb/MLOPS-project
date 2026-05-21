@@ -25,11 +25,12 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
 # Directories
-GLUE_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/1-data-pipeline")
-CLARIFY_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/4-eval-clarify")
+from pipeline_config import pipeline_dir, gp_model_ops
+GLUE_DIR = pipeline_dir
+CLARIFY_DIR = gp_model_ops / "4-eval-clarify"
 EVAL_DIR = CLARIFY_DIR / "2-test-data" / "evaluation"
 RESULTS_DIR = CLARIFY_DIR / "3-results"
-MODEL_VERSIONS_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/3-model-registry")
+MODEL_VERSIONS_DIR = gp_model_ops / "3-model-registry"
 
 # Knowledge categories -> subdirectory names
 KNOWLEDGE_CATEGORIES = {

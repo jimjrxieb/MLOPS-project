@@ -38,7 +38,8 @@ from datetime import datetime
 from typing import List, Dict, Set
 
 # Directories
-BASE_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/1-data-pipeline")
+from pipeline_config import pipeline_dir
+BASE_DIR = pipeline_dir
 ETL_DIR = BASE_DIR / "02-ETL-data"
 CHUNK_DIR = BASE_DIR / "03-chunked-untrained"
 HOLDOUT_DIR = BASE_DIR / "03-eval-holdout"

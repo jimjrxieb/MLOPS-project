@@ -1,0 +1,1295 @@
+Question 1
+Incorrect
+When conducting forensic analysis of a hard drive, what tool would BEST prevent changing the hard drive contents during your analysis?
+Correct answer
+Hardware write blocker
+Your answer is incorrect
+Forensic drive duplicator
+Software write blocker
+Degausser
+Overall explanation
+OBJ. 3.2: Both hardware and software write blockers are designed to ensure that forensic software and tools cannot change a drive inadvertently by accessing it. But, since the question indicates that you need to choose the BEST solution to protect the drive's contents from being changed during analysis, you should pick the hardware write blocker. A hardware write blocker's primary purpose is to intercept and prevent (or 'block') any modifying command operation from ever reaching the storage device. A forensic drive duplicator copies a drive and validates that it matches the original drive but cannot be used by itself during analysis. A degausser is used to wipe magnetic media. Therefore, it should not be used on the drive since it would erase the hard drive contents.   For support or reporting issues, include Question ID: 63fe08cf3b7322449ddbdf20 in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 2
+Correct
+Upon identifying a system vulnerability, the IT department of JKelly Data Solutions has implemented a solution that reduces the likelihood of the vulnerability being exploited but does not eliminate it completely. This solution is an example of which aspect of vulnerability management?
+Your answer is correct
+Mitigation
+Encryption
+Recurrence
+Authentication
+Overall explanation
+OBJ. 4.1: This solution is an example of mitigation as it reduces the likelihood of the vulnerability being exploited. While encryption can protect data, it does not reduce the likelihood of a vulnerability being exploited. Authentication methods ensure only authorized users can access systems, but they do not reduce the exploitability of a specific vulnerability. Recurrence is a situation where a previously resolved vulnerability has appeared again.   For support or reporting issues, include Question ID: 6477d1f84d820822c483f006 in your ticket. Thank you.
+
+Domain
+4.0 - Reporting and Communication
+Question 3
+Correct
+What is the purpose of an incident declaration and escalation process during incident response?
+Your answer is correct
+It determines the severity of an incident and allocates appropriate resources
+It communicates the incident to the public
+It is used to punish those responsible for the incident
+It provides a detailed analysis of the incident
+Overall explanation
+OBJ. 4.2: Incident declaration and escalation processes help to gauge the severity of an incident and ensure appropriate resources are allocated for effective response and recovery. The incident declaration and escalation process is not primarily about communicating the incident to the public. That is usually handled by public relations or a designated communications team. The incident declaration and escalation process is not about assigning blame or punishment. It's about understanding the severity of an incident and ensuring a proper response. While the incident declaration and escalation process may help guide the analysis, its primary purpose is not to provide a detailed analysis of the incident.   For support or reporting issues, include Question ID: 6478d5e62e78fa905c56714f in your ticket. Thank you.
+
+Domain
+4.0 - Reporting and Communication
+Question 4
+Incorrect
+Which of the following is exploited by an SQL injection to give the attacker access to a database?
+Your answer is incorrect
+Database server
+Operating system
+Correct answer
+Web application
+Firewall
+Overall explanation
+OBJ. 2.4: SQL injections target the data stored in enterprise databases by exploiting flaws in client-facing applications. These vulnerabilities being exploited are most often found in web applications. The database server or operating system would normally be exploited by a remote code execution, a buffer overflow, or another type of server-side attack. The firewall would not be subject to an SQL injection.   For support or reporting issues, include Question ID: 63fe08313b7322449ddbd75b in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 5
+Correct
+Jamie's organization is attempting to budget for the next fiscal year. Jamie has calculated that the asset value of a database server is $120,000. Based on her analysis, she believes that a data breach to this server will occur once every four years and has a risk factor is 30%. What is the ALE for a data breach within Jamie's organization?
+Your answer is correct
+$9,000
+$360,000
+$36,000
+$90,000
+Overall explanation
+OBJ. 2.3: The single loss expectancy (SLE) is the amount that would be lost in a single occurrence (AV) times the risk factor (RF). The annual loss expectancy (ALE) is the total cost of a risk to an organization annually. This is determined by multiplying the SLE by the annual rate of occurrence (ARO).
+
+SLE = AV x RF = $120,000 x 0.3 = $36,000
+ALE = SLE x ARO = $36,000 x 0.25 = $9,000   For support or reporting issues, include Question ID: 63fe08fb3b7322449ddbe144 in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 6
+Incorrect
+You are analyzing the logs of a web server. Consider the following log sample:
+
+
+Based on the logs above, which of the following type of attacks was conducted against this server?
+
+Your answer is incorrect
+Cross-site scripting
+Directory traversal
+Correct answer
+SQL injection
+XML injection
+Overall explanation
+OBJ. 1.3: SQL injection is a code injection technique that is used to attack data-driven applications. SQL injections are conducted by inserting malicious SQL statements into an entry field for execution. For example, an attacker may try to dump the contents of the database by using this technique. A common SQL injection technique is to insert an always true statement, such as 1 == 1, or in this example, 6810 == 6810 . In this case, the SQL injection is evidenced by the SQL statements being sent to the web application hosted by WordPress. XML Injection is an attack technique used to manipulate or compromise an XML application or service's logic. The injection of unintended XML content and/or structures into an XML message can alter the application's intended logic. Cross-Site Scripting (XSS) attacks are a type of injection in which malicious scripts are injected into otherwise benign and trusted websites. XSS attacks occur when an attacker uses a web application to send malicious code, generally in a browser side script, to a different end-user. A directory traversal attack aims to access files and directories that are stored outside the webroot folder. By manipulating variables or URLs that reference files with “dot-dot-slash (../)” sequences and its variations or using absolute file paths, it may be possible to access arbitrary files and directories stored on the file system, including application source code or configuration and critical system files.   For support or reporting issues, include Question ID: 63fe083d3b7322449ddbd7fb in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 7
+Correct
+In a network vulnerability assessment report, several zero-day and critical vulnerabilities were discovered. Why might this necessitate immediate action?
+Because they signal a need to decrease the frequency of vulnerability assessments
+Because zero-day and critical vulnerabilities improve the system's performance
+Because they indicate a need to hire more staff
+Your answer is correct
+These vulnerabilities present significant risk due to no current security fix being available
+Overall explanation
+OBJ. 4.1: Zero-day and critical vulnerabilities are high-risk issues that can severely compromise a system's security. One example of a zero-day virus that caused significant havoc is the "WannaCry" ransomware. It exploited a vulnerability in the Windows operating system, spreading rapidly across networks and encrypting files, demanding ransom payments in exchange for decryption. These types of vulnerabilities are significant threats, not performance enhancers. While additional resources might be needed for vulnerability management, the presence of critical vulnerabilities doesn't directly indicate staffing needs. On the contrary, critical vulnerabilities might suggest a need for more frequent and thorough assessments.   For support or reporting issues, include Question ID: 6478a9265d84bb1bc07c7daa in your ticket. Thank you.
+
+Domain
+4.0 - Reporting and Communication
+Question 8
+Correct
+You have been tasked to create some baseline system images to remediate vulnerabilities found in different operating systems. Before any of the images can be deployed, they must be scanned for malware and vulnerabilities. You must ensure the configurations meet industry-standard benchmarks and that the baselining creation process can be repeated frequently. What vulnerability option would BEST create the process requirements to meet the industry-standard benchmarks?
+Utilizing an authorized credential scan
+Utilizing a known malware plugin
+Utilizing a non-credential scan
+Your answer is correct
+Utilizing an operating system SCAP plugin
+Overall explanation
+OBJ. 2.4: Security Content Automation Protocol (SCAP) is a multi-purpose framework of specifications supporting automated configuration, vulnerability and patch checking, technical control compliance activities, and security measurement. It is an industry-standard and support testing for compliance. The other options will not allow for a truly repeatable process since individual scans would occur each time instead of comparing against a known good baseline.   For support or reporting issues, include Question ID: 63fe08923b7322449ddbdc26 in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 9
+Correct
+A company has a Service-Level Agreement (SLA) with a third-party provider, which offers limited system downtime for maintenance and patching. How might this SLA impact the remediation of identified vulnerabilities?
+The SLA ensures automatic patching of all vulnerabilities
+Your answer is correct
+The limited downtime may delay patching, prolonging exposure to known vulnerabilities
+The SLA guarantees no vulnerabilities in the system
+The SLA prevents any cybersecurity attacks
+Overall explanation
+OBJ. 4.1: Limited downtime for maintenance may hinder timely patch application, leaving the system vulnerable for longer periods. While some SLAs might include patch management, they do not ensure automatic remediation of all vulnerabilities. An SLA provides a level of service commitment but does not guarantee a system will be free of vulnerabilities. An SLA does not prevent cybersecurity attacks but outlines the expected service levels.   For support or reporting issues, include Question ID: 6477fd75fa500c2f2e5aba4f in your ticket. Thank you.
+
+Domain
+4.0 - Reporting and Communication
+Question 10
+Correct
+Which of the following would a virtual private cloud infrastructure be classified as?
+
+Software as a Service
+Platform as a Service
+Function as a Service
+Your answer is correct
+Infrastructure as a Service
+Overall explanation
+OBJ. 1.1: Infrastructure as a Service (IaaS) is a computing method that uses the cloud to provide any or all infrastructure needs. In a VPC environment, an organization may provision virtual servers in a cloud-hosted network. The service consumer is still responsible for maintaining the IP address space and routing internally to the cloud. Platform as a Service (PaaS) is a computing method that uses the cloud to provide any platform-type services. Software as a Service (SaaS) is a computing method that uses the cloud to provide users with application services. Function as a Service (FaaS) is a cloud service model that supports serverless software architecture by provisioning runtime containers to execute code in a particular programming language.   For support or reporting issues, include Question ID: 63fe08273b7322449ddbd6e8 in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 11
+Correct
+During a collaboration between a startup and a multinational corporation, the signed Memorandum of Understanding (MOU) has placed some limitations on the startup's system access. What could this potentially lead to?
+An increase in the cybersecurity measures employed by the multinational corporation
+A reduction in overall project costs
+Greater market visibility for the startup
+Your answer is correct
+Potentially restricting ability to fully remediate vulnerabilities
+Overall explanation
+OBJ. 4.1: This situation could potentially lead to the startup having a restricted ability to fully remediate vulnerabilities within their systems. Due to the limitations placed by the MOU, the startup might not have the necessary access to apply patches, make configuration changes, or implement compensating controls as swiftly or comprehensively as needed. This could increase the time it takes to remediate vulnerabilities and potentially increase their exposure to risk. While the MOU outlines the agreement between the two parties, it does not inherently lead to cost reductions. While collaborating with a large corporation may increase visibility, this is unrelated to vulnerability management. The MOU does not directly affect the cybersecurity measures of the multinational corporation.   For support or reporting issues, include Question ID: 647801e6fcfc2e1a66e506b8 in your ticket. Thank you.
+
+Domain
+4.0 - Reporting and Communication
+Question 12
+Correct
+Why do legacy systems pose challenges for organizations when it comes to patching and remediation?
+Legacy systems have built-in security mechanisms that prevent the need for patching
+Legacy systems are easier to patch due to their simplified architecture
+Legacy systems are more secure and less susceptible to vulnerabilities
+Your answer is correct
+Legacy systems often lack support and compatibility with newer patches
+Overall explanation
+OBJ. 2.5: Legacy systems are outdated and may no longer be actively supported by the vendor or manufacturer. As a result, compatibility issues arise when attempting to apply newer patches or updates, which can lead to system instability or disruptions. This challenge hinders organizations' ability to promptly remediate vulnerabilities in legacy systems. Legacy systems are not inherently more secure. In fact, they often lack the latest security enhancements and updates, making them more vulnerable to attacks and exploitation. Legacy systems can be more challenging to patch due to their complex and outdated architecture. The lack of compatibility with newer patches and updates complicates the remediation process, making it more difficult rather than easier. Legacy systems may have some security mechanisms, but they still require regular patching to address vulnerabilities and maintain a secure posture. Relying solely on built-in security mechanisms without applying patches can expose the system to known vulnerabilities.   For support or reporting issues, include Question ID: 647153f9dffc4122fd491bcf in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 13
+Incorrect
+Dion Training wants to require students to logon using multifactor authentication in an effort to increase the security of the authorization and authentication process. Currently, students login to diontraining.com using a username and password. What proposed solution would best meet the goal of enabling multifactor authentication for the student login process?
+Require students to create a unique pin that is entered after their username and password are accepted
+Require students to choose an image to serve as a secondary password after logon
+Your answer is incorrect
+Require students to enter a cognitive password requirement (such as 'What is your dog's name?')
+Correct answer
+Require students to enter a unique six-digit number that is sent to them by SMS after entering their username and password
+Overall explanation
+OBJ. 2.4: All of the options presented are knowledge factors (something you know) except the six-digit number sent by SMS to your smartphone. This SMS sent number is an example of a possession factor or something you have. In this case, it verifies you have your smartphone. By combining this possession factor with the already in use knowledge factor (username and password), you can establish multifactor security for the login process.   For support or reporting issues, include Question ID: 63fe087b3b7322449ddbdb00 in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 14
+Correct
+Why is it crucial for an organization to conduct regular vulnerability management reporting?
+Your answer is correct
+Helps in identifying and prioritizing the system vulnerabilities
+Improves employee morale
+Increases the number of customers
+Boosts the company's stock price
+Overall explanation
+OBJ. 4.1: Regular reporting of system vulnerabilities provides the security team with an up-to-date view of the organization's risk landscape, enabling them to make informed decisions for effective mitigation. By analyzing and understanding the vulnerabilities identified in the reports, the security team can prioritize remediation efforts, allocate resources appropriately, and implement necessary security controls. While a secure system can indirectly contribute to a company's overall success, regular reporting itself doesn't directly affect the company's stock price. The main aim of vulnerability reporting is to secure the system, not directly increasing the customer base. Although a secure work environment could indirectly contribute to employee morale, the primary purpose of vulnerability reporting is to maintain a secure system.   For support or reporting issues, include Question ID: 6478be4aa8e5a8d70a04526e in your ticket. Thank you.
+
+Domain
+4.0 - Reporting and Communication
+Question 15
+Correct
+You received an incident response report indicating a piece of malware was introduced into the company’s network through a remote workstation connected to the company’s servers over a VPN connection. Which of the following controls should be applied to prevent this type of incident from occurring again?
+ACL
+MAC filtering
+SPF
+Your answer is correct
+NAC
+Overall explanation
+OBJ. 1.1: Network Access Control (NAC) is an approach to computer security that attempts to unify endpoint security technology (such as anti-virus, host intrusion prevention, and vulnerability assessment), user or system authentication, and network security enforcement. When a remote workstation connects to the network, NAC will place it into a segmented portion of the network (sandbox), scan it for malware and validate its security controls, and then based on the results of those scans, either connect it to the company’s networks or place the workstation into a separate quarantined portion of the network for further remediation. An access control list (ACL) is a network traffic filter that can control incoming or outgoing traffic. An ACL alone would not have prevented this issue. MAC Filtering refers to a security access control method whereby the MAC address assigned to each network card is used to determine access to the network. MAC filtering operates at layer 2 and is easy to bypass. Sender Policy Framework (SPF) is an email authentication method designed to detect forging sender addresses during the email delivery.   For support or reporting issues, include Question ID: 63fe08713b7322449ddbda88 in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 16
+Correct
+Which type of system would classify traffic as malicious or benign based on explicitly defined examples of malicious and benign traffic?
+Artificial intelligence
+Deep learning
+
+Generative adversarial network
+Your answer is correct
+Machine learning
+Overall explanation
+OBJ. 1.5: A machine learning (ML) system uses a computer to accomplish a task without being explicitly programmed. In the context of cybersecurity, ML generally works by analyzing example data sets to create its own ability to classify future items presented. If the system was presented with large datasets of malicious and benign traffic, it will learn which is malicious and categorize future traffic presented to it. Artificial Intelligence is the science of creating machines to develop problem-solving and analysis strategies without significant human direction or intervention. AI goes beyond ML and can make a more complicated decision than just the classifications made by ML. A deep learning system can determine what is malicious traffic without having the prior benefit of being told what is benign/malicious. A generative adversarial network is an underlying strategy used to accomplish deep learning but is not specific to the scenario described.   For support or reporting issues, include Question ID: 63fe08a23b7322449ddbdcee in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 17
+Correct
+A malware infection has been detected on a standalone system in your organization that has no direct internet connection. In this scenario, which of the following is a likely vector for the malware infection?
+An infected website
+A malicious email attachment
+A network-based attack
+Your answer is correct
+Infected removable media
+Overall explanation
+OBJ. 1.4: In a standalone system with no direct internet connection, malware is often introduced through infected removable media, such as a USB drive. Without an internet connection, malicious email attachments are not a likely vector for malware infection. Without an internet connection, an infected website is not a likely vector for a malware infection on a standalone system. Without connectivity to other networks, a network-based attack is not a likely vector for a malware infection on a standalone system.   For support or reporting issues, include Question ID: 647a679d7c419735927a809d in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 18
+Incorrect
+You conducted a security scan and found that port 389 is being used when connecting to LDAP for user authentication instead of port 636. The security scanning software recommends that you remediate this by changing user authentication to port to 636 wherever possible. What should you do?
+Mark this as a false positive in your audit report since the services that typically run on ports 389 and 636 are identical
+Your answer is incorrect
+Conduct remediation actions to update encryption keys on each server to match port 636
+Correct answer
+Change all devices and servers that support it to port 636 since encrypted services run by default on port 636
+Change all devices and servers that support it to port 636 since port 389 is a reserved port that requires root access and can expose the server to privilege escalation attacks
+Overall explanation
+OBJ. 2.4: LDAP can be run on either port 389 or port 636. Port 389 is the standard port for LDAP but typically runs unencrypted LDAP services over this port. Instead, you should change all devices and servers that can technically support the change to port 636 since LDAP services over port 636 are encrypted by default.   For support or reporting issues, include Question ID: 63fe08423b7322449ddbd837 in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 19
+Incorrect
+What is the primary importance of the 'Mean Time to Detect' (MTTD) metric in the context of incident response?
+Correct answer
+It measures the effectiveness of detection mechanisms
+It determines the severity of an incident
+Your answer is incorrect
+It calculates the total duration of the incident response process
+It gauges the impact of an incident on the organization
+Overall explanation
+OBJ. 4.2: The MTTD metric evaluates the efficiency of an organization's detection systems by measuring the time it takes to identify a potential incident. While MTTD contributes to the overall timeline of incident response, it specifically refers to the time from when an incident occurs to when it is detected, not the total duration of the response process. The MTTD metric does not directly measure the impact of an incident. It focuses on the detection capabilities of the organization. MTTD measures the time taken to detect an incident, not the severity of the incident.   For support or reporting issues, include Question ID: 6478d76d2e78fa905c56715e in your ticket. Thank you.
+
+Domain
+4.0 - Reporting and Communication
+Question 20
+Incorrect
+During the Stuxnet attack, a sophisticated worm was delivered to the victim, Iran's nuclear facilities, via an infected USB stick. Which phase of the Cyber Kill Chain does this represent?
+Command and Control
+Correct answer
+Delivery
+Your answer is incorrect
+Installation
+Reconnaissance
+Overall explanation
+OBJ. 3.1: The delivery of the Stuxnet worm via an infected USB stick represents the Delivery phase of the Cyber Kill Chain. Reconnaissance is about gathering information about the target system, not delivering a payload. Installation is the phase where the payload establishes a foothold on the system. Command and Control is about maintaining communication with the compromised system, not delivering a payload.    For support or reporting issues, include Question ID: 64790bfa4d4221440139f57f in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 21
+Correct
+Which of the following types of information is protected by rules in the United States that specify the minimum frequency of vulnerability scanning required for devices that process it?
+Insurance records
+Your answer is correct
+Credit card data
+Driver’s license numbers
+Medical records
+Overall explanation
+OBJ. 2.1: The Payment Card Industry Data Security Standard is an information security standard for organizations that handle branded credit cards from the major card schemes. The PCI Standard is mandated by the card brands but administered by the Payment Card Industry Security Standards Council. As part of PCI DSS compliance, organizations must conduct internal and external scans at prescribed intervals on any devices or systems that process credit card data. HIPPA protects medical and insurance records, but this law doesn't define a frequency for vulnerability scanning requirements. Driver's license numbers are considered PII, but again, there is no defined frequency scanning requirement regarding protecting PII under law, regulation, or rule.   For support or reporting issues, include Question ID: 63fe09143b7322449ddbe27f in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 22
+Correct
+Which of the following type of solutions would you classify an FPGA as?
+Trusted platform module
+Root of trust
+Hardware security module
+Your answer is correct
+Anti-tamper
+Overall explanation
+OBJ. 1.1: A field-programmable gate array (FPGA) is an anti-tamper mechanism that makes use of a type of programmable controller and a physically unclonable function (PUF). The PUF generates a digital fingerprint based on the unique features of the device. This means that tampering with a device, such as removing the chip or adding an unknown input/output mechanism, can be detected. A remedial action like using zero-filling cryptographic keys can be performed automatically. A hardware security module (HSM) is an appliance for generating and storing cryptographic keys. It is a solution that may be less susceptible to tampering and insider threats than a traditional software-based storage solution. A trusted platform module (TPM) is a specification for hardware-based storage of digital certificates, cryptographic keys, hashed passwords, and other user and platform identification information. A hardware root of trust (RoT) or trust anchor is a secure subsystem that can provide attestation to declare something as true.   For support or reporting issues, include Question ID: 63fe09073b7322449ddbe1da in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 23
+Correct
+An employee contacts the service desk because they cannot open an attachment they receive in their email. The service desk agent conducts a screen sharing session with the user and investigates the issue. The agent notices that the attached file is named Invoice1043.pdf, and a black pop-up window appears and then disappears quickly when the attachment was double-clicked. Which of the following is most likely causing this issue?
+Your answer is correct
+The attachment is using a double file extension to mask its identity
+The user doesn't have a PDF reader installed on their computer
+The file contains an embedded link to a malicious website
+The email is a form of spam and should be deleted
+Overall explanation
+OBJ. 1.3: The message contains a file attachment hoping that the user will execute or open it. The attachment's nature might be disguised by formatting tricks such as using a double file extension, such as Invoice1043.pdf.exe, where the user only sees the first extension since .exe is a known file type in Windows. This would explain the black popup window that appears and then disappeared, especially if the exe file was running a command-line tool. This file is most likely not a PDF, so there is no need for a PDF reader. Additionally, most modern web browsers, such as Chrome and Edge, can open PDF files by default for the user. The file would not contain an embedded link since an embedded link is another popular attack vector that embeds a link to a malicious site within the email body, not within the file. This email is likely not spam and would be better categorized as a phishing attempt instead.   For support or reporting issues, include Question ID: 63fe08a63b7322449ddbdd1b in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 24
+Correct
+Dion Training Solutions has just installed a backup generator for their offices that use SCADA/ICS for remote monitoring of the system. The generator’s control system has an embedded cellular modem that periodically connects to the generator’s manufacturer to provide usage statistics. The modem is configured for outbound connections only, and the generator has no data connection with any of Dion Training’s other networks. The manufacturer utilizes data minimization procedures and uses the data to recommend preventative maintenance service and ensure maximum uptime and reliability by identifying parts that need to be replaced. Which of the following cybersecurity risk is being assumed in this scenario?
+There is medium risk being assumed since the manufacturer could use the data for purposes other than originally agreed upon
+There is a critical risk being assumed since the cellular modem represents a threat to the enterprise network if an attacker exploits the generator and then pivots to the production environment
+There is high risk being assumed since the presence of a cellular modem could allow an attacker to remotely disrupt the generator
+Your answer is correct
+There is minimal risk being assumed since the cellular modem is configured for outbound connections only
+Overall explanation
+OBJ. 2.2: There is minimal risk being assumed in this scenario since the cellular modem is configured for outbound connections only. This also minimizes the risk of an attacker gaining remote access to the generator. The generator is logically and physically isolated from the rest of the enterprise network, so even if an attacker could exploit the generator, they could not pivot into the production network. While there is a risk of the manufacturer using the data for purposes other than originally agreed upon, this is a minimal risk due to the manufacturer’s data minimization procedures and the type of data collected. Should the manufacturer choose to use usage statistics about the generator for some other purpose, it would have a negligible impact on the company since it does not contain any PII or proprietary company data.   For support or reporting issues, include Question ID: 63fe08283b7322449ddbd6f2 in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 25
+Correct
+A salesperson's laptop has become unresponsive after attempting to open a PDF in their email. A cybersecurity analyst reviews the IDS and anti-virus software for any alerts or unusual behavior but finds nothing suspicious. Which of the following threats would BEST classify this scenario?
+Ping of death
+Your answer is correct
+Zero-day malware
+PII exfiltration
+RAT
+Overall explanation
+OBJ. 2.1: Based on the scenario provided, it appears that the laptop has become the victim of a zero-day attack. A zero-day attack is an attack that exploits a potentially serious software security weakness that the vendor or developer may be unaware of. This means that there will not be a signature available in the IDS or anti-virus definition file. Therefore, it cannot be combatted with traditional signature-based detection methods. PII (personally identifiable information) exfiltration is the unauthorized copying, transfer, or retrieval of PII data from a computer or server. A ping of death is a type of attack on a computer system that involves sending a malformed or otherwise malicious ping to a computer. A remote access Trojan (RAT) is a malware program that includes a back door for administrative control over the target computer. Based on the scenario's information, we do not have any indications that a ping packet was sent, that PII has been exfiltrated, or that the attack now has remote control of the laptop. Since neither the IDS nor anti-virus alerted on the PDF, it is most likely a form of a zero-day attack.   For support or reporting issues, include Question ID: 63fe08a03b7322449ddbdcd0 in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 26
+Incorrect
+After a cyber incident at your organization where a ransomware attack crippled the operational servers, your team is tasked with conducting an in-depth examination. The goal is to trace back the origin of the attack, determining where and how it penetrated your defenses. Which activity would best aid your team in this endeavor?
+Lessons learned
+Forensic analysis
+Your answer is incorrect
+Incident response plan
+Correct answer
+Root cause analysis
+Overall explanation
+OBJ. 3.3: Root cause analysis involves investigating an incident in detail to determine its origin and how it unfolded, with the aim of preventing similar incidents in the future. Although forensic analysis also involves a thorough investigation of an incident, its focus is broader and often includes legal implications, whereas root cause analysis is more focused on the initial causes of the issue. Lessons learned is the review process after an incident, where stakeholders evaluate what happened, what was done well, and what needs improvement. It's a broader concept than just determining the initial cause of an issue. The incident response plan is a preparatory document outlining the organization's approach to managing security incidents. It is not an activity performed after an incident.   For support or reporting issues, include Question ID: 64798ac1c6ae0ad185c9454e in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 27
+Correct
+Following a root cause analysis of an edge router's unexpected failure, a cybersecurity analyst discovered that the system administrator had purchased the device from an unauthorized reseller. The analyst suspects that the router may be a counterfeit device. Which of the following controls would have been most effective in preventing this issue?
+Verify that all routers are patched to the latest release
+Ensure all anti-virus signatures are up to date
+Your answer is correct
+Conduct secure supply chain management training
+Increase network vulnerability scan frequency
+Overall explanation
+OBJ. 1.4: Anti-counterfeit training is part of the NIST 800-53r4 control set (SA-19(1)) and should be a mandatory part of your supply chain management training within your organization.  All other options may produce security gains in the network. They are unlikely to reliably detect a counterfeit item or prevent its introduction into the organization's supply chain.  Training on detection methodologies (i.e., simple visual inspections) and training for acquisition personnel will better prevent recurrences.   For support or reporting issues, include Question ID: 63fe08823b7322449ddbdb5a in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 28
+Incorrect
+Which technique would provide the largest increase in security on a network with ICS, SCADA, or IoT devices?
+Your answer is incorrect
+Implement endpoint protection platforms
+Installation of anti-virus tools
+Use of a host-based IDS or IPS
+Correct answer
+User and entity behavior analytics
+Overall explanation
+OBJ. 1.1: Since ICS, SCADA, and IoT devices often run proprietary, inaccessible, or unpatchable operating systems, the traditional tools used to detect the presence of malicious cyber activity in normal enterprise networks will not function properly. Therefore, user and entity behavior analytics (UEBA) is best suited to detect and classify known-good behavior from these systems to create a baseline. Once a known-good baseline is established, deviations can be detected and analyzed. UEBA may be heavily dependent on advanced computing techniques like artificial intelligence and machine learning and may have a higher false-positive rate. As the name suggests, the analytics software tracks user account behavior across different devices and cloud services. Entity refers to machine accounts, such as client workstations or virtualized server instances, and embedded hardware, such as the Internet of Things (IoT) devices. Traditional technologies include anti-virus tools, host-based IDS and IPS, and endpoint protection platforms.   For support or reporting issues, include Question ID: 63fe085b3b7322449ddbd972 in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 29
+Correct
+Trevor is responsible for conducting the vulnerability scans for his organization. His supervisor must produce a monthly report for the CIO that includes the number of open vulnerabilities. What process should Trevor use to ensure the supervisor gets the information needed for their monthly report?
+Run a report each month and then email it to his supervisor
+Your answer is correct
+Create a custom report that is automatically emailed each month to the supervisor with the needed information
+Create an account for the supervisor to the vulnerability scanner so they can run their own reports
+Create an account for the supervisor's assistant so they can create their own reports
+Overall explanation
+OBJ. 4.1: The best solution is to design a report that provides all necessary information and configure it to send this report to the supervisor each month automatically. It is not a good practice to create additional accounts on the vulnerability scanner beyond what is necessary per the concept of least privilege. It is also inefficient for Trevor to run the reports each month and then email them to his supervisor. When possible, the use of automation should be encouraged.   For support or reporting issues, include Question ID: 63fe08433b7322449ddbd841 in your ticket. Thank you.
+
+Domain
+4.0 - Reporting and Communication
+Question 30
+Incorrect
+Which of the following vulnerabilities was a zero-day exploit?
+Correct answer
+SandWorm attack
+Shellshock
+Your answer is incorrect
+Dirty COW
+Windows VBScript Engine
+Overall explanation
+OBJ. 4.1: The SandWorm attack was a sophisticated cyber espionage campaign discovered in 2014. It exploited a zero-day vulnerability in Microsoft Windows and targeted various organizations, primarily in the energy and government sectors, allowing the attackers to gain unauthorized access, exfiltrate sensitive information, and carry out remote code execution. This vulnerability in Microsoft Windows was exploited by the SandWorm team before a patch was available, qualifying it as a zero-day exploit. Dirty COW was a serious vulnerability in the Linux kernel, but it was not a zero-day exploit. Shellshock was a critical vulnerability in the Bash shell, but it was not exploited before a patch was available. While CVE-2018-8174 was a significant vulnerability in Windows VBScript engine, it was not a zero-day exploit.   For support or reporting issues, include Question ID: 6478c336b9b62cc0d936d431 in your ticket. Thank you.
+
+Domain
+4.0 - Reporting and Communication
+Question 31
+Correct
+Which of the following frameworks is best suited for performing a structured approach to security testing across different areas such as applications, networks, and systems?
+OWASP Testing Guide
+MITRE ATT&CK
+Your answer is correct
+Open Source Security Testing Methodology Manual (OSS TMM)
+Diamond Model of Intrusion Analysis
+Overall explanation
+OBJ. 3.1: The Open Source Security Testing Methodology Manual (OSSTMM) provides a structured approach to security testing across different areas such as applications, networks, and systems. The Diamond Model primarily focuses on understanding the relationship between four elements of an attack: the adversary, the victim, the infrastructure, and the capability. It's not geared towards security testing. The MITRE ATT&CK framework provides a matrix of tactics, techniques, and procedures (TTPs) used by cyber adversaries. It doesn't focus on providing a structured approach to security testing. The OWASP Testing Guide provides a methodology for testing the security of web applications specifically, not a comprehensive approach to security testing across different areas.   For support or reporting issues, include Question ID: 6478fc1449dfe4fd3bd9beab in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 32
+Incorrect
+Which of the following methods could not be used to retrieve the key from a forensic copy of a BitLocker encrypted drive?
+Your answer is incorrect
+Analyzing the memory dump file
+Analyzing the hibernation file
+Correct answer
+Retrieving the key from the MBR
+Performing a FireWire attack on mounted drives
+Overall explanation
+OBJ. 3.2: BitLocker information is not stored in the Master Boot Record (MBR). Therefore, you cannot retrieve the key from the MBR. BitLocker keys can also be retrieved via hibernation files or memory dumps. The recovery key may also be retrieved by conducting a FireWire attack on the mounted drive using a side-channel attack known as a DMA attack. This question may seem beyond the scope of the exam. Still, the objectives allow for "other examples of technologies, processes, or tasks about each objective may also be included on the exam although not listed or covered" in the objectives' bulletized lists. The exam tests the equivalent of 4 years of hands-on experience in a technical cybersecurity job role. The content examples listed in the objectives are meant to clarify the test objectives and should not be construed as a comprehensive listing of this examination's content. Therefore, questions like this are fair game on test day. That said, your goal is not to score 100% on the exam; it is to pass it. Don't let questions like this throw you off on test day. If you aren't sure, take your best guess and move on!   For support or reporting issues, include Question ID: 63fe08e43b7322449ddbe029 in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 33
+Correct
+Your intrusion detection system has produced an alert based on its review of a series of network packets. After analysis, it is determined that the network packets did not contain any malicious activity. How should you classify this alert?
+True negative
+False negative
+Your answer is correct
+False positive
+True positive
+Overall explanation
+OBJ. 2.3: A false positive occurs when an alert is triggered (the system believes malicious activity occurred) when there is no malicious activity involved. A false positive is an error in some evaluation process in which a condition tested for is mistakenly found to have been detected.   For support or reporting issues, include Question ID: 63fe08503b7322449ddbd8e1 in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 34
+Correct
+A company has recently experienced a data breach and has lost nearly 1 GB of personally identifiable information about its customers. You have been assigned as part of the incident response team to identify how the data was leaked from the network. Your team has conducted an extensive investigation, and so far, the only evidence of a large amount of data leaving the network is from the email server. One user has sent numerous large attachments out of the network to their personal email address. Upon closer inspection, those emails only contain pictures of that user’s recent trip to Australia. What is the most likely explanation for how the data left the network?
+The data was encrypted and emailed it to their spouse's email account
+The files were downloaded from home while connected to the corporate VPN
+Your answer is correct
+Steganography was used to hide the leaked data inside the user's photos
+The data was hashed and then emailed to their personal email account
+Overall explanation
+OBJ. 1.2: The most likely explanation is that the user utilized steganography to hide the leaked data inside their trip photos. Steganography is the process of hiding one message inside another. By hiding the customer’s information within the digital photos, the incident response team would not see the data being hidden without knowing to look for it inside the seemingly benign pictures from the trip. The scenario did not mention whether or not the user connected to the corporate VPN from their home, and the company should log all VPN connections, so this is not the correct answer. Additionally, the user could not hash the data and email it to themselves without losing the information since hashes are a one-way algorithm. Therefore, even if the user had the hash value, they still would not have the customers' personal information. Finally, according to the scenario, the user’s email showed no evidence of encrypted files being sent.   For support or reporting issues, include Question ID: 63fe09003b7322449ddbe185 in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 35
+Incorrect
+What sanitization technique uses only logical techniques to remove data, such as overwriting a hard drive with a random series of ones and zeroes?
+Destroy
+Your answer is incorrect
+Degauss
+Correct answer
+Clear
+Purge
+Overall explanation
+OBJ. 3.2: Clear applies logical techniques to sanitize data in all user-addressable storage locations for protection against simple non-invasive data recovery techniques. Clearing involves overwriting data once (and seldom more than three times) with repetitive data (such as all zeros) or resetting a device to factory settings. Purging data is meant to eliminate information from being feasibly recovered even in a laboratory environment. Destroy requires physical destruction of the media, such as pulverization, melting, incineration, and disintegration. Degaussing is the process of decreasing or eliminating a remnant magnetic field. Degaussing is an effective method of sanitization for magnetic media, such as hard drives and floppy disks.   For support or reporting issues, include Question ID: 63fe08873b7322449ddbdb9b in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 36
+Correct
+Your organization has been experiencing several cybersecurity incidents, including data breaches and compliance violations, that seems to stem from the software your team develops. What approach can you implement to systematically reduce these incidents?
+Patch Management
+Your answer is correct
+Secure Software Development Life Cycle (SDLC)
+Waterfall Model
+Agile Development
+Overall explanation
+OBJ. 2.5: Implementing a Secure SDLC involves integrating security considerations into every phase of software development. This not only helps prevent security vulnerabilities but also ensures data protection, compliance with regulations, and reduces the chances of operational disruptions, making it the ideal approach to decrease the cybersecurity incidents your organization is experiencing. The waterfall model is a linear approach to software development where one phase must be completed before the next begins. While it provides structure to the development process, it does not inherently emphasize security considerations, and therefore may not help to reduce security incidents. Agile development focuses on rapid and iterative development, which allows for flexibility and quick changes. However, without integrating a focus on security into each sprint, this method alone might not be effective in reducing cybersecurity incidents. While patch management is crucial for maintaining up-to-date security, it is a reactive approach. It may help to fix known vulnerabilities but does not prevent the introduction of new vulnerabilities during software development. Hence, it does not offer a comprehensive solution to the problem at hand.   For support or reporting issues, include Question ID: 6471439c33a1b213196b0cea in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 37
+Incorrect
+You are investigating a suspected compromise. You have noticed several files that you don't recognize. How can you quickly and effectively check if the files have been infected with malware?
+Correct answer
+Submit the files to an open-source intelligence provider like VirusTotal
+Your answer is incorrect
+Scan the files using a local anti-virus/anti-malware engine
+Disassemble the files and conduct static analysis on them using IDA Pro
+Run the Strings tool against each file to identify common malware identifiers
+Overall explanation
+OBJ. 3.2: The best option is to submit them to an open-source intelligence provider like VirusTotal. VirusTotal allows you to quickly analyze suspicious files and URLs to detect types of malware. It then automatically shares them with the security community, as well. Disassembly and static analysis would require a higher level of knowledge and more time to complete. Running the Strings tool can help identify text if the code is not encoded in a specific way within the malware, but you have to know what you are looking for, such as a malware signature. You should never scan the files using a local anti-virus or anti-malware engine if you suspect the workstation or server has already been compromised because the scanner may also be compromised.   For support or reporting issues, include Question ID: 63fe08c43b7322449ddbde9e in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 38
+Incorrect
+What is the best practice for protecting against SQL Injection attacks?
+Your answer is incorrect
+Use client-side input validation
+Encrypt all data in the database
+Avoid using a database
+Correct answer
+Use parameterized queries or prepared statements
+Overall explanation
+OBJ. 2.5: Using parameterized queries or prepared statements is indeed a best practice for protecting against SQL Injection attacks, as it ensures that user input is always treated as literal data and not part of the SQL command. While client-side input validation can help improve user experience, it's not a security measure as it can be easily bypassed. While encrypting sensitive data is a good security measure, it does not protect against SQL Injection attacks, which involve the misuse of the database command language. Avoiding databases is not a practical solution for most applications, as they often need to store and retrieve data. Security should not be achieved by avoiding useful technologies but by using them in a secure way.    For support or reporting issues, include Question ID: 646835a84828556950390e5b in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 39
+Correct
+Sagar is planning to patch a production system to correct a detected vulnerability during his most recent vulnerability scan of the network. What process should he follow to minimize the risk of a system failure while patching this vulnerability?
+Your answer is correct
+Deploy the patch in a sandbox environment to test it prior to patching the production system
+Contact the vendor to determine a safe time frame for deploying the patch into the production environment
+Deploy the patch immediately on the production system to remediate the vulnerability
+Wait 60 days to deploy the patch to ensure there are no associated bugs reported with it
+Overall explanation
+OBJ. 2.1: While patching a system is necessary to remediate a vulnerability, you should always test the patch before implementation. It is considered a best practice to create a staging or sandbox environment to test the patches' installation before installing them into the production environment. This reduces the risks of the patch breaking something in the production system. Unless you are dealing with a very critical vulnerability and the risk of not patching is worse than the risk of patching the production system directly, you should not immediately patch the production systems without testing the patch first. You should not wait 60 days to deploy the patch. Waiting this long provides attackers an opportunity to reverse engineer the patch and creating a working exploit against the vulnerability. Finally, asking the vendor for a safe time frame is not helpful since the vendor does not know the specifics of your environment or your business operations.   For support or reporting issues, include Question ID: 63fe08ac3b7322449ddbdd66 in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 40
+Incorrect
+James is working with the software development team to integrate real-time security reviews into some of their SDLC processes. Which of the following would best meet this requirement?
+Correct answer
+Pair Programming
+Your answer is incorrect
+Tool-assisted review
+Formal code review
+Pass-around code review
+Overall explanation
+OBJ. 2.5: Pair programming is a real-time process that would meet this requirement. It utilizes two developers working on one workstation, where one developer reviews the code being written in real-time by the other developer. While the other three options can also provide a security review, none are considered "real-time" since they are asynchronous processes performed after the coding has already been completed.   For support or reporting issues, include Question ID: 63fe08683b7322449ddbda10 in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 41
+Correct
+You are reviewing the IDS logs and notice the following log entry:
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+(where email=support@diontraining.com and password=‘ or 7==7’)
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+What type of attack is being performed?
+
+Your answer is correct
+SQL injection
+XML injection
+Header manipulation
+Cross-site scripting
+Overall explanation
+OBJ. 1.3: SQL injection is a code injection technique that is used to attack data-driven applications. SQL injections are conducted by inserting malicious SQL statements into an entry field for execution. For example, an attacker may try to dump the contents of the database by using this technique. A common SQL injection technique is to insert an always true statement, such as 1 == 1, or in this example, 7 == 7. Header manipulation is the insertion of malicious data, which has not been validated, into an HTTP response header. XML Injection is an attack technique used to manipulate or compromise an XML application or service's logic. The injection of unintended XML content and/or structures into an XML message can alter the application's intended logic. Cross-Site Scripting (XSS) attacks are a type of injection in which malicious scripts are injected into otherwise benign and trusted websites. XSS attacks occur when an attacker uses a web application to send malicious code, generally in a browser side script, to a different end-user.   For support or reporting issues, include Question ID: 63fe082d3b7322449ddbd733 in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 42
+Incorrect
+A company's quarterly vulnerability reports consistently reveal popular content management systems like WordPress and Joomla in the "Top 10 Most Vulnerable" list, what strategic action might this situation suggest for the company to undertake?
+Your answer is incorrect
+This pattern suggests a need to increase the frequency of company-wide meetings
+The repeated listing of these applications means they are most used within the organization
+Repeated appearance of applications in the list indicates a need for staff training on those applications
+Correct answer
+The company should conduct risk analysis on the use of the application
+Overall explanation
+OBJ. 4.1: This pattern may necessitate a reevaluation of the vulnerable applications' continued use or an increased focus on mitigating their vulnerabilities. While staff training can be part of vulnerability management, repeated vulnerabilities might indicate deeper issues with the applications themselves. Company-wide meetings and vulnerability management are largely unrelated. The pattern primarily points toward potential issues with the applications. Application usage and vulnerability are not directly correlated; applications can be heavily used and still secure, or lightly used and highly vulnerable.   For support or reporting issues, include Question ID: 6478acb32c2251f4e907b566 in your ticket. Thank you.
+
+Domain
+4.0 - Reporting and Communication
+Question 43
+Correct
+Which phase of the Cyber Kill Chain involves the gathering of information about the target system, its technologies, potential vulnerabilities, and users?
+Exploitation
+Weaponization
+Your answer is correct
+Reconnaissance
+Delivery
+Overall explanation
+OBJ. 3.1: Reconnaissance is the initial phase of the Cyber Kill Chain that involves gathering information about the target system, its technologies, potential vulnerabilities, and users. The weaponization phase involves packaging an exploit into a deliverable payload, not gathering information about a target system. The delivery phase involves transmitting the weaponized bundle to the victim, not gathering information about a target system. Exploitation involves the execution of the delivered exploit, not gathering information about a target system.   For support or reporting issues, include Question ID: 6478ffdd96eaf29032efbb28 in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 44
+Incorrect
+You are attending a cybersecurity conference and just watched a security researcher demonstrating the exploitation of a web interface on a SCADA/ICS component. This caused the device to malfunction and be destroyed. You recognize that the same component is used throughout your company’s manufacturing plants. Which of the following mitigation strategies would provide you with the most immediate protection against this emergent threat?
+Replace the affected SCADA/ICS components with more secure models from a different manufacturer
+Correct answer
+Evaluate if the web interface must remain open for the system to function; if it isn’t needed, block the web interface
+Your answer is incorrect
+Demand that the manufacturer of the component release a patch immediately and deploy the patch as soon as possible
+Logically or physically isolate the SCADA/ICS component from the enterprise network
+Overall explanation
+OBJ. 2.4: The most immediate protection against this emergent threat would be to block the web interface from being accessible over the network. Before doing this, you must evaluate whether the interface needs to remain open for the system to function properly. If it is not needed, you should block it to minimize the SCADA/ICS component's attack surface. Ideally, your SCADA/ICS components should already be logically or physically isolated from the enterprise network. Since the question doesn’t mention the networks as an area of concern, we can assume they are already following the industry best practice of logical or physical segmentation between the SCADA/ICS network and the enterprise network. On the exam, make sure you focus on the question being asked. In this case, the question focuses on the web interface. Developing a patch can be a time-consuming process, therefore waiting for the manufacturer to provide a patch will not provide immediate protection to your components. The same is true for replacing the affected components. Even if you could get the company to authorize the funding for such a purchase, it would take time to order, ship, receive and install the new components. Additionally, you would cause unwanted downtime in the factory during the installation of the components, making it an ineffective option when simply blocking the web interface is free, quick, and effective.   For support or reporting issues, include Question ID: 63fe084e3b7322449ddbd8c8 in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 45
+Incorrect
+Which of the following would an adversary do during the 'delivery' phase of the Lockheed Martin kill chain? (SELECT THREE)
+
+Your selection is correct
+Direct action against public-facing servers
+Your selection is incorrect
+Adversary triggering exploits for non-public facing servers
+Correct selection
+Deliberate social media interactions with the target's personnel
+Your selection is incorrect
+Select a decoy document to present to the victim
+Collect press releases, contract awards, and conference attendee lists
+Correct selection
+Release of malicious email
+Overall explanation
+OBJ. 3.1: During the delivery phase, the adversary is firing whatever exploits they have prepared during the weaponization phase. At this stage, they still do not have access to their target, though. Therefore, taking direct action against a public-facing web server, sending a spear-phishing email, placing a USB drive with malware, or starting a conversation on social media all fit within this phase. internet-facing servers were enumerated during reconnaissance. Selecting a decoy document to present to the victim occurs during weaponization. Collecting press releases, contract awards, and conference attendee lists occur during the reconnaissance phase.   For support or reporting issues, include Question ID: 63fe08643b7322449ddbd9e2 in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 46
+Correct
+Susan, a help desk technician at Dion Training, has received several trouble tickets today related to employees receiving the same email as part of a phishing campaign. She has determined that the email's malicious link is not being blocked by the company's security suite when a user clicks the link. Susan asks you what action can be performed to prevent a user from reaching the website associated with the malicious link in the phishing email. What action do you recommend she utilize?
+Enable TLS on your organization's mail server
+Your answer is correct
+Add the malicious domain name to your content filter and web proxy's blacklist
+Forward this phishing email to all employees with a warning not to click on the embedded links
+Block the IP address of the malicious domain in your firewall's ACL
+Overall explanation
+OBJ. 2.4: To prevent a user from accessing the malicious website when the link is clicked, the malicious domain name should be added to the blacklist of the company's content filter and web proxy. This will ensure that no devices on the network can reach the malicious domain name. While blocking the IP address associated with the domain name might help for a short period of time, the owner of the malicious domain could quickly redirect the DNS to point to a different IP. Then the users would still be able to access the malicious domain and its contents. Enabling TLS on the mail server will only encrypt the connection between the email server and its clients, but it will not prevent the users from clicking on the malicious link and accessing the malicious content. While informing the users that there is an active attempt at phishing being conducted against the organization is a good idea, forwarding the phishing email with the malicious link will generally cause more users to accidentally click on the malicious link, which further exacerbates the issue.   For support or reporting issues, include Question ID: 63fe08a73b7322449ddbdd2a in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 47
+Correct
+During the massive SolarWinds supply chain attack of 2020, cybersecurity professionals worldwide had to react quickly to protect their networks. A specific annual cybersecurity conference often hosts a capture-the-flag (CTF) event where participants are challenged to solve a series of real-world scenarios for practicing their incident response skills. Which conference is this?
+RSA Conference
+Your answer is correct
+DEF CON
+Black Hat
+Pwn2Own
+Overall explanation
+OBJ. 3.3: DEF CON is one of the world's largest and most notable hacker conventions, held annually in Las Vegas, Nevada. Its capture-the-flag (CTF) event is a competitive and practical exercise in incident response. While the Black Hat conference is another renowned cybersecurity event, its primary focus is on revealing new vulnerabilities, not on practical incident response exercises like CTF. RSA Conference is a series of IT security conferences, but it does not host the capture-the-flag events for practical incident response exercises. Pwn2Own is a computer hacking contest held annually at the CanSecWest security conference. However, its main focus is on discovering new vulnerabilities, not on incident response exercises.   For support or reporting issues, include Question ID: 64798cf0de55614945a387f3 in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 48
+Incorrect
+You just completed an nmap scan against a workstation and received the following output:
+-=-=-=-=-=-=--=-=-=-=-=-=--=-=-=-=-=-=--=-=-=-=-=-=-
+
+# nmap diontraining012
+
+Starting Nmap ( http://nmap.org )
+
+Nmap scan report for diontraining012 (192.168.14.61)
+
+Not shown: 997 filtered ports
+
+PORT STATE
+
+135/tcp open
+
+139/tcp open
+
+445/tcp open
+
+Nmap done: 1 IP address (1 host up) scanned in 1.24 seconds
+
+-=-=-=-=-=-=--=-=-=-=-=-=--=-=-=-=-=-=--=-=-=-=-=-=-
+
+Based on these results, which of the following operating systems is most likely being run by this workstation?
+
+Your answer is incorrect
+CentOS
+Ubuntu
+Correct answer
+Windows
+macOS
+Overall explanation
+OBJ. 2.2: The workstation is most likely running a version of the Windows operating system. Port 139 and port 445 are associated with the SMB file and printer sharing service run by Windows. Since Windows 2000, the NetBIOS file and print sharing has been running over these ports on all Windows systems by default.   For support or reporting issues, include Question ID: 63fe08573b7322449ddbd93b in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 49
+Incorrect
+Which of the following lists represents the NIST cybersecurity framework's four tiers, when ordered from least mature to most mature?
+Correct answer
+Partial, Risk Informed, Repeatable, Adaptive
+Your answer is incorrect
+Partial, Repeatable, Risk Informed, Adaptive
+Partial, Risk Informed, Managed, Adaptive
+Partial, Managed, Risk Informed, Adaptive
+Overall explanation
+OBJ. 1.5: From least mature to most mature, the NIST cybersecurity framework is Partial (tier 1), Risk Informed (tier 2), Repeatable (tier 3), and Adaptive (tier 4). This question may seem beyond the scope of the exam. Still, the objectives allow for "other examples of technologies, processes, or tasks about each objective may also be included on the exam although not listed or covered" in the objectives' bulletized lists. The exam tests the equivalent of 4 years of hands-on experience in a technical cybersecurity job role. The content examples listed in the objectives are meant to clarify the test objectives and should not be construed as a comprehensive listing of this examination's content. Therefore, questions like this are fair game on test day. That said, your goal isn’t to score 100% on the exam; it is to pass it. Don't let questions like this throw you off on test day. If you aren't sure, take your best guess and move on!   For support or reporting issues, include Question ID: 63fe08fc3b7322449ddbe14e in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 50
+Correct
+Your organization has detected unusual network traffic patterns originating from an internal server during non-business hours. Upon investigation, it's discovered that an attacker has gained access and is sending data outbound on an uncommon port. According to the MITRE ATT&CK framework, which stage does this activity align with?
+Your answer is correct
+Exfiltration
+Lateral Movement
+Command and Control
+Discovery
+Overall explanation
+OBJ. 3.1: In the MITRE ATT&CK framework, Exfiltration is the stage that describes the transmission of information from within the victim's environment to a location controlled by the adversary. Discovery involves the adversary understanding the network and looking for resources to further their attack, not the act of sending data out of the network. Command and Control pertains to how an adversary communicates with systems under their control within a target network, not the stage of exporting data out of the network. Lateral Movement refers to the techniques an adversary uses to traverse the network, not the act of exfiltrating data.   For support or reporting issues, include Question ID: 647913d84d4221440139f5a7 in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 51
+Correct
+Which of the following is a best practice that should be followed when scheduling vulnerability scans of an organization's data center?
+Your answer is correct
+Schedule scans to run during periods of low activity
+Schedule scans to run during peak times to simulate performance under load
+Schedule scans to begin at the same time every day
+Schedule scans to be conducted evenly throughout the day
+Overall explanation
+OBJ. 2.1: For the best results, the scans should be scheduled during periods of low activity. This will help to reduce the negative impact of scanning on business operations. The other three options all carry a higher risk of causing disruptions to the network or its business operations.   For support or reporting issues, include Question ID: 63fe082e3b7322449ddbd738 in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 52
+Correct
+An incident response team is publishing an incident summary report and is determining the evidence retention requirements for the data collected during a response. Which of the following incident response phases is currently being performed by the team?
+Eradication and recovery
+Detection and analysis
+Preparation
+Your answer is correct
+Post-incident activities
+Overall explanation
+OBJ. 3.2: The post-incident activities phase is when report writing occurs, incident summary reports are published, evidence retention is determined, and lessons learned reports are created. An incident response has five stages: preparation, detection and analysis, containment, eradication and recovery, and post-incident activities.   For support or reporting issues, include Question ID: 63fe08ec3b7322449ddbe088 in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 53
+Correct
+You are reviewing the latest list of important web application security controls published by OWASP. Which of these items is LEAST likely to appear on that list?
+Implement identity and authentication controls
+Your answer is correct
+Obscure web interface locations
+Implement appropriate access controls
+Leverage security frameworks and libraries
+Overall explanation
+OBJ. 2.4: The least likely option to appear in the list is to obscure web interface locations. This recommendation is based on security through obscurity and is not considered a good security practice. The other options are all considered best practices in designing web application security controls and creating software assurance in our programs.   For support or reporting issues, include Question ID: 63fe087c3b7322449ddbdb14 in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 54
+Correct
+In a network containing ICS, SCADA, or IoT devices, which approach would best enhance the detection and prevention of lateral movement by an attacker?
+
+Deploying host-based IDS and/or IPS on all devices
+
+Your answer is correct
+Implementing network segmentation with VLANs
+
+Utilizing encryption for all network traffic
+
+Installing anti-virus software on each device
+
+Overall explanation
+OBJ. 1.4: Network segmentation with VLANs helps to isolate different parts of the network, making it harder for attackers to move laterally between devices if one is compromised. This approach provides a more effective barrier than deploying host-based IDS/IPS or anti-virus software, which may not adequately address the risks associated with lateral movement in ICS, SCADA, or IoT environments. Encryption protects data integrity; however it does not detect or prevent lateral movement.    For support or reporting issues, include Question ID: 6709b62a6e8c8f0d2a812c5b in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 55
+Correct
+In response to high-profile security incidents like the SolarWinds hack, the cybersecurity industry seeks to understand the specific strategies and methods used by attackers. Which of the following attack methodology frameworks focuses primarily on comprehending these specific tactics, techniques, and procedures (TTPs)?
+OWASP Testing Guide
+Cyber Kill Chain
+Diamond Model of Intrusion Analysis
+Your answer is correct
+MITRE ATT&CK
+Overall explanation
+OBJ. 3.1: The MITRE ATT&CK framework provides a comprehensive matrix of tactics, techniques, and procedures (TTPs) used by attackers. It helps to understand the specific methodologies an attacker could potentially use. The Diamond Model primarily focuses on understanding the relationship between four elements of an attack: the adversary, the victim, the infrastructure, and the capability. The Cyber Kill Chain describes the stages of a cyber attack, from identifying vulnerabilities (reconnaissance) to achieving objectives (actions and objectives). It doesn't focus on specific tactics, techniques, and procedures an attacker could potentially use. The OWASP Testing Guide provides a methodology for testing the security of web applications. It doesn't focus on the specific tactics, techniques, and procedures an attacker could potentially use.   For support or reporting issues, include Question ID: 6478fbda82355ee4e611539b in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 56
+Correct
+You are the head of a cybersecurity operations center. Currently, the team is struggling to manage data from different security tools and platforms. You're considering implementing a "single pane of glass" solution. What is the primary benefit of this approach?
+It eliminates the need for team coordination
+It increases the complexity of data management
+Your answer is correct
+It provides a unified view of security data from different sources
+It reduces the number of security tools required
+Overall explanation
+OBJ. 1.5: A single pane of glass solution aggregates data from multiple sources into a single dashboard, making it easier to view and manage. While a single pane of glass solution can streamline operations, it does not necessarily reduce the number of security tools required. These tools are still necessary for gathering the data that is displayed. A single pane of glass solution doesn't eliminate the need for team coordination. While it can provide a unified view of data, effective teamwork and communication are still necessary for managing cybersecurity operations. A single pane of glass solution is designed to simplify data management by providing a unified view of data from different sources, not to increase complexity.   For support or reporting issues, include Question ID: 647a628b76fd5bf8deaa6b10 in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 57
+Correct
+What type of malware changes its binary pattern in its code on specific dates or times to avoid detection by antimalware software?
+Your answer is correct
+Polymorphic virus
+Trojan
+Logic bomb
+Ransomware
+Overall explanation
+OBJ. 2.4: A polymorphic virus alters its binary code to avoid detection by antimalware scanners that rely on signature-based detection. By changing its signature, the virus can avoid detection.   For support or reporting issues, include Question ID: 63fe085f3b7322449ddbd9a4 in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 58
+Correct
+What SCAP component provides a list of entries that contains an identification number, a description, and a public reference for each publicly known weakness in a piece of software?
+CPE
+Your answer is correct
+CVE
+CCE
+XCCDF
+Overall explanation
+OBJ. 2.1: The Common Vulnerabilities and Exposures (CVE) system provides a reference-method for publicly known information-security vulnerabilities and exposures. XCCDF (extensible configuration checklist description format) is a language that is used in creating checklists for reporting results. The Common Configuration Enumeration (CCE) provides unique identifiers to system configuration issues to facilitate fast and accurate correlation of configuration data across multiple information sources and tools. Common Platform Enumeration (CPE) is a standardized method of describing and identifying classes of applications, operating systems, and hardware devices present among an enterprise's computing assets.   For support or reporting issues, include Question ID: 63fe08bc3b7322449ddbde2e in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 59
+Correct
+Cybersecurity analysts are experiencing some issues with their vulnerability scans aborting because the previous day's scans are still running when the scanner attempts to start the current day's scans. Which of the following recommendations is LEAST likely to resolve this issue?
+Your answer is correct
+Reduce the sensitivity of scans
+Add another vulnerability scanner
+Reduce the frequency of scans
+Reduce the scope of scans
+Overall explanation
+OBJ. 2.1: If the cybersecurity analyst were to reduce the scans' sensitivity, it still would not decrease the time spent scanning the network and could alter the effectiveness of the results received. In this scenario, the scans, as currently scoped, are taking more than 24 hours to complete with the current resources. The analyst could reduce the scans' scope, thereby scanning fewer systems or vulnerabilities signatures and taking less time to complete. Alternatively, the analyst could reduce the scans' frequency by moving to a less frequent schedule, such as one scan every 48 hours or one scan per week. The final option would be to add additional vulnerability scanners to the process. This would allow the two scanners to work together to divide the workload and complete the task within the 24-hour scan frequency currently provided.   For support or reporting issues, include Question ID: 63fe08473b7322449ddbd873 in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 60
+Incorrect
+Your company is making a significant investment in infrastructure-as-a-service (IaaS) hosting to replace its data centers. Which of the following techniques should be used to mitigate the risk of data remanence when moving virtual hosts from one server to another in the cloud?
+Your answer is incorrect
+Use data masking
+Span multiple virtual disks to fragment data
+Zero-wipe drives before moving systems
+Correct answer
+Use full-disk encryption
+Overall explanation
+OBJ. 1.1: To mitigate the risk of data remanence, you should implement full disk encryption. This method will ensure that all data is encrypted and cannot be exposed to other organizations or the underlying IaaS provider. Using a zero wipe is typically impossible because VM systems may move without user intervention during scaling and elasticity operations. Data masking can mean that all or part of a field's contents is redacted, by substituting all character strings with "x," for example. Data masking will not prevent your corporate data from being exposed by data remanence. Spanning multiple disks will leave the data accessible, even though it would be fragmented, and would make the data remanence problem worse overall.   For support or reporting issues, include Question ID: 63fe08343b7322449ddbd78d in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 61
+Incorrect
+What type of malicious application does not require user intervention or another application to act as a host to replicate?
+Your answer is incorrect
+Virus
+Trojan
+Macro
+Correct answer
+Worm
+Overall explanation
+OBJ. 1.2: A worm is a self-replicating type of malware that does not require user intervention or another application to act as a host for it to replicate. Viruses and Macros require user intervention to spread, and Trojans are hosted within another application that appears harmless.   For support or reporting issues, include Question ID: 63fe083d3b7322449ddbd7f1 in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 62
+Correct
+Your organization has implemented several cybersecurity tools, but there is a lack of coordination among the team in managing and facilitating automation. Which of the following actions would most effectively address this issue?
+Limiting team access to tools
+Your answer is correct
+Establishing clear roles and responsibilities for managing automation
+Buying more tools
+Ignoring automation
+Overall explanation
+OBJ. 1.5: Establishing clear roles and responsibilities ensures everyone knows who is in charge of what parts of the automation process, reducing confusion and increasing coordination. Simply buying more tools doesn't necessarily improve coordination among the team. It may add complexity and could actually worsen the issue without proper management and integration. Ignoring automation would be counterproductive. Automation can help improve efficiency and free up staff to focus on more complex tasks. Limiting team access to tools can lead to silos, inhibit teamwork, and reduce overall efficiency in managing and facilitating automation. Establishing clear roles and responsibilities ensures everyone knows who is in charge of what parts of the automation process, reducing confusion and increasing coordination.   For support or reporting issues, include Question ID: 647a61bd76fd5bf8deaa6b0b in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 63
+Incorrect
+Based on some old SIEM alerts, you have been asked to perform a forensic analysis on a given host. You have noticed that some SSL network connections are occurring over ports other than port 443. The SIEM alerts indicate that copies of svchost.exe and cmd.exe have been found in the host's %TEMP% folder. The logs indicate that RDP connections have previously connected with an IP address that is external to the corporate intranet, as well. What threat might you have uncovered during your analysis?
+DDoS
+Your answer is incorrect
+Software vulnerability
+Correct answer
+APT
+Ransomware
+Overall explanation
+OBJ. 1.4: The provided indicators of compromise appear to be from an Advanced Persistent Threat (APT). These attacks tend to go undetected for several weeks or months and utilize secure communication to external IPs as well as Remote Desktop Protocol connections to provide the attackers with access to the infected host. While an APT might use a software vulnerability to gain their initial access, the full description provided in the question that includes the files being copied and executed from the %TEMP% folder and the use of SSL/RDP connections indicates longer-term exploitation, such as one caused by an APT.   For support or reporting issues, include Question ID: 63fe082c3b7322449ddbd71f in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 64
+Correct
+Your organization's computer network has been experiencing some unusual activities. You are considering establishing a Computer Security Incident Response Team (CSIRT) to address these incidents. Which of the following would be a primary function of a CSIRT?
+Exploiting vulnerabilities
+Creating marketing strategies
+Writing security policies
+Your answer is correct
+Coordinating the response to security incidents
+Overall explanation
+OBJ. 1.4: A CSIRT's main role is to coordinate the response to computer security incidents, which includes identifying, managing, and preventing further incidents. Exploiting vulnerabilities is not a function of a CSIRT. This is a behavior associated with threat actors, not with defensive security teams. While a CSIRT might contribute to the development of security policies based on their incident response experiences, their primary function is to respond to security incidents, not to write policies. Creating marketing strategies is outside the scope of a CSIRT's responsibilities, which are focused on computer security.   For support or reporting issues, include Question ID: 647a6559109d5b5929ca5443 in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 65
+Incorrect
+A threat actor infiltrates your organization's network and plants malicious software that remains dormant, only to activate and spread at a specific time. This software allows the attacker to maintain a presence within your network even after initial detection and cleaning efforts. Which stage of the MITRE ATT&CK framework does this action best represent?
+Your answer is incorrect
+Command and Control
+Initial Access
+Correct answer
+Persistence
+Defense Evasion
+Overall explanation
+OBJ. 3.1: The MITRE ATT&CK framework includes Persistence as a stage that describes the techniques an adversary may use to maintain their foothold in a network despite interruptions such as system restarts or periodic credential updates. Initial Access refers to the stage when the adversary first breaches the network, not the methods used to maintain a presence within the network. Command and Control represents the communication channel between the compromised systems and the adversary, not the tactics used to remain in the network. Defense Evasion involves techniques to avoid detection, while the scenario described pertains to maintaining presence within the network.   For support or reporting issues, include Question ID: 6479138aa12e9833fb7050d4 in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 66
+Incorrect
+As the organization begins to process credit card transactions, which was not previously part of their operations, what security approach is crucial to implement in this new scenario?
+Your answer is incorrect
+Data Loss Prevention (DLP)
+Correct answer
+Changing Business Requirements
+Virtual Private Network (VPN)
+Awareness, education, and training
+Overall explanation
+OBJ. 4.1: With changes in business requirements, such as the introduction of credit card transaction processing, it becomes essential to implement new security measures aligned with relevant standards, such as the Payment Card Industry Data Security Standard (PCI DSS). While DLP is a good security measure, it doesn’t fully cover the new security needs related to processing credit card transactions. While a VPN can provide secure communication channels, it doesn't directly address the security needs related to processing credit card transactions. Regular training can educate employees about the risks associated with clicking on malicious links and how to recognize them but this is not the most appropriate concept in this scenario.   For support or reporting issues, include Question ID: 6477ed8c20f33a566c7049c6 in your ticket. Thank you.
+
+Domain
+4.0 - Reporting and Communication
+Question 67
+Incorrect
+According to Lockheed Martin's white paper "Intel Driven Defense," which of the following technologies could degrade an adversary's effort during the actions on the objectives phase of the kill chain?
+Audit log
+Your answer is incorrect
+NIPS
+Correct answer
+Quality of service
+Honeypot
+Overall explanation
+OBJ. 3.1: During the adversary's actions on objective phase, the adversary is already deep within the victim's network and has defeated all security mechanisms. If the adversary is attempting to exfiltrate data, implementing a quality of service approach could potentially slow down the rate at which information could be exfiltrated. This is considered a degradation to their effort by purposely manipulating service quality to decrease their transfer speeds. Honeypots could deceive an enemy during the actions on objective phase as the adversary may unknowingly take actions against a honeypot instead of their real objectives, but this would be classified as deception and not degradation. NIPS technologies serve to disrupt C2 channels, not degrade them. Audit logs may detect actions an adversary has taken after the fact but will not degrade the actions themselves.   For support or reporting issues, include Question ID: 63fe08da3b7322449ddbdfa7 in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 68
+Incorrect
+Anton was hired to perform a penetration test on one of his local businesses and is currently on the reconnaissance stage. He wants to attempt to discover subdomains of an organization's network without relying on direct network scanning techniques that might trigger IPS alerts. Which of the following is his best course of action?
+
+Correct answer
+Perform a DNS brute-force attack
+Use a nmap stealth scan
+Your answer is incorrect
+Use a nmap ping sweep
+Perform a DNS zone transfer
+Overall explanation
+OBJ. 2.5: The best course of action is to perform a DNS brute-force attack. This method involves querying DNS servers for potential subdomains using a precompiled list. DNS queries often appear as normal traffic and are less likely to trigger IPS/IDS alerts compared to techniques like Nmap scans or DNS zone transfers, which are more invasive and more commonly monitored. A ping sweep and stealth scan involve direct interaction with the target network and are more likely to be flagged.   For support or reporting issues, include Question ID: 63fe08903b7322449ddbdc12 in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 69
+Incorrect
+Which of the following lists the UEFI boot phases in the proper order?
+Pre-EFI initialization, Security, Boot Device Select, Transient System Load, Driver Execution Environment, Runtime
+Driver Execution Environment, Boot Device Select, Security, Transient System Load, Pre-EFI initialization, Runtime
+Correct answer
+Security, Pre-EFI initialization, Driver Execution Environment, Boot Device Select, Transient System Load, Runtime
+Your answer is incorrect
+Boot Device Select, Security, Pre-EFI initialization, Driver Execution Environment, Transient System Load, Runtime
+Overall explanation
+OBJ. 1.1: The security must first prevent any potential contamination from advanced malware from affecting the system as it proceeds into its startup process. The security consists of initializing the code that the system executes after powering on the EFI system. Pre-EFI initialization initializes the CPU, temporary memory, and boot firmware volume (BFV). Driver Execution Environment initializes the entire system's physical memory, I/O, and MIMO (Memory Mapped Input Output) resources. Finally, it begins dispatching DXE Drivers present in the system Firmware Volumes (given in the HOBL). Boot Device Select interprets the boot configuration data and selects the Boot Policy for later implementation. Runtime focuses on clearing the UEFI program from memory and transferring control to the operating system.   For support or reporting issues, include Question ID: 63fe086c3b7322449ddbda4c in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 70
+Correct
+What type of malware is designed to be difficult for malware analysts to reverse engineer?
+Trojan
+Logic bomb
+Your answer is correct
+Armored virus
+Rootkit
+Overall explanation
+OBJ. 2.1: Armored viruses are a type of virus that use various techniques to protect it from being reverse engineered. This includes changing its code during execution and encrypting its payloads.   For support or reporting issues, include Question ID: 63fe082a3b7322449ddbd706 in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 71
+Incorrect
+As a SOC analyst, you receive an alert concerning a dramatic slowdown affecting the company's e-commerce server due to the load balancer's critical failure. Your company depends on online sales for all of its business, and you know the immediate impact of this event will be a loss of sales. Which of the following is an appropriate classification of the impact in terms of the total impact and notification requirements? (SELECT THREE)
+Total impact includes damages to the company's reputation
+Your selection is correct
+Organization impact is anticipated
+Correct selection
+Notification of external authorities is optional
+Your selection is incorrect
+Notification of external authorities is required
+Your selection is correct
+Total impact includes a loss of customers
+Localized impact is anticipated
+Overall explanation
+OBJ. 4.2: Since online sales are critical to business operations, the impact would be categorized as organizational and not localized. While the immediate impact is a loss of sales due to the slow servers causing customer frustration and abandoned carts, the longer-term impact could include losing customers who will never return. It is unlikely to include damages to the company’s reputation over this event, though it isn't a major trust and security issue like a data breach. In terms of notification requirements, it is optional to inform external authorities since there is no evidence of a crime.   For support or reporting issues, include Question ID: 63fe09203b7322449ddbe311 in your ticket. Thank you.
+
+Domain
+4.0 - Reporting and Communication
+Question 72
+Correct
+In the Cyber Kill Chain, which phase involves the attacker fulfilling their intent on the victim’s system, such as data exfiltration, data destruction, or encryption for ransom?
+Reconnaissance
+Weaponization
+Your answer is correct
+Actions on Objectives
+
+Command and Control
+Overall explanation
+OBJ. 3.1: The Actions on Objectives phase of the Cyber Kill Chain involves fulfilling the adversary's intent, such as data exfiltration, data destruction, or encryption for ransom. Reconnaissance involves gathering information about the target system, not fulfilling the adversary's intent. Weaponization involves creating a malicious payload, not fulfilling the adversary's intent. Command and Control involves maintaining communication with the compromised system, not fulfilling the adversary's intent.   For support or reporting issues, include Question ID: 64790171d71ecc536f31e60a in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 73
+Incorrect
+Which of the following techniques would be the most appropriate solution to implementing a multi-factor authentication system?
+Correct answer
+Smartcard and PIN
+Your answer is incorrect
+Username and password
+Password and security question
+Fingerprint and retinal scan
+Overall explanation
+OBJ. 1.1: Multi-factor authentication (MFA) creates multiple security layers to help increase the confidence that the user requesting access is who they claim to be by requiring two distinct factors for authentication. These factors can be something you know (knowledge factor), something you have (possession factor), something you are (inheritance factor), something you do (action factor), or somewhere you are (location factor). By selecting a smartcard (something you have) and a PIN (something you know), you have implemented multi-factor authentication. Choosing a fingerprint and retinal scan would instead use only one factor (inheritance). Choosing a username, password, and security question would also be only using one factor (knowledge). For something to be considered multi-factor, you need items from at least two different authentication factor categories: knowledge, possession, inheritance, location, or action.   For support or reporting issues, include Question ID: 63fe08813b7322449ddbdb50 in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 74
+Correct
+Dion FutureScope AI system has multiple vulnerabilities. One of them has a high likelihood of being exploited and could lead to a minor loss of non-sensitive data. Another one has a moderate likelihood of being exploited but could lead to a significant loss of sensitive data. Which vulnerability should be addressed first?
+Both vulnerabilities should be addressed simultaneously
+Neither vulnerability needs to be addressed until an attack occurs
+The vulnerability with the high likelihood of exploitation and minor data loss
+Your answer is correct
+The vulnerability with the moderate likelihood of exploitation and significant potential data loss
+Overall explanation
+OBJ. 4.1: The vulnerability with the moderate likelihood of exploitation and significant potential data loss has the potential for more significant harm due to the potential loss of sensitive data, and thus should be addressed first. Although vulnerability with the high likelihood of exploitation and minor data loss has a high likelihood of being exploited, it only leads to minor non-sensitive data loss, so it can be dealt with later. While it's ideal to address all vulnerabilities as soon as possible, prioritization helps manage resources and efforts efficiently, so the vulnerabilities shouldn't be addressed simultaneously. Not addressing either vulnerability is a risky approach as waiting for an attack to occur could lead to data loss and other potential damages.   For support or reporting issues, include Question ID: 6477d76c2c53c48509f2bafa in your ticket. Thank you.
+
+Domain
+4.0 - Reporting and Communication
+Question 75
+Incorrect
+A cybersecurity analyst is attempting to perform an active reconnaissance technique to audit their company’s security controls. Which DNS assessment technique would be classified as active?
+Your answer is incorrect
+A DNS forward or reverse lookup
+A whois query
+Correct answer
+A zone transfer
+Using maltego
+Overall explanation
+OBJ. 2.5: DNS zone transfer, also sometimes known by the inducing DNS query type AXFR, is a DNS transaction type. It is one of the many mechanisms available for administrators to replicate DNS databases across a set of DNS servers. DNS zone transfers are an active technique. Performing a whois query is a passive reconnaissance technique that performs a query of the databases that store the registered users or assignees of an Internet resource, such as a domain name, an IP address block, or an autonomous system, but is also used for a wider range of other information. Performing a DNS forward and reverse lookup zones is an active technique that allows the resolution of names to IP addresses and IP addresses to names. This can be conducted as a passive technique. Maltego is used for open-source intelligence and forensics. It focuses on providing a library for data discovery from open sources and visualizing that information in a graph format suitable for link analysis and data mining. It collects this information passively since it can acquire the information from whois lookup servers, a DNS lookup tool using public DNS servers, or even emails and hostnames one can acquire from TheHarvester.   For support or reporting issues, include Question ID: 63fe089d3b7322449ddbdcad in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 76
+Correct
+You're using Burp Suite for web application vulnerability testing but need to extend its functionality. What should be added?
+Your answer is correct
+Plugins
+APIs
+Drivers
+Scripts
+Overall explanation
+OBJ. 1.5: Plugins are software components that can extend the functionality of Burp Suite, including automated security tasks and additional vulnerability scanning options. APIs (Application Programming Interfaces) allow different software applications to communicate but do not inherently extend the functionality of a specific tool like plugins. While drivers enable hardware-software communication, they do not extend the functionality of Burp Suite. While scripts can automate certain tasks, they do not inherently extend the functionality of a specific tool like plugins.    For support or reporting issues, include Question ID: 64714881ba568440bf9cd618 in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 77
+Incorrect
+You are conducting a grep search on a log file using the following REGEX expression:
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+\b[A-Za-z0-9_%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}\b
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+Which of the following strings would be included in the output of the search?
+
+Correct answer
+support@diontraining.com
+www.diontraining.com
+jason.dion@diontraining.com
+Your answer is incorrect
+jason_dion@dion.training
+Overall explanation
+OBJ. 1.3: In the above REGEX, the \b parameter identifies that we are looking for whole words. The strategic use of the + operator indicates the three places where the word is broken into parts. The first part ([A-Za-z0-9_%+-]" is composed of upper or lower case alphanumeric symbols "_%+-."  After the first part of the word and the at sign (@) is specified, follows by another word ([A-Za-z0-9.-]), a period (\.), and another purely alphabetic (non-numeric) string that is 2-6 characters in length. This finds a standard email format of something@something.com (but could be @something.co, @something.org, @something.money, or other options as long as the top-level domain is between 2 and 6 characters). The option of www.diontraining.com is wrong because it does not have an @ sign in the string. The option of jason.dion@diontraining.com is wrong because you cannot use a period before the @ symbol, only letters, numbers, and some specified symbols ( _ % + - ). The option of jason_dion@dion.training is wrong because the last word (training) is longer than 6 characters in length. As a cybersecurity analyst, you must get comfortable creating regular expressions and understanding what type of output they generate.   For support or reporting issues, include Question ID: 63fe08a33b7322449ddbdcfd in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 78
+Incorrect
+Your organization is a large enterprise with a complex IT infrastructure. You have a team of system administrators who are responsible for collecting data from various sources, such as firewalls, IDS, and SIEMs. The data is collected to identify anomalies of interest, such as unusual network traffic patterns or suspicious login attempts. In which phase of the security intelligence cycle are the system administrators working?
+Dissemination
+Feedback
+Correct answer
+Collection
+Your answer is incorrect
+Analysis
+Overall explanation
+OBJ. 1.4: The collection phase is usually implemented by administrators using various software suites, such as security information and event management (SIEM). This software must be configured with connectors or agents that can retrieve data from sources such as firewalls, routers, IDS sensors, and servers. The analysis phase focuses on converting collected data into useful information or actionable intelligence. The dissemination phase refers to publishing information produced by analysis to consumers who need to develop the insights. The final phase of the security intelligence cycle is feedback and review, which utilizes both intelligence producers and intelligence consumers' input. This phase aims to improve the implementation of the requirements, collection, analysis, and dissemination phases as the life cycle develops.   For support or reporting issues, include Question ID: 63fe08593b7322449ddbd959 in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 79
+Incorrect
+What method might a system administrator use to replicate the DNS information from one DNS server to another, but could also be used maliciously by an attacker?
+Correct answer
+Zone transfers
+Your answer is incorrect
+DNS registration
+CNAME
+DNSSEC
+Overall explanation
+OBJ. 1.3: Zone transfers provide an easy way to send all the DNS information from one DNS server to another, but an attacker could also use it for reconnaissance against your organization. For this reason, most administrators disable zone transfers from untrusted servers. DNSSEC strengthens authentication in DNS using digital signatures based on public-key cryptography. CNAME is a Canonical Name Record or Alias Record. A type of resource record in the Domain Name System (DNS) specifies that one domain name is an alias of another canonical domain name. DNS registration is a service, which allows the owner of a domain name to use their name servers, which can match the domain name in question.   For support or reporting issues, include Question ID: 63fe086a3b7322449ddbda29 in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 80
+Correct
+As a cybersecurity professional, you are tasked with quickly identifying malicious IP addresses interacting with your network. You need a tool that provides a database of reported malicious IPs, allowing you to cross-check any suspicious IPs. What tool would be most suited for this purpose?
+Your answer is correct
+AbuseIPDB
+Pattern Recognition
+SOAR
+Joe Sandbox
+Overall explanation
+OBJ. 1.3: AbuseIPDB is a database where users can report and check IP addresses for reported malicious activity. It would be the most suitable tool for cross-referencing suspicious IP addresses. Pattern recognition is more related to identifying recurring trends or anomalies in data and doesn't provide a database of reported malicious IP addresses. Joe Sandbox is primarily used for malware analysis and doesn't provide a database of reported malicious IP addresses. SOAR (Security Orchestration, Automation, and Response) tools might help detect suspicious IP addresses through their data collection and analysis capabilities, but they do not provide a specific database of reported malicious IPs like AbuseIPDB.     For support or reporting issues, include Question ID: 647a58027352194008cd68aa in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 81
+Correct
+As an incident response manager, you've just concluded an incident where an attacker was able to breach your network by exploiting an unpatched vulnerability. In reviewing the incident, you realize that alerts regarding the vulnerability were overlooked due to a high volume of alerts. What should be your immediate next step to prevent similar occurrences?
+Ignore the incident since it was resolved
+Increase the alert volume to ensure nothing is missed
+
+Hire more incident response team members
+Your answer is correct
+Perform a root cause analysis
+Overall explanation
+OBJ. 4.2: A root cause analysis can help understand why important alerts were missed and guide improvements in your alert management system to prevent similar oversights in the future. While having more team members may help manage alerts, it does not address the underlying issue of alert fatigue or inadequate alert management. Ignoring the issue won't prevent similar incidents in the future. Learning from incidents is a crucial part of improving security posture. Increasing the alert volume may exacerbate the problem by contributing to alert fatigue, making it more difficult for important alerts to be noticed.   For support or reporting issues, include Question ID: 6478e0d67645babdfa6fcdb7 in your ticket. Thank you.
+
+Domain
+4.0 - Reporting and Communication
+Question 82
+Correct
+After a significant security breach involving customer data leakage, your organization conducts a comprehensive review. The aim is to comprehend the contributing factors that led to this incident and to establish measures to avert such incidents in the future. Which term best describes this specific post-incident activity?
+Forensic analysis
+Incident response plan
+Root cause analysis
+Your answer is correct
+Lessons learned
+Overall explanation
+OBJ. 3.3: The lessons learned process involves a thorough review after an incident to identify what happened, what was done well, and what needs to be improved to prevent similar incidents in the future. Forensic analysis involves a meticulous examination of all evidence related to an incident to understand its origin, extent, and impact. It does not inherently focus on the improvement of future responses. Root cause analysis seeks to identify the initial cause of an issue, but does not involve a broad review of the incident response process. An incident response plan is a set of procedures and processes to handle and manage an incident effectively. It is used in preparation for potential incidents, not in post-incident activity.   For support or reporting issues, include Question ID: 64798b10c6ae0ad185c94558 in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 83
+Correct
+What technique is an attacker using if they review data and publicly available information to gather intelligence about the target organization without scanning or other technical information-gathering activities?
+Patch management
+Your answer is correct
+Passive reconnaissance
+Active scanning
+Vulnerability scanning
+Overall explanation
+OBJ. 1.4: Passive reconnaissance combines publicly available data from various sources about an organization and does not use active scanning or data gathering methods. Vulnerability scanning is an inspection of the potential points of exploitation on a computer or network to identify security holes. A vulnerability scan is usually conducted to detect and classify system weaknesses in computers, networks, and communications equipment and predict the effectiveness of countermeasures. Patch management is the process that helps acquire, test, and install multiple patches (code changes) on existing applications and software tools on a computer, enabling systems to stay updated on existing patches and determining which patches are the appropriate ones.   For support or reporting issues, include Question ID: 63fe08fe3b7322449ddbe16c in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 84
+Incorrect
+You are trying to find some files that were deleted by a user on a Windows workstation. What two locations are most likely to contain those deleted files?
+Correct selection
+Slack space
+Unallocated space
+Your selection is correct
+Recycle bin
+Registry
+Overall explanation
+OBJ. 1.2: Files that users have deleted are most likely found in the Recycle Bin or slack space. Slack space is the space left after a file has been written to a cluster. Slack space may contain remnant data from previous files after the pointer to the files was deleted by a user. Unallocated space has not been partitioned and, therefore, would typically not have been written to. The registry will not store files that have been deleted but may contain a reference to the file, such as the file's name.   For support or reporting issues, include Question ID: 63fe08f73b7322449ddbe111 in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 85
+Incorrect
+You need to determine the best way to test operating system patches in a lab environment before deploying them to your automated patch management system. Unfortunately, your network has several different operating systems in use, but you only have one machine available to test the patches on. What is the best environment to utilize to perform the testing of the patches before deployment?
+Your answer is incorrect
+Sandboxing
+Correct answer
+Virtualization
+Bypass testing and deploy patches directly into the production environment
+Purchase additional workstations
+Overall explanation
+OBJ. 1.1: When you have a limited amount of hardware resources to utilize but have a requirement to test multiple operating systems, you should set up a virtualized environment to test the patch across each operating system before deployment. You should never deploy patches directly into production without testing them first in the lab.   For support or reporting issues, include Question ID: 63fe083f3b7322449ddbd80f in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 86
+Correct
+Jorge and Marta are working on a programming project together. During a code review, Marta explains her code to Jorge while looking at the code on her computer. Which of the following code review techniques is being used in this scenario?
+Your answer is correct
+Over-the-shoulder
+Dual control
+Pair programming
+Tool-assisted review
+Overall explanation
+OBJ. 2.5: Over-the-shoulder code reviews rely on a programmer explaining their code to a peer. This provides a chance for a review of the code and a better understanding of both programmers' code. In this example, Marta is explaining her code to Jorge while he looks over her shoulder. Pair programming alternates between programmers, with one strategizing and reviewing it while the other enters the computer's code. Dual control is a personnel security process that requires more than one employee available to perform a specific task. This is used with split knowledge and is not a form of code review. A tool-assisted review is conducted using a software tool or other form of automation.   For support or reporting issues, include Question ID: 63fe087e3b7322449ddbdb2d in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 87
+Correct
+Your organization wants to perform a comprehensive security assessment of its applications, networks, and systems. Which methodology would best guide this process?
+MITRE ATT&CK
+Cyber Kill Chain
+Diamond Model of Intrusion Analysis
+Your answer is correct
+Open Source Security Testing Methodology Manual (OSSTMM)
+Overall explanation
+OBJ. 3.1: The OSSTMM provides a structured approach to security testing across a variety of areas, including applications, networks, and systems. The MITRE ATT&CK framework primarily serves as a knowledge base for understanding attacker behaviors and tactics, techniques, and procedures (TTPs), not for conducting a comprehensive security assessment. The Diamond Model focuses on understanding the relationships in a cyber attack, not on guiding a comprehensive security assessment. The Cyber Kill Chain describes the stages of a cyber attack, but it does not provide guidance for a comprehensive security assessment.   For support or reporting issues, include Question ID: 6478f8220d8d332e8293d5ef in your ticket. Thank you.
+
+Domain
+3.0 - Incident Response and Management
+Question 88
+Incorrect
+You are analyzing the following network utilization report because you suspect one of the servers has been compromised.
+
+-=-=-=-=-=--=-=-=-=-=--=-=-=-=-=--=-=-=-=-=--=-=-=-=-=--=-=-=-=-=-
+
+IP Address         Name                Uptime                     Historical         Current
+
+192.168.20.2      web01 7D       12H 32M 06S            42.6 GB          44.1 GB
+
+192.168.20.3      webdev02      4D 07H 12M 45S       1.95 GB          2.13 GB
+
+192.168.20.4      dbsvr01          12D 02H 46M 14S      3.15 GB         24.6 GB
+
+192.168.20.5      marketing     01 2D 17H 18M 41S     5.2 GB            4.9 GB
+
+-=-=-=-=-=--=-=-=-=-=--=-=-=-=-=--=-=-=-=-=--=-=-=-=-=--=-=-=-=-=-
+
+Based on the report above, which of the following servers do you suspect has been compromised and should be investigated further?
+
+marketing01
+Correct answer
+dbsvr01
+Your answer is incorrect
+web01
+webdev02
+Overall explanation
+OBJ. 2.2: Due to the considerable increase in network utilization on dbsvr01, it should be suspected of compromise and further investigated. The server has a historical average utilization of only 3.15 GB per month, but this month there has been an increase to 24.6 GB of usage. This increase is nearly 8x more than the previous month when all of the other servers stayed relatively constant. This indicates a possible compromise of the database server (dbsvr01) and a data breach or data exfiltration.   For support or reporting issues, include Question ID: 63fe08ac3b7322449ddbdd6b in your ticket. Thank you.
+
+Domain
+2.0 - Vulnerability Management
+Question 89
+Correct
+When using tcpdump, which option or flag would you use to record the ethernet frames during a packet capture?
+Your answer is correct
+-e
+-nn
+-n
+-X
+Overall explanation
+OBJ. 1.3: The -e option includes the ethernet header during packet capture. The -n flag will show the IP addresses in numeric form. The -nn option shows IP addresses and ports in numeric format. The -X option will capture the packet's payload in hex and ASCII formats.   For support or reporting issues, include Question ID: 63fe08e73b7322449ddbe047 in your ticket. Thank you.
+
+Domain
+1.0 - Security Operations
+Question 90
+Correct
+A company's Service-Level Agreement (SLA) with a cloud service provider restricts downtime for maintenance and patching. What are the potential risks with this scenario?
+Your answer is correct
+Extend the time frame in which identified vulnerabilities remain unpatched
+Ensure that the system is never vulnerable to cyber threats
+Decrease the company's reliance on IT personnel
+Increase the server capacity during peak business hours
+Overall explanation
+OBJ. 4.1: Limited availability or restricted downtime windows can postpone the patching process, thus prolonging the period during which systems remain susceptible to known vulnerabilities. In such situations, organizations need to devise effective strategies to minimize service disruption while ensuring patches are deployed promptly. This could include planning for patching during off-peak hours or using technologies that allow for seamless updates without significant system interruptions. The SLA does not directly affect the company's reliance on its IT staff. No SLA can guarantee absolute immunity from cyber threats, as vulnerabilities can emerge at any time. While important, server capacity is unrelated to vulnerability patching schedules.
+
+For support or reporting issues, include Question ID: 6478021afcfc2e1a66e506bd in your ticket. Thank you.
+
+Domain
+4.0 - Reporting and Communication

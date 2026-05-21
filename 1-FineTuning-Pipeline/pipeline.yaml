@@ -1,0 +1,26 @@
+# Active run manifest — edit this before starting a new training run.
+# All pipeline scripts read from here at runtime.
+# One file to change, everything else follows.
+#
+# base_model options:
+#   beru  (3B): unsloth/Llama-3.2-3B-Instruct
+#   katie (3B): unsloth/Llama-3.2-3B-Instruct
+#   jade  (8B): unsloth/Llama-3.1-8B-Instruct
+
+run:
+  model_name: "beru"
+  version: "v1.8"
+  experiment_id: "exp-016"
+
+base_model: "unsloth/Llama-3.2-3B-Instruct"
+
+corpus:
+  train: "01-raw-data-lake/beru_training_exp014.jsonl"
+  validation: "06-eval-holdout/beru_eval_holdout.jsonl"
+
+output:
+  registry: "3-model-registry/beru/v1.8"
+  experiment: "5-experiments/exp-016-beru-v1.8"
+
+# Points to the hyperparameter yaml for this model (relative to this directory)
+config_file: "config_beru.yaml"

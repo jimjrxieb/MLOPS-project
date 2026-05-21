@@ -1,0 +1,48 @@
+experiment_id: exp-015
+model_name: beru
+version: v1.7
+date: "2026-05-20"
+
+base_model: unsloth/Llama-3.2-3B-Instruct
+quantization: Q4_K_M
+
+corpus:
+  sources:
+    - ai_exam_cgrc-exam1.jsonl       # 45 examples — ISC2 CGRC exam Q&A
+    - ai_exam_cgrc-exam2.jsonl       # 48 examples
+    - ai_exam_cgrc-exam3.jsonl       # 64 examples
+    - ai_exam_cgrc-exam4.jsonl       # 38 examples
+    - ai_exam_cgrc-exam5.jsonl       # 11 examples
+    - ai_exam_cysa-exam1.jsonl       # 87 examples — CompTIA CySA+
+    - ai_exam_genl-examtips.jsonl    # 28 examples — AI governance tips
+    - ai_exam_secai-exam1.jsonl      # 42 examples — AI security exam
+    - ai_exam_secai-exam2.jsonl      # 23 examples
+    - seclab_grc_training.jsonl      # 164 examples — GRC-HAT governance briefs + control maps
+    - beru_training_v1.jsonl         # prior corpus (net-new after dedup)
+    - beru_training_combined_v1.jsonl
+    - beru_training_exp011.jsonl
+    - beru_training_exp012.jsonl
+  raw_total: 3899
+  after_dedup: 1832
+  holdout: 96  # 5%, seed=42
+
+training:
+  lora_r: 64
+  lora_alpha: 128
+  batch_size: 4
+  gradient_accumulation: 8
+  effective_batch: 32
+  learning_rate: 2.0e-5
+  epochs: 2
+  max_seq_length: 4096
+  warmup_ratio: 0.03
+  lr_scheduler: cosine
+  trainable_params: 97_255_424
+  total_params: 3_310_005_248
+  trainable_pct: 2.94
+
+hardware:
+  gpu: NVIDIA GeForce RTX 5080 Laptop GPU
+  vram_gb: 15.92
+  training_time_min: 33.9
+  steps: 116

@@ -1,0 +1,800 @@
+Question 169
+Skipped
+Cross-referencing selected controls with organizational policy is important because:
+It eliminates the need for compliance audits
+Explanation
+Audits are still necessary for independent verification.
+Correct answer
+It ensures controls align with both internal and external requirements
+Explanation
+Correct. Cross-referencing ensures that selected controls satisfy both internal policies and external regulatory requirements, revealing gaps or overlaps.
+It allows ignoring industry standards
+Explanation
+Ignoring industry standards can lead to non-compliance.
+It prevents technical team involvement
+Explanation
+Technical teams should remain involved in the process.
+Overall explanation
+Cross-referencing ensures that selected controls satisfy both internal policies and external regulatory requirements, revealing gaps or overlaps.
+Domain
+30 - Selecting Security and Privacy Controls Based on Baseli
+Question 170
+Skipped
+Why is stakeholder engagement crucial in tailoring security and privacy baselines?
+It ensures only technical concerns are addressed
+Explanation
+Addressing only technical concerns ignores critical business and operational input.
+Correct answer
+It guarantees the baseline is practical and aligned with business, technical, and operational needs
+Explanation
+Correct. Engaging stakeholders ensures the tailored baseline is practical, effective, and aligned with all operational, technical, and business needs.
+It reduces the need for documentation
+Explanation
+Documentation remains essential regardless of engagement.
+It allows for skipping risk assessments
+Explanation
+Skipping risk assessments undermines the process.
+Overall explanation
+Engaging stakeholders ensures the tailored baseline is practical, effective, and aligned with all operational, technical, and business needs.
+Domain
+30 - Selecting Security and Privacy Controls Based on Baseli
+Question 171
+Skipped
+Which regulation is particularly focused on safeguarding financial customer data and providing privacy notices?
+HIPAA
+Explanation
+HIPAA is for healthcare.
+FISMA
+Explanation
+FISMA is for federal agencies.
+Correct answer
+GLBA
+Explanation
+Correct. The Gramm-Leach-Bliley Act (GLBspecifically requires financial institutions to safeguard customer data and provide privacy notices.
+GDPR
+Explanation
+GDPR is for data privacy, not specifically financial data.
+Overall explanation
+The Gramm-Leach-Bliley Act (GLBspecifically requires financial institutions to safeguard customer data and provide privacy notices.
+Domain
+7 - Legal Regulatory and Contractual Obligations
+Question 172
+Skipped
+Which sector-specific regulation requires annual reviews and formal authorizations of federal information systems?
+HIPAA
+Explanation
+HIPAA applies to healthcare, not federal information systems.
+Correct answer
+FISMA
+Explanation
+Correct. FISMA requires federal agencies to conduct annual reviews, continuous monitoring, and formal authorization of their information systems.
+GLBA
+Explanation
+GLBA applies to financial institutions.
+GDPR
+Explanation
+GDPR is focused on data privacy, not federal system authorization.
+Overall explanation
+FISMA requires federal agencies to conduct annual reviews, continuous monitoring, and formal authorization of their information systems.
+Domain
+7 - Legal Regulatory and Contractual Obligations
+Question 173
+Skipped
+When a contract includes a breach notification timeline shorter than regulatory requirements, what is the organizationâ€™s obligation?
+Follow the regulatory timeline only
+Explanation
+Regulatory timelines are the minimum; stricter contracts must be honored.
+Ignore both timelines
+Explanation
+Ignoring timelines breaches obligations.
+Correct answer
+Abide by the stricter contractual timeline
+Explanation
+Correct. When a contract specifies a stricter timeline (e.g., for incident notification) than regulation, the organization must meet the stricter contractual obligation.
+Renegotiate the contract after an incident
+Explanation
+Renegotiation is not the solution after an incident.
+Overall explanation
+When a contract specifies a stricter timeline (e.g., for incident notification) than regulation, the organization must meet the stricter contractual obligation.
+Domain
+7 - Legal Regulatory and Contractual Obligations
+Question 174
+Skipped
+Why is version control critical in evidence management?
+It ensures only one person accesses evidence
+Explanation
+Version control does not limit access to one person.
+It prevents artifacts from being observed
+Explanation
+It does not affect observation of artifacts.
+Correct answer
+It guarantees the latest and most accurate evidence is used
+Explanation
+Correct. Version control ensures assessors use the latest, most accurate evidence, preventing mistakes from outdated documents.
+It eliminates the need for backups
+Explanation
+Backups are still necessary even with version control.
+Overall explanation
+Version control ensures assessors use the latest, most accurate evidence, preventing mistakes from outdated documents.
+Domain
+43 - Collecting and Validating Assessment Evidence
+Question 175
+Skipped
+How does sampling help in evidence validation?
+It allows analysis of all records
+Explanation
+Sampling does not involve reviewing all records.
+It increases the likelihood of bias
+Explanation
+Poor sampling can cause bias, but when done well, it avoids it.
+Correct answer
+It enables review of representative subsets for feasibility
+Explanation
+Correct. Sampling allows assessors to efficiently review representative parts of large data sets, making validation feasible.
+It replaces the need for contextual understanding
+Explanation
+Sampling should be combined with contextual understanding.
+Overall explanation
+Sampling allows assessors to efficiently review representative parts of large data sets, making validation feasible.
+Domain
+43 - Collecting and Validating Assessment Evidence
+Question 176
+Skipped
+What is the MAIN reason interviews should be corroborated with other sources of evidence?
+They are always inaccurate
+Explanation
+Interviews are not always inaccurate, just potentially biased.
+They are time-consuming
+Explanation
+Time consumption is not the main issue with interviews.
+Correct answer
+They are subjective and prone to bias
+Explanation
+Correct. Interviews are subjective and prone to bias; therefore, corroborating their findings with other evidence increases reliability.
+They do not provide any context
+Explanation
+Interviews actually do provide context, rather than lacking it.
+Overall explanation
+Interviews are subjective and prone to bias; therefore, corroborating their findings with other evidence increases reliability.
+Domain
+43 - Collecting and Validating Assessment Evidence
+Question 177
+Skipped
+Which is the most accurate statement about setting measurable GRC objectives?
+They should only address compliance requirements
+Explanation
+Limiting objectives to compliance misses business alignment.
+Correct answer
+They should directly support business goals and be measured by tangible outcomes
+Explanation
+Correct. Measurable GRC objectives must directly support business goals and be tracked by tangible, impactful outcomes.
+They should be based on industry benchmarks alone
+Explanation
+Industry benchmarks alone ignore unique business goals.
+They are only necessary for large organizations
+Explanation
+All organizations benefit from measurable GRC objectives.
+Overall explanation
+Measurable GRC objectives must directly support business goals and be tracked by tangible, impactful outcomes.
+Domain
+8 - Business Strategy Goals and GRC Integration
+Question 178
+Skipped
+Which is an example of GRC driving business opportunity, as discussed in the lecture?
+Ignoring data privacy to cut costs
+Explanation
+Ignoring privacy increases risk and undermines trust.
+Correct answer
+Using risk frameworks to seize new growth opportunities with confidence
+Explanation
+Correct. Using risk frameworks to pursue new opportunities demonstrates GRCâ€™s proactive, business-enabling role.
+Only responding to regulatory fines after they occur
+Explanation
+Reacting to fines is reactive, not opportunity-driven.
+Avoiding investment in compliance technology
+Explanation
+Avoiding technology limits GRC effectiveness.
+Overall explanation
+Using risk frameworks to pursue new opportunities demonstrates GRCâ€™s proactive, business-enabling role.
+Domain
+8 - Business Strategy Goals and GRC Integration
+Question 179
+Skipped
+Why might executives view GRC investments as a cost center rather than a value driver?
+Because GRC always reduces profitability
+Explanation
+GRC can drive profitability if aligned.
+Correct answer
+Because GRCâ€™s strategic contributions are often poorly articulated
+Explanation
+Correct. Executives often see GRC as a cost center when its strategic contributions are not clearly communicated or understood.
+Because GRC activities never impact business growth
+Explanation
+GRC can and does impact growth when leveraged strategically.
+Because executives lack interest in risk management
+Explanation
+Many executives care about risk but need value articulated.
+Overall explanation
+Executives often see GRC as a cost center when its strategic contributions are not clearly communicated or understood.
+Domain
+8 - Business Strategy Goals and GRC Integration
+Question 180
+Skipped
+Which component ensures stakeholders are kept informed and empowered in the risk management process?
+Risk assessment
+Explanation
+Assessment estimates likelihood and impact but does not primarily inform stakeholders.
+Risk response
+Explanation
+Response deals with managing risks, not informing stakeholders.
+Risk identification
+Explanation
+Identification discovers risks but does not focus on stakeholder communication.
+Correct answer
+Risk communication and reporting
+Explanation
+Correct. Risk communication and reporting ensure stakeholders remain informed and empowered for decision-making, as emphasized in the program components.
+Overall explanation
+Risk communication and reporting ensure stakeholders remain informed and empowered for decision-making, as emphasized in the program components.
+Domain
+15 - Establishing an Information Security Risk Management Pr
+Question 181
+Skipped
+The Risk Management Framework (RMF) lifecycle is significant because it:
+Focuses solely on technical risk controls
+Explanation
+It is not limited to technical controls; it covers processes and governance.
+Applies risk management only during system decommissioning
+Explanation
+RMF activities are not limited to decommissioning; they begin in planning.
+Correct answer
+Embeds risk management throughout the systemâ€™s entire lifecycle
+Explanation
+Correct. The RMF lifecycle embeds risk management throughout the entire system lifecycle, from planning to decommissioning, ensuring continuous risk consideration.
+Limits risk activities to periodic reviews
+Explanation
+Risk activities are ongoing, not restricted to periodic reviews.
+Overall explanation
+The RMF lifecycle embeds risk management throughout the entire system lifecycle, from planning to decommissioning, ensuring continuous risk consideration.
+Domain
+15 - Establishing an Information Security Risk Management Pr
+Question 182
+Skipped
+When organizations face budget and resource constraints, the recommended approach is to:
+Ignore lower-priority risks entirely
+Explanation
+Lower-priority risks may still be monitored; ignoring them is not recommended.
+Correct answer
+Prioritize risks using a risk-based approach
+Explanation
+Correct. When resources are limited, organizations should use a risk-based approach to prioritize which risks to address, focusing on the most critical.
+Focus only on compliance requirements
+Explanation
+Focusing solely on compliance misses organization-specific risks.
+Mitigate all risks regardless of cost
+Explanation
+Mitigating all risks is often unfeasible due to constraints.
+Overall explanation
+When resources are limited, organizations should use a risk-based approach to prioritize which risks to address, focusing on the most critical.
+Domain
+15 - Establishing an Information Security Risk Management Pr
+Question 183
+Skipped
+What role do GRC platforms and technology play in effective GRC programs?
+Correct answer
+They automate and streamline policy management, risk assessments, and compliance tracking
+Explanation
+Correct. GRC platforms and technology automate and streamline policy management, risk assessments, and compliance tracking, enhancing efficiency and transparency.
+They replace the need for any human oversight
+Explanation
+Human oversight remains essential for effective GRC.
+They serve only as reporting tools for auditors
+Explanation
+Platforms do more than just reporting; they integrate and automate processes.
+They are optional, with little impact on efficiency
+Explanation
+Technology enhances efficiency and is not just optional.
+Overall explanation
+GRC platforms and technology automate and streamline policy management, risk assessments, and compliance tracking, enhancing efficiency and transparency.
+Domain
+3 - Core GRC Concepts Governance Risk and Compliance in Cont
+Question 184
+Skipped
+What broader impacts are noted in the lecture as consequences of GRC failure, beyond financial penalties?
+Only temporary loss of profits
+Explanation
+Impacts are long-lasting, not just temporary profit loss.
+Correct answer
+Damage to employee morale, customer loyalty, and societal trust
+Explanation
+Correct. GRC failures impact employee morale, customer loyalty, and societal trust, beyond just financial penalties.
+Increased market share
+Explanation
+Market share often decreases after GRC failures.
+Enhanced legal protection
+Explanation
+Legal protection is weakened, not enhanced, by failures.
+Overall explanation
+GRC failures impact employee morale, customer loyalty, and societal trust, beyond just financial penalties.
+Domain
+3 - Core GRC Concepts Governance Risk and Compliance in Cont
+Question 185
+Skipped
+What critical factor is necessary for effective GRC implementation, according to the lecture?
+Siloed approaches by specialized teams
+Explanation
+Siloed approaches hinder GRC effectiveness.
+Correct answer
+Executive buy-in, clear communication, and adequate resources
+Explanation
+Correct. Effective GRC requires executive support, clear communication, and sufficient resources, as highlighted in the lecture.
+Reliance solely on automated tools
+Explanation
+Automated tools are useful but not sufficient alone.
+Treating GRC as a checklist exercise
+Explanation
+GRC is not just a checklist; it requires ongoing commitment.
+Overall explanation
+Effective GRC requires executive support, clear communication, and sufficient resources, as highlighted in the lecture.
+Domain
+3 - Core GRC Concepts Governance Risk and Compliance in Cont
+Question 186
+Skipped
+The inclusion of network diagrams and configuration management plans as supplemental documents primarily serves to:
+Correct answer
+Demonstrate thoroughness and transparency to reviewers
+Explanation
+Correct. Including network diagrams and configuration management plans shows thoroughness and transparency, helping reviewers understand the systemâ€™s security context.
+Satisfy only legal requirements
+Explanation
+They are not included solely for legal compliance.
+Limit the scope of the Security Plan
+Explanation
+They support, not limit, the SPâ€™s scope.
+Replace the need for privacy documentation
+Explanation
+They do not replace privacy documentation.
+Overall explanation
+Including network diagrams and configuration management plans shows thoroughness and transparency, helping reviewers understand the systemâ€™s security context.
+Domain
+47 - Authorization Packages and Required Artifacts
+Question 187
+Skipped
+The recommended order for organizing documents in an authorization package is:
+POA&M, Security Plan, SAR, then executive summary
+Explanation
+This order is not standard and may confuse reviewers.
+Correct answer
+Executive summary, Security Plan, SAR, POA&M, then supplemental documents
+Explanation
+Correct. The recommended order is executive summary, Security Plan, SAR, POA&M, and then supplemental documents for logical flow and clarity.
+Supplemental documents first, followed by core artifacts
+Explanation
+Core artifacts should precede supplemental documents.
+SAR, Security Plan, executive summary, POA&M
+Explanation
+This order disrupts logical flow.
+Overall explanation
+The recommended order is executive summary, Security Plan, SAR, POA&M, and then supplemental documents for logical flow and clarity.
+Domain
+47 - Authorization Packages and Required Artifacts
+Question 188
+Skipped
+What role does the Security Assessment Report (SAR) play in the authorization package?
+It defines the organizationâ€™s data privacy policies
+Explanation
+Data privacy policies are typically covered in privacy documentation, not the SAR.
+Correct answer
+It documents the independent evaluation of implemented security controls
+Explanation
+Correct. The SAR documents the results of an independent evaluation of implemented security controls, verifying claims made in the Security Plan.
+It outlines remediation actions and assigns responsibility
+Explanation
+Remediation actions are detailed in the POA&M, not the SAR.
+It serves as a template for future system configurations
+Explanation
+The SAR is not a configuration template.
+Overall explanation
+The SAR documents the results of an independent evaluation of implemented security controls, verifying claims made in the Security Plan.
+Domain
+47 - Authorization Packages and Required Artifacts
+Question 189
+Skipped
+How does enterprise architecture assist with system categorization in the RMF?
+By assessing only the system in isolation
+Explanation
+Considering only the system in isolation ignores critical dependencies.
+Correct answer
+By providing context about interconnections, roles, and data flows for accurate categorization
+Explanation
+Correct. Enterprise architecture provides the necessary context about system roles, interconnections, and data flows, supporting accurate categorization within the RMF.
+By delegating categorization to vendors
+Explanation
+Vendors may contribute information, but categorization is an internal process.
+By ignoring third-party integrations
+Explanation
+Third-party integrations are essential components of the context.
+Overall explanation
+Enterprise architecture provides the necessary context about system roles, interconnections, and data flows, supporting accurate categorization within the RMF.
+Domain
+24 - Understanding Enterprise Architecture and Governance Fr
+Question 190
+Skipped
+Why is identifying system dependencies crucial in risk management?
+Dependencies have minimal impact on overall system risk
+Explanation
+Dependencies can significantly impact risk, not minimal.
+Correct answer
+Unidentified dependencies can lead to underestimated risks and insufficient protection
+Explanation
+Correct. Unidentified dependencies can result in underestimated risks and insufficient protection, increasing vulnerabilities across interconnected systems.
+Dependencies are only relevant for financial reporting
+Explanation
+Dependencies go far beyond financial reporting.
+Dependencies are static and rarely change
+Explanation
+Dependencies are dynamic and frequently change as environments evolve.
+Overall explanation
+Unidentified dependencies can result in underestimated risks and insufficient protection, increasing vulnerabilities across interconnected systems.
+Domain
+24 - Understanding Enterprise Architecture and Governance Fr
+Question 191
+Skipped
+What is a key function of governance structures in enterprise architecture?
+Eliminating the need for security controls
+Explanation
+Security controls are essential and not eliminated by governance.
+Enforcing ad hoc decision-making to speed up processes
+Explanation
+Ad hoc decision-making is what governance structures aim to prevent.
+Correct answer
+Defining policies, roles, and processes that guide systematic and enforceable decision-making
+Explanation
+Correct. Governance structures define systematic policies, roles, and processes to ensure enforceable and aligned organizational decision-making.
+Allowing business units to make technology choices independently
+Explanation
+Allowing independent business unit choices undermines governance goals.
+Overall explanation
+Governance structures define systematic policies, roles, and processes to ensure enforceable and aligned organizational decision-making.
+Domain
+24 - Understanding Enterprise Architecture and Governance Fr
+Question 192
+Skipped
+In the context of inherited controls, what responsibility do departments retain when using a centralized IT-provided firewall?
+None; all responsibility is transferred to IT.
+Explanation
+Responsibility is not fully transferred; departments must remain vigilant.
+Only the responsibility for purchasing hardware.
+Explanation
+Purchasing hardware is not the main responsibility retained.
+Correct answer
+Responsibility for understanding the firewallâ€™s limitations and residual risks.
+Explanation
+Correct. Departments retain responsibility for understanding inherited controlsâ€™ limitations and residual risks, even when a centralized IT provides the control.
+Responsibility for managing the firewallâ€™s day-to-day configuration.
+Explanation
+Departments do not manage day-to-day configuration if IT manages the firewall.
+Overall explanation
+Departments retain responsibility for understanding inherited controlsâ€™ limitations and residual risks, even when a centralized IT provides the control.
+Domain
+32 - Control Allocation and Stakeholder Agreement
+Question 193
+Skipped
+Why is clear documentation of control allocation essential in complex organizations?
+It ensures only internal teams are accountable for controls.
+Explanation
+Documentation clarifies responsibilities for all parties, not just internal teams.
+It eliminates the need for third-party audits.
+Explanation
+Documentation does not eliminate the need for audits.
+Correct answer
+It prevents confusion, duplication, and unmanaged controls by clarifying roles.
+Explanation
+Correct. Clear documentation clarifies who is responsible for each control, preventing confusion, unnecessary duplication, and unmanaged controls, which are critical in complex organizations.
+It allows stakeholders to delegate responsibilities informally.
+Explanation
+Documentation formalizes, not informalizes, responsibility.
+Overall explanation
+Clear documentation clarifies who is responsible for each control, preventing confusion, unnecessary duplication, and unmanaged controls, which are critical in complex organizations.
+Domain
+32 - Control Allocation and Stakeholder Agreement
+Question 194
+Skipped
+In the context of control management, what is a â€˜conflictâ€™ in allocation?
+A situation where no party is responsible for a control.
+Explanation
+No responsibility is a gap, not a conflict.
+Correct answer
+Multiple parties assuming responsibility for the same control, causing inefficiency.
+Explanation
+Correct. A conflict arises when multiple parties assume responsibility for the same control, causing inefficiency and confusion.
+Only external vendors managing controls.
+Explanation
+Conflicts are not defined by exclusive external management.
+Delayed stakeholder concurrence.
+Explanation
+Delayed concurrence is not the definition of conflict.
+Overall explanation
+A conflict arises when multiple parties assume responsibility for the same control, causing inefficiency and confusion.
+Domain
+32 - Control Allocation and Stakeholder Agreement
+Question 195
+Skipped
+What is the primary function of risk acceptance criteria in an organization?
+To identify all possible risks
+Explanation
+Identifying risks is part of risk assessment, not the function of acceptance criteria.
+Correct answer
+To set formal thresholds for tolerable residual risk
+Explanation
+Correct. Risk acceptance criteria are formalized thresholds that define the maximum tolerable level of residual risk for an organization to achieve its objectives.
+To eliminate all risks to zero
+Explanation
+Elimination of all risks is not practical or the purpose of criteria.
+To allocate funding for security initiatives
+Explanation
+Allocating funding is not the main function of acceptance criteria.
+Overall explanation
+Risk acceptance criteria are formalized thresholds that define the maximum tolerable level of residual risk for an organization to achieve its objectives.
+Domain
+50 - Risk Acceptance Criteria and Decision-Making
+Question 196
+Skipped
+In balancing mission objectives and security risks, which principle is most often emphasized?
+Always prioritize security over all other considerations
+Explanation
+Security is critical but must be balanced with mission needs.
+Correct answer
+Make trade-offs through ongoing dialogue among leadership, security, and mission owners
+Explanation
+Correct. Balancing objectives and security requires trade-offs made through ongoing dialogue among leadership, mission owners, and security teams.
+Implement new technologies regardless of risk
+Explanation
+Implementing technologies regardless of risk is reckless.
+Defer all innovation until risks are eliminated
+Explanation
+Waiting for all risks to be eliminated stifles innovation and is impractical.
+Overall explanation
+Balancing objectives and security requires trade-offs made through ongoing dialogue among leadership, mission owners, and security teams.
+Domain
+50 - Risk Acceptance Criteria and Decision-Making
+Question 197
+Skipped
+Why is balancing security and mission objectives described as both an art and a science?
+Because it is based only on artistic intuition
+Explanation
+Artistic intuition alone is insufficient for risk management.
+Correct answer
+Because it requires both structured processes and dynamic, context-sensitive decision-making
+Explanation
+Correct. Balancing security and mission objectives is both an art and a science because it requires structured processes and flexible, context-aware decision-making.
+Because it eliminates the need for quantitative data
+Explanation
+Quantitative data is an important part of decision-making.
+Because it ignores regulatory requirements
+Explanation
+Regulatory requirements cannot be ignored in the process.
+Overall explanation
+Balancing security and mission objectives is both an art and a science because it requires structured processes and flexible, context-aware decision-making.
+Domain
+50 - Risk Acceptance Criteria and Decision-Making
+Question 198
+Skipped
+Why is formal change control necessary in secure configuration management?
+To prevent any changes from being made to systems
+Explanation
+Change control manages, not forbids, changes.
+Correct answer
+To ensure that all modifications are planned, reviewed, approved, and documented
+Explanation
+Correct. Formal change control ensures every modification is properly planned, reviewed, approved, and documented, protecting systems from unauthorized or poor changes.
+To allow only senior management to make changes
+Explanation
+Changes should be controlled by process, not just rank.
+To speed up the process of deploying software updates
+Explanation
+Formal processes may slow, not speed, unsupervised updates.
+Overall explanation
+Formal change control ensures every modification is properly planned, reviewed, approved, and documented, protecting systems from unauthorized or poor changes.
+Domain
+36 - Secure System and Software Configuration Management
+Question 199
+Skipped
+How does effective configuration management reduce recovery costs after a security incident?
+By preventing the need for backups
+Explanation
+Backups are still needed, regardless of configuration management.
+Correct answer
+By minimizing the likelihood and impact of incidents through standardized, secure settings
+Explanation
+Correct. Standardized, secure configurations lower the chance and impact of incidents, thus reducing recovery costs.
+By allowing users to bypass security controls
+Explanation
+Allowing bypasses increases, not decreases, risk.
+By focusing only on software updates
+Explanation
+Configuration management covers more than just software updates.
+Overall explanation
+Standardized, secure configurations lower the chance and impact of incidents, thus reducing recovery costs.
+Domain
+36 - Secure System and Software Configuration Management
+Question 200
+Skipped
+What is a common obstacle to implementing secure configuration management?
+Lack of technical standards
+Explanation
+Technical standards are typically available.
+Correct answer
+Resistance to change by users or administrators
+Explanation
+Correct. Resistance to change from users or admins is a common obstacle to consistent secure configuration management.
+Overabundance of security controls
+Explanation
+Overabundance of controls is not a typical obstacle.
+Too many regulatory requirements
+Explanation
+Regulatory requirements are a driver, not a barrier.
+Overall explanation
+Resistance to change from users or admins is a common obstacle to consistent secure configuration management.
+Domain
+36 - Secure System and Software Configuration Management
+Question 201
+Skipped
+Which of the following is a KEY challenge unique to privacy assessments?
+Implementing network firewalls
+Explanation
+Firewalls are security, not privacy-specific.
+Correct answer
+Documenting and understanding data flows, especially with shadow IT
+Explanation
+Correct. Understanding and documenting data flows, and managing shadow IT, are key privacy assessment challenges.
+Scheduling employee vacations
+Explanation
+Vacations are irrelevant.
+Procuring hardware for data centers
+Explanation
+Hardware procurement is not a privacy assessment issue.
+Overall explanation
+Understanding and documenting data flows, and managing shadow IT, are key privacy assessment challenges.
+Domain
+53 - Ongoing Security and Privacy Assessments
+Question 202
+Skipped
+What is a crucial requirement for healthcare organizations under HIPAA regarding control implementation?
+Only technical controls are needed
+Explanation
+Both technical and administrative controls are necessary.
+Correct answer
+Maintain strong access controls, audit logs, and restricted physical access
+Explanation
+Correct. HIPAA mandates strong access controls, audit logs, and restricted physical access, along with administrative procedures.
+Focus solely on encrypting emails
+Explanation
+Focusing only on email encryption is too narrow.
+Ignore administrative procedures
+Explanation
+Administrative procedures are essential under HIPAA.
+Overall explanation
+HIPAA mandates strong access controls, audit logs, and restricted physical access, along with administrative procedures.
+Domain
+35 - Implementing Selected Security and Privacy Controls
+Question 203
+Skipped
+Which of the following is an example of assurance in risk management?
+Installing a firewall
+Explanation
+Installing a firewall is implementing a control, not assurance.
+Using biometric authentication
+Explanation
+Biometric authentication is a strong control, not assurance itself.
+Correct answer
+Conducting regular audits to verify controls are working as intended
+Explanation
+Correct. Assurance is the confidence that controls are operating as intended, achieved through activities like audits and monitoring.
+Calculating the likelihood of a threat
+Explanation
+Calculating likelihood is risk assessment, not assurance.
+Overall explanation
+Assurance is the confidence that controls are operating as intended, achieved through activities like audits and monitoring.
+Domain
+16 - Risk Concepts and Terminology
+Question 204
+Skipped
+Why might smaller organizations prioritize certain NIST SP 800-53 controls over others?
+They are exempt from compliance requirements
+Explanation
+Smaller organizations are not exempt from compliance.
+They have unlimited resources
+Explanation
+They usually lack, not have, unlimited resources.
+Correct answer
+They face resource constraints and must focus on the most critical risks
+Explanation
+Correct. Smaller organizations often face resource constraints and must focus on the most critical controls based on risk assessment.
+They do not need to consider privacy controls
+Explanation
+Privacy controls remain important regardless of size.
+Overall explanation
+Smaller organizations often face resource constraints and must focus on the most critical controls based on risk assessment.
+Domain
+29 - Introduction to NIST SP 800-53 and Control Families
+Question 205
+Skipped
+What is the most significant business impact of failing to update inventories after retiring a system?
+Increased power consumption
+Explanation
+Power consumption is not the primary consequence.
+Correct answer
+Ghost assets causing confusion in incident response or compliance
+Explanation
+Correct. Ghost assets can mislead teams into thinking controls or systems are still active, causing confusion during audits or incident response.
+Decreased morale in the IT department
+Explanation
+IT morale is not the main concern.
+Higher software licensing costs
+Explanation
+Software licensing is unrelated.
+Overall explanation
+Ghost assets can mislead teams into thinking controls or systems are still active, causing confusion during audits or incident response.
+Domain
+60 - Retiring or Reassigning Security Controls
+Question 206
+Skipped
+In the financial sector, what is a potential consequence of failing to apply controls consistently across online, mobile, and in-branch systems?
+Enhanced customer experience
+Explanation
+Inconsistent controls harm, not enhance, customer experience.
+Correct answer
+Security breaches and exploitation of gaps by attackers
+Explanation
+Correct. Failing to apply controls consistently leads to exploitable security gaps, increasing the risk of breaches.
+Decreased need for employee training
+Explanation
+Employee training needs are unrelated to consistency.
+Reduced audit requirements
+Explanation
+Audit requirements are not reduced by inconsistency.
+Overall explanation
+Failing to apply controls consistently leads to exploitable security gaps, increasing the risk of breaches.
+Domain
+35 - Implementing Selected Security and Privacy Controls
+Question 207
+Skipped
+In the context of GRC, why is continuous commitment and monitoring necessary?
+Because regulatory requirements and risks are static
+Explanation
+Risks and regulations are dynamic, not static.
+To ensure GRC is a checkbox exercise
+Explanation
+GRC is not a checkbox exercise.
+Correct answer
+Because threats, regulations, and organizational contexts change over time
+Explanation
+Correct. Continuous commitment and monitoring are necessary because threats, regulations, and organizational contexts are constantly changing.
+To minimize leadership involvement
+Explanation
+Leadership must remain actively involved.
+Overall explanation
+Continuous commitment and monitoring are necessary because threats, regulations, and organizational contexts are constantly changing.
+Domain
+3 - Core GRC Concepts Governance Risk and Compliance in Cont
+Question 208
+Skipped
+What should be done if a monitoring tool used by a decommissioned system is also logging data from an active system?
+Shut down the tool immediately
+Explanation
+Shutting down could disrupt necessary logging.
+Correct answer
+Reassign the tool to the active system
+Explanation
+Correct. Reassigning the monitoring tool ensures logging continues for the active system while properly decommissioning the retired system.
+Delete all logs without review
+Explanation
+Deleting logs may violate compliance or audit needs.
+Ignore the tool since it’s no longer needed for the retired system
+Explanation
+Ignoring risks losing essential monitoring.
+Overall explanation
+Reassigning the monitoring tool ensures logging continues for the active system while properly decommissioning the retired system.
+Domain
+60 - Retiring or Reassigning Security Controls

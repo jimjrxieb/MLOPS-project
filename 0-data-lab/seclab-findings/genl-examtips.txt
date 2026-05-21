@@ -42,119 +42,585 @@ Q:What function does positional encoding serve in the Transformer architecture?
 A:Overall explanation
 Positional encoding is a vital component of the Transformer architecture. Transformers lack the inherent sequential processing of recurrent neural networks, so they rely on positional encoding to incorporate information about the order of tokens in the input sequence. This is typically achieved by adding fixed or learned vectors (e.g., sine and cosine functions) to the token embeddings, where each position in the sequence has a unique encoding. This allows the model to distinguish the relative or absolute positions of tokens, enabling it to understand word order in tasks like translation or text generation. For example, in the sentence The cat sleeps, positional encoding ensures the model knows cat is the second token and sleeps is the third. Option A is incorrect, as positional encoding does not remove information but adds positional context. Option B is wrong because semantic meaning is captured by token embeddings, not positional encoding. Option D is also inaccurate, as the importance of tokens is determined by the attention mechanism, not positional encoding.
 
-Q:
-A:
+Q:What is typically meant by 'generative AI'?
+A:Overall explanation
+Generative AI is a branch of artificial intelligence focused on creating models that can generate new and original data, such as text, images, or audio, that resembles the training data. In the context of LLMs, generative AI involves models like GPT that produce coherent text for tasks like text completion, dialogue, or creative writing by learning patterns from large datasets. These models use techniques like autoregressive generation to create novel outputs. Option B is incorrect, as generative AI is not limited to generating classification models but focuses on producing new data. Option C is wrong, as improving model efficiency is a concern of optimization techniques, not generative AI. Option D is inaccurate, as analyzing and interpreting data falls under discriminative AI, not generative AI.
 
-Q:
-A:
+Q:As a data scientist deploying deep learning models, your team discusses TensorRT and ONNX for optimization and deployment. Select the two accurate descriptions of their roles.
+A:Overall explanation
+Tensor-RT is an SDK developed by NVIDIA that optimizes and accelerates deep learning model inference specifically on NVIDIA hardware. ONNX (Open Neural Network Exchange) is an open format designed for interoperability between different deep learning frameworks, allowing models to be exchanged easily, which makes it suitable for cross-framework deployment and integration. Together, they enable efficient model optimization and deployment, especially in heterogeneous environments.
 
-Q:
-A:
+Q:You've trained a new deep learning model and plan A/B testing for performance comparison. Which method is proper?
+A:Overall explanation
+The correct A/B testing methodology involves randomly assigning users to different groups, where each group interacts with one of the models (new or old) simultaneously. This approach ensures a fair, unbiased comparison under similar conditions, eliminating confounding variables introduced by time or sequential changes, and yielding reliable statistical insights on model performance.
 
-Q:
-A:
+Q:What role does a tokenizer play in Large Language Models?
+A:Overall explanation
+A tokenizer in the context of large language models (LLMs) is a tool that splits text into smaller units called tokens (e.g., words, subwords, or characters) for processing by the model. NVIDIA's NeMo documentation on NLP preprocessing explains that tokenization is a critical step in preparing text data, with algorithms like WordPiece, Byte-Pair Encoding (BPE), or SentencePiece breaking text into manageable units to handle vocabulary constraints and out-of-vocabulary words. For example, the sentence "I love AI" might be tokenized into ["I", "love", "AI"] or subword units like ["I", "lov", "##e", "AI"]. Option A is incorrect, as removing stop words is a separate preprocessing step. Option B is wrong, as tokenization is not a predictive algorithm. Option D is misleading, as converting text to numerical representations is the role of embeddings, not tokenization.
 
-Q:
-A:
+Q:Why is positional encoding required in Transformer models?
+A:Overall explanation
+Positional encoding is a critical component in transformer-based models because, unlike recurrent neural networks (RNNs), transformers process input sequences in parallel and lack an inherent sense of word order. Positional encoding addresses this by embedding information about the position of each token in the sequence, enabling the model to understand the sequential relationships between tokens. According to the original transformer paper ('Attention is All You Need' by Vaswani et al., 2017), positional encodings are added to the input embeddings to provide the model with information about the relative or absolute position of tokens. NVIDIA's documentation on transformer-based models, such as those supported by the NeMo framework, emphasizes that positional encodings are typically implemented using sinusoidal functions or learned embeddings to preserve sequence order, which is essential for tasks like natural language processing (NLP). Options B, C, and D are incorrect because positional encoding does not address overfitting, dimensionality reduction, or throughput directly; these are handled by other techniques like regularization, dimensionality reduction methods, or hardware optimization.
 
-Q:
-A:
+Q:In preprocessing text for Large Language Models, what is tokenization?
+A:Overall explanation
+Tokenization is the process of splitting text into smaller units, such as words, subwords, or characters, which serve as the basic units for processing by LLMs. NVIDIA's NeMo documentation on NLP preprocessing explains that tokenization is a critical step in preparing text data, with popular tokenizers (e.g., WordPiece, BPE) breaking text into subword units to handle out-of-vocabulary words and improve model efficiency. For example, the sentence “I love AI” might be tokenized into [“I” , “love” , “AI” ] or subword units like [“I” , “lov” , “##e” , “AI” ]. Option B (numerical representations) refers to embedding, not tokenization. Option C (removing stop words) is a separate preprocessing step. Option D (data augmentation) is unrelated to tokenization.
 
-Q:
-A:
+Q:What best captures the role of attention mechanisms in Transformers?
+A:Overall explanation
+Attention mechanisms in transformer models, as introduced in "Attention is All You Need" (Vaswani et al., 2017), allow the model to focus on relevant parts of the input sequence by assigning higher weights to important tokens during processing. NVIDIA's NeMo documentation explains that self-attention enables transformers to capture long-range dependencies and contextual relationships, making them effective for tasks like language modeling and translation. Option B is incorrect, as attention does not compress sequences but processes them fully. Option C is false, as attention is not about generating noise. Option D refers to embeddings, not attention.
 
-Q:
-A:
+Q:In the realm of Large Language Models, what defines a foundation model?
+A:Overall explanation
+In the context of Large Language Models (LLMs), a foundation model refers to a large-scale model trained on vast quantities of diverse data, designed to serve as a versatile starting point that can be fine-tuned or adapted for a variety of downstream tasks, such as text generation, classification, or translation. Foundation models like BERT, GPT, or T5 are pre-trained on massive datasets and can be customized for specific applications, making them highly flexible and efficient. Option A is incorrect, as achieving state-of-the-art results on GLUE is not a defining characteristic of foundation models, though some may perform well on such benchmarks. Option C is wrong, as there is no specific validation by an AI safety institute required to define a foundation model. Option D is inaccurate, as the "Attention is All You Need" paper introduced Transformers, which rely on attention mechanisms, not recurrent neural networks or convolution layers.
 
-Q:
-A:
+Q:The prompt 'Translate to French: cheese =>' exemplifies which technique?
+A:Overall explanation
+The prompt “Translate English to French: cheese =>” is an example of zero-shot learning. Zero-shot learning refers to a model’s ability to perform a task without prior task-specific training or examples, relying solely on its pre-trained knowledge and the prompt’s instructions. In this case, the prompt provides no training examples, expecting the model to translate “cheese” to French (“fromage”) based on its general understanding of language and translation. Option A, few-shot learning, is incorrect, as it involves providing a few examples in the prompt. Option B, fine-tuning, involves retraining the model, not prompting. Option C, one-shot learning, requires a single example, which is not provided here.
 
-Q:
-A:
+Q:For complex reasoning tasks like multi-step math problems in LLMs, which prompt technique best ensures consistent strong results?
+A:Overall explanation
+Chain-of-thought (CoT) prompting is an advanced prompt engineering technique that significantly enhances a large language model's (LLM) performance on complex reasoning tasks, such as multistep mathematical problems. By including examples that explicitly demonstrate step-by-step reasoning in the prompt, CoT guides the model to break down the problem into intermediate steps, improving accuracy and robustness. NVIDIA's NeMo documentation on prompt engineering highlights CoT as a powerful method for tasks requiring logical or sequential reasoning, as it leverages the model's ability to mimic structured problem-solving. Research by Wei et al. (2022) demonstrates that CoT outperforms other methods for mathematical reasoning. Option A (zero-shot) is less effective for complex tasks due to lack of guidance. Option B (few-shot with random examples) is suboptimal without structured reasoning. Option D (RAG) is useful for factual queries but less relevant for pure reasoning tasks.
 
-Q:
-A:
+Q:Which prompt engineering method helps LLMs produce more precise and suitable responses?
+A:Overall explanation
+Prompt engineering involves designing inputs to guide large language models (LLMs) to produce desired outputs without modifying the model itself. Leveraging the system message is a key technique, where a predefined instruction or context is provided to the LLM to set the tone, role, or constraints for its responses. NVIDIA's NeMo framework documentation on conversational AI highlights the use of system messages to improve the contextual accuracy of LLMs, especially in dialogue systems or task-specific applications. For instance, a system message like "You are a helpful technical assistant" ensures responses align with the intended role. Options A, C, and D involve model training or architectural changes, which are not part of prompt engineering.
 
-Q:
-A:
+Q:What is the goal of few-shot learning in prompt engineering?
+A:Overall explanation
+Few-shot learning in prompt engineering involves providing a small number of examples (demonstrations) within the prompt to guide a large language model (LLM) to perform a specific task without modifying its weights. NVIDIA’s NeMo documentation on prompt-based learning explains that few-shot prompting leverages the model’s pre-trained knowledge by showing it a few input-output pairs, enabling it to generalize to new tasks. For example, providing two examples of sentiment classification in a prompt helps the model understand the task. Option B is incorrect, as few-shot learning does not involve training from scratch. Option C is wrong, as hyperparameter optimization is a separate process. Option D is false, as few-shot learning avoids large-scale fine-tuning.
 
-Q:
-A:
+Question 1
+Incorrect
+In the Exploratory Data Analysis (EDA) stage, analysts frequently calculate numerical summaries to gain a clearer view of the data's distribution and variability. Which EDA method specifically involves computing measures like mean, median, mode, variance, standard deviation, min, max, and percentiles?
+Data Visualization
+Explanation
+Data visualization uses graphs and charts, not numerical calculations.
+Feature Engineering
+Explanation
+Feature engineering creates or modifies input variables, not summary statistics.
+Correct answer
+Descriptive Statistics
+Explanation
+Descriptive statistics summarize key dataset characteristics through measures of central tendency and dispersion.
+Your answer is incorrect
+Inferential Statistics
+Explanation
+Inferential statistics draw conclusions beyond the data using probability.
+Overall explanation
+Descriptive statistics is an EDA technique used to summarize and describe the essential characteristics of a dataset using numerical measures such as mean, median, mode, variance, standard deviation, minimum, maximum, and percentiles. These statistics provide insight into central tendency and data dispersion. Option A is incorrect because data visualization focuses on graphical representation rather than numerical summaries. Option B is wrong because feature engineering involves creating or transforming features, not summarizing data. Option D is incorrect because inferential statistics focuses on making predictions or inferences beyond the dataset.
+Domain
+Data Science
+Question 2
+Correct
+During data analysis, graphical displays are commonly employed to quickly uncover insights about data patterns and structure. What is the main goal of data visualization in this scenario?
+Training predictive models
+Explanation
+Predictive models are trained with algorithms, not visuals.
+Cleaning and preprocessing raw data
+Explanation
+Cleaning addresses missing or inconsistent values.
+Converting categorical variables to numerical format
+Explanation
+This is part of data preprocessing/encoding.
+Your answer is correct
+Revealing patterns, trends, and outliers through graphs
 
-Q:
-A:
+Explanation
+Visualization tools like histograms, scatter plots, and box plots help identify relationships and anomalies quickly.
 
-Q:
-A:
+Overall explanation
+Data visualization is primarily used to reveal patterns, trends, and outliers in data using graphical tools such as histograms, box plots, bar charts, and scatter plots. These visuals help analysts quickly understand complex data relationships. Option A is incorrect because model training is performed using algorithms, not visualizations. Option B is wrong as data cleaning involves handling missing or inconsistent values. Option C is incorrect because encoding categorical variables is part of preprocessing, not visualization.
+Domain
+Data Science
+Question 3
+Correct
+During the training of machine learning or deep learning models, the full dataset is typically fed through the model several times to enhance learning. What exactly does an 'epoch' mean in this process?
+A single batch of training examples
+Explanation
+A batch is only a portion of the dataset.
+Your answer is correct
+One full pass over the entire training dataset
+Explanation
+An epoch completes when all training data has been processed once.
+A step applied solely in model evaluation
+Explanation
+Epochs occur during training.
+A direct measure of model accuracy
+Explanation
+Epochs count iterations, not performance.
+Overall explanation
+An epoch refers to one complete pass of the entire training dataset through the learning algorithm. Multiple epochs allow the model to iteratively adjust its parameters and improve performance. Option A is incorrect because a batch is only a subset of the dataset. Option C is wrong as epochs are part of training, not evaluation. Option D is incorrect because epochs do not directly measure accuracy.
+Domain
+Data Science
+Question 4
+Correct
+Once a machine learning model is trained, evaluating its effectiveness on unfamiliar data is essential. What does 'model evaluation' refer to here?
+Gathering and labeling data for training
 
-Q:
-A:
+Explanation
+This happens before training.
 
-Q:
-A:
+Tuning hyperparameters
+Explanation
+This optimizes model settings separately.
+Your answer is correct
+Evaluating the trained model's performance on new unseen data
 
-Q:
-A:
+Explanation
+Evaluation measures generalization using metrics on test data.
 
-Q:
-A:
+Deploying the model in production
 
-Q:
-A:
+Explanation
+Deployment follows successful evaluation.
 
-Q:
-A:
+Overall explanation
+Model evaluation involves assessing how well a trained model performs on unseen or test data using appropriate metrics. This step helps determine the model’s ability to generalize. Option A is incorrect because data collection occurs before training. Option B is wrong since hyperparameter tuning is part of model optimization. Option D is incorrect because deployment occurs after evaluation.
+Domain
+Data Science
+Question 5
+Incorrect
+Beyond quantitative metrics, some models—particularly generative ones—are assessed through subjective assessment. Which option represents a qualitative evaluation approach?
+Your answer is incorrect
+Calculating accuracy
+Explanation
+Accuracy is a numerical metric.
+Analyzing a confusion matrix
+Explanation
+Confusion matrices yield quantitative results.
+Correct answer
+Human evaluation of generated content
+Explanation
+Human reviewers judge coherence, relevance, and quality subjectively.
+Optimizing loss functions
+Explanation
+Loss optimization occurs during training.
+Overall explanation
+Qualitative evaluation relies on subjective judgment, such as human review of generated outputs, to assess aspects like coherence and relevance. This is especially important in generative tasks. Option A is incorrect because accuracy is a quantitative metric. Option B is wrong as confusion matrices provide numerical evaluation. Option D is incorrect because loss optimization is part of training, not evaluation.
+Domain
+Data Science
+Question 6
+Incorrect
+Transfer learning allows models to reuse knowledge from prior tasks or larger pre-trained models. Which method below is a form of transfer learning?
+Feature scaling
+Explanation
+Scaling normalizes inputs as preprocessing.
+Your answer is incorrect
+Data augmentation
+Explanation
+Augmentation expands training data variations.
+Correct answer
+Knowledge distillation
+Explanation
+A smaller student model learns from a larger teacher model's outputs.
+Dimensionality reduction
+Explanation
+This reduces feature count.
+Overall explanation
+Knowledge distillation is a transfer learning technique where a smaller student model learns from a larger, pre-trained teacher model. This helps retain performance while reducing model size. Option A is incorrect because feature scaling is a preprocessing step. Option B is wrong as data augmentation modifies training data rather than transferring knowledge. Option D is incorrect because dimensionality reduction focuses on reducing features.
+Domain
+Data Science
+Question 7
+Incorrect
+In machine learning, input variables are key for pattern detection. What term describes a 'feature'?
+The entire training dataset
+Explanation
+A dataset contains many features.
+Correct answer
+An individual observable attribute or property of the data
+Explanation
+Features are measurable inputs the model uses.
+An output prediction from the model
+Explanation
+Predictions are model outputs.
+Your answer is incorrect
+A particular learning algorithm
+Explanation
+Algorithms define the learning process.
+Overall explanation
+A feature is an individual measurable property or characteristic of the data used as input to a machine learning model. Features provide the information needed for learning patterns. Option A is incorrect because a dataset consists of multiple features. Option C is wrong as predictions are model outputs. Option D is incorrect because learning algorithms define how models learn, not the data itself.
+Domain
+Data Science
+Question 8
+Incorrect
+For NLP tasks like translation, summarization, or paraphrasing, models need to transform input sequences into output sequences. Which architecture is best suited for these sequence-to-sequence problems?
+Your answer is incorrect
+Convolutional Neural Networks
+Explanation
+CNNs excel at grid-like data such as images.
+Attention-only mechanisms
+Explanation
+Attention alone lacks full seq2seq structure.
+Correct answer
+Encoder-Decoder architecture
+Explanation
+Encoder processes input; decoder generates output.
+Clustering algorithms
+Explanation
+Clustering is unsupervised grouping.
+Overall explanation
+The encoder-decoder mechanism is designed for sequence-to-sequence tasks, where the encoder processes the input sequence and the decoder generates the corresponding output sequence. Option A is incorrect because CNNs are mainly used for spatial data. Option B is wrong as attention alone does not define a full sequence-to-sequence architecture. Option D is incorrect because clustering is an unsupervised learning technique.
+Domain
+Data Science
+Question 9
+Correct
+When handling large datasets with demanding ML algorithms, GPU acceleration boosts speed significantly. Which library provides GPU-accelerated alternatives to standard ML routines?
+NumPy
+Explanation
+NumPy runs primarily on CPUs.
+Pandas
+Explanation
+Pandas handles data manipulation.
+Your answer is correct
+cuML
+Explanation
+cuML offers GPU-accelerated implementations of common algorithms.
+Scikit-learn
+Explanation
+Scikit-learn is CPU-based.
+Overall explanation
+cuML is a GPU-accelerated machine learning library developed by NVIDIA that provides high-performance implementations of common ML algorithms. Option A is incorrect because NumPy primarily operates on CPUs. Option B is wrong as Pandas is used for data manipulation, not ML acceleration. Option D is incorrect because scikit-learn is CPU-based.
+Domain
+Data Science
+Question 10
+Correct
+Tensor-RT employs various optimizations to prepare models for efficient deployment. Which technique does Tensor-RT use to build faster inference engines?
 
-Q:
-A:
+Dropout regularization
+Explanation
+Dropout prevents overfitting during training.
+Data augmentation
+Explanation
+Augmentation enhances training data.
+Your answer is correct
+Layer fusion
+Explanation
+Fusing layers combines operations for reduced latency.
+Gradient clipping
+Explanation
+Clipping stabilizes training gradients.
+Overall explanation
+TensorRT uses layer fusion to combine multiple neural network layers into a single optimized operation, reducing latency and improving inference speed. Option A is incorrect because dropout is used during training. Option B is wrong as data augmentation is a training-time technique. Option D is incorrect because gradient clipping is used during backpropagation.
+Domain
+Data Science
+Question 11
+Correct
+Which statement most accurately defines Word2vec?
+A programming language for AI development
+Explanation
+Word2vec is not a language.
+A statistical method for word frequency analysis
+Explanation
+It focuses on context, not just frequency.
+Your answer is correct
+A deep learning method that produces word embeddings from text
+Explanation
+Word2vec uses neural networks to create semantic vector representations.
+A database system for word storage and queries
+Explanation
+It is not a database.
+Overall explanation
+Word2vec is a technique developed by Google that uses shallow neural networks to learn vector representations (embeddings) of words, capturing their semantic relationships based on context in large text corpora. Therefore, the best description is that it is a deep learning algorithm that generates word embeddings.
+Domain
+Data Science
+Question 12
+Incorrect
+In large language models, what role does the attention mechanism play?
+Assessing importance of words in the generated output
+Explanation
+Attention primarily weights input tokens.
+Determining generation order of words
+Explanation
+Order is handled by decoding strategy.
+Your answer is incorrect
+Capturing word order in the input
+Explanation
+Positional encoding handles order.
+Correct answer
+Assigning relevance weights to input tokens
+Explanation
+Attention computes weighted focus on relevant parts of the input.
+Overall explanation
+The attention mechanism is a critical component of large language models, particularly in Transformer architectures. Its primary purpose is to assign weights to each token in the input sequence based on its relevance to other tokens, allowing the model to focus on the most contextually important parts of the input when generating or interpreting text. This is achieved through mechanisms like self-attention, where each token computes a weighted sum of all other tokens’ representations, with weights determined by their relevance (e.g., via scaled dot-product attention). This enables the model to capture long-range dependencies and contextual relationships effectively, unlike traditional recurrent networks. Option A is incorrect because attention focuses on the input sequence, not the output sequence. Option B is wrong as the order of generation is determined by the model’s autoregressive or decoding strategy, not the attention mechanism itself. Option C is also inaccurate, as capturing the order of words is the role of positional encoding, not attention.
+Domain
+Data Science
+Question 13
+Incorrect
+What function does positional encoding serve in the Transformer architecture?
+Eliminating redundant input information
+Explanation
+It adds information, not removes.
+Your answer is incorrect
+Encoding semantic meaning of tokens
+Explanation
+Semantics come from token embeddings.
+Correct answer
+Injecting positional order information for tokens
+Explanation
+Transformers need explicit position info since they process in parallel.
+Encoding token importance
+Explanation
+Importance is handled by attention.
+Overall explanation
+Positional encoding is a vital component of the Transformer architecture. Transformers lack the inherent sequential processing of recurrent neural networks, so they rely on positional encoding to incorporate information about the order of tokens in the input sequence. This is typically achieved by adding fixed or learned vectors (e.g., sine and cosine functions) to the token embeddings, where each position in the sequence has a unique encoding. This allows the model to distinguish the relative or absolute positions of tokens, enabling it to understand word order in tasks like translation or text generation. For example, in the sentence The cat sleeps, positional encoding ensures the model knows cat is the second token and sleeps is the third. Option A is incorrect, as positional encoding does not remove information but adds positional context. Option B is wrong because semantic meaning is captured by token embeddings, not positional encoding. Option D is also inaccurate, as the importance of tokens is determined by the attention mechanism, not positional encoding.
+Domain
+Data Science
+Question 14
+Incorrect
+What is typically meant by 'generative AI'?
+Correct answer
+AI that creates models capable of producing new data instances
+Explanation
+Generative AI produces novel content like text or images.
+AI that automatically builds classification models
+Explanation
+It focuses on content generation, not model creation.
+AI that enhances efficiency of existing models
+Explanation
+Efficiency is separate from generation.
+Your answer is incorrect
+AI that analyzes and interprets data
+Explanation
+Analysis is discriminative AI.
+Overall explanation
+Generative AI is a branch of artificial intelligence focused on creating models that can generate new and original data, such as text, images, or audio, that resembles the training data. In the context of LLMs, generative AI involves models like GPT that produce coherent text for tasks like text completion, dialogue, or creative writing by learning patterns from large datasets. These models use techniques like autoregressive generation to create novel outputs. Option B is incorrect, as generative AI is not limited to generating classification models but focuses on producing new data. Option C is wrong, as improving model efficiency is a concern of optimization techniques, not generative AI. Option D is inaccurate, as analyzing and interpreting data falls under discriminative AI, not generative AI.
+Domain
+Data Science
+Question 15
+Incorrect
+As a data scientist deploying deep learning models, your team discusses TensorRT and ONNX for optimization and deployment. Select the two accurate descriptions of their roles.
+Your selection is incorrect
+Tensor-RT acts as hardware accelerator while ONNX is a language for ML development
 
-Q:
-A:
+Explanation
+Incorrect roles.
+Correct selection
+Tensor-RT optimizes and deploys models on NVIDIA GPUs; ONNX enables framework interoperability
 
-Q:
-A:
+Explanation
+Accurate descriptions.
+Your selection is incorrect
+Tensor-RT builds and trains models; ONNX optimizes for specific hardware
 
-Q:
-A:
+Explanation
+Incorrect.
+Correct selection
+Tensor-RT accelerates inference via optimization; ONNX provides interoperable model format
 
-Q:
-A:
+Explanation
+Accurate descriptions.
+TensorRT creates models from scratch; ONNX handles deployment
+Explanation
+Incorrect.
+Overall explanation
+Tensor-RT is an SDK developed by NVIDIA that optimizes and accelerates deep learning model inference specifically on NVIDIA hardware. ONNX (Open Neural Network Exchange) is an open format designed for interoperability between different deep learning frameworks, allowing models to be exchanged easily, which makes it suitable for cross-framework deployment and integration. Together, they enable efficient model optimization and deployment, especially in heterogeneous environments.
 
-Q:
-A:
+Domain
+Data Science
+Question 16
+Incorrect
+You've trained a new deep learning model and plan A/B testing for performance comparison. Which method is proper?
+Your answer is incorrect
+Run new model for a while and compare to old model's past metrics
+Explanation
+Time-based comparison introduces biases.
+Run new model then revert to old for comparison
+Explanation
+Sequential switching confounds results.
+Run new model and use user feedback only
+Explanation
+Feedback is subjective.
+Correct answer
+Randomly split users: half use new model, half use old then compare metrics
 
-Q:
-A:
+Explanation
+Simultaneous random assignment ensures fair comparison.
 
-Q:
-A:
-
-Q:
-A:
-
-Q:
-A:
-
-Q:
-A:
-
-Q:
-A:
-
-Q:
-A:
-
-Q:
-A:
-
-Q:
-A:
-
-Q:
-A:
-
-Q:
-A:
-
-Q:
-A:
+Overall explanation
+The correct A/B testing methodology involves randomly assigning users to different groups, where each group interacts with one of the models (new or old) simultaneously. This approach ensures a fair, unbiased comparison under similar conditions, eliminating confounding variables introduced by time or sequential changes, and yielding reliable statistical insights on model performance.
+Domain
+Data Science
+Question 17
+Correct
+What role does a tokenizer play in Large Language Models?
+Removing stop words and punctuation
+Explanation
+That's a separate cleaning step.
+Predicting the next token in text
+Explanation
+Prediction is the model's task.
+Your answer is correct
+Dividing text into smaller units (tokens) for processing
+Explanation
+Tokenizers break text into manageable tokens.
+Converting text directly to numerical tokens
+Explanation
+Numerical mapping is done by embeddings.
+Overall explanation
+A tokenizer in the context of large language models (LLMs) is a tool that splits text into smaller units called tokens (e.g., words, subwords, or characters) for processing by the model. NVIDIA's NeMo documentation on NLP preprocessing explains that tokenization is a critical step in preparing text data, with algorithms like WordPiece, Byte-Pair Encoding (BPE), or SentencePiece breaking text into manageable units to handle vocabulary constraints and out-of-vocabulary words. For example, the sentence "I love AI" might be tokenized into ["I", "love", "AI"] or subword units like ["I", "lov", "##e", "AI"]. Option A is incorrect, as removing stop words is a separate preprocessing step. Option B is wrong, as tokenization is not a predictive algorithm. Option D is misleading, as converting text to numerical representations is the role of embeddings, not tokenization.
+Domain
+Data Science
+Question 18
+Incorrect
+Why is positional encoding required in Transformer models?
+Correct answer
+To indicate the sequence order of tokens
+Explanation
+Transformers process in parallel without built-in order.
+Your answer is incorrect
+To avoid model overfitting
+Explanation
+Regularization handles overfitting.
+To lower input dimensionality
+Explanation
+Other methods reduce dimensions.
+To boost processing speed
+Explanation
+Hardware optimizations increase throughput.
+Overall explanation
+Positional encoding is a critical component in transformer-based models because, unlike recurrent neural networks (RNNs), transformers process input sequences in parallel and lack an inherent sense of word order. Positional encoding addresses this by embedding information about the position of each token in the sequence, enabling the model to understand the sequential relationships between tokens. According to the original transformer paper ('Attention is All You Need' by Vaswani et al., 2017), positional encodings are added to the input embeddings to provide the model with information about the relative or absolute position of tokens. NVIDIA's documentation on transformer-based models, such as those supported by the NeMo framework, emphasizes that positional encodings are typically implemented using sinusoidal functions or learned embeddings to preserve sequence order, which is essential for tasks like natural language processing (NLP). Options B, C, and D are incorrect because positional encoding does not address overfitting, dimensionality reduction, or throughput directly; these are handled by other techniques like regularization, dimensionality reduction methods, or hardware optimization.
+Domain
+Data Science
+Question 19
+Correct
+In preprocessing text for Large Language Models, what is tokenization?
+Your answer is correct
+Breaking text into smaller units such as words or subwords
+Explanation
+Tokenization creates processable units.
+Turning text into numerical vectors
+Explanation
+Embeddings handle numerical conversion.
+Eliminating stop words
+Explanation
+Stop word removal is separate.
+Using augmentation to create more data
+Explanation
+Augmentation varies existing data.
+Overall explanation
+Tokenization is the process of splitting text into smaller units, such as words, subwords, or characters, which serve as the basic units for processing by LLMs. NVIDIA's NeMo documentation on NLP preprocessing explains that tokenization is a critical step in preparing text data, with popular tokenizers (e.g., WordPiece, BPE) breaking text into subword units to handle out-of-vocabulary words and improve model efficiency. For example, the sentence “I love AI” might be tokenized into [“I” , “love” , “AI” ] or subword units like [“I” , “lov” , “##e” , “AI” ]. Option B (numerical representations) refers to embedding, not tokenization. Option C (removing stop words) is a separate preprocessing step. Option D (data augmentation) is unrelated to tokenization.
+Domain
+Data Science
+Question 20
+Incorrect
+What best captures the role of attention mechanisms in Transformers?
+Correct answer
+Concentrating on relevant input portions for the task
+Explanation
+Attention weights important tokens dynamically.
+Compressing input for quicker computation
+Explanation
+Attention processes full sequence.
+Adding noise for robustness
+Explanation
+Noise is unrelated.
+Your answer is incorrect
+Transforming text to numbers
+Explanation
+Embeddings do that.
+Overall explanation
+Attention mechanisms in transformer models, as introduced in "Attention is All You Need" (Vaswani et al., 2017), allow the model to focus on relevant parts of the input sequence by assigning higher weights to important tokens during processing. NVIDIA's NeMo documentation explains that self-attention enables transformers to capture long-range dependencies and contextual relationships, making them effective for tasks like language modeling and translation. Option B is incorrect, as attention does not compress sequences but processes them fully. Option C is false, as attention is not about generating noise. Option D refers to embeddings, not attention.
+Domain
+Data Science
+Question 21
+Correct
+In the realm of Large Language Models, what defines a foundation model?
+A model achieving top GLUE benchmark scores
+Explanation
+SOTA performance is not the definition.
+Your answer is correct
+A large-scale model trained on massive data to adapt to various downstream tasks
+Explanation
+Foundation models are broad pre-trained bases for specialization.
+A model certified by AI safety institutes for Transformer apps
+Explanation
+No such certification defines them.
+A model from the 'Attention is All You Need' paper using RNNs/convolutions
+Explanation
+Transformers use attention, not RNNs.
+Overall explanation
+In the context of Large Language Models (LLMs), a foundation model refers to a large-scale model trained on vast quantities of diverse data, designed to serve as a versatile starting point that can be fine-tuned or adapted for a variety of downstream tasks, such as text generation, classification, or translation. Foundation models like BERT, GPT, or T5 are pre-trained on massive datasets and can be customized for specific applications, making them highly flexible and efficient. Option A is incorrect, as achieving state-of-the-art results on GLUE is not a defining characteristic of foundation models, though some may perform well on such benchmarks. Option C is wrong, as there is no specific validation by an AI safety institute required to define a foundation model. Option D is inaccurate, as the "Attention is All You Need" paper introduced Transformers, which rely on attention mechanisms, not recurrent neural networks or convolution layers.
+Domain
+Data Science
+Question 22
+Correct
+The prompt 'Translate to French: cheese =>' exemplifies which technique?
+Few-shot learning
+Explanation
+Few-shot provides multiple examples.
+Fine-tuning the model
+Explanation
+Fine-tuning retrains weights.
+One-shot learning
+Explanation
+One-shot gives one example.
+Your answer is correct
+Zero-shot learning
+Explanation
+No examples—just instructions.
+Overall explanation
+The prompt “Translate English to French: cheese =>” is an example of zero-shot learning. Zero-shot learning refers to a model’s ability to perform a task without prior task-specific training or examples, relying solely on its pre-trained knowledge and the prompt’s instructions. In this case, the prompt provides no training examples, expecting the model to translate “cheese” to French (“fromage”) based on its general understanding of language and translation. Option A, few-shot learning, is incorrect, as it involves providing a few examples in the prompt. Option B, fine-tuning, involves retraining the model, not prompting. Option C, one-shot learning, requires a single example, which is not provided here.
+Domain
+Data Science
+Question 23
+Correct
+For complex reasoning tasks like multi-step math problems in LLMs, which prompt technique best ensures consistent strong results?
+Zero-shot with basic instructions
+Explanation
+Lacks guidance for complexity.
+Few-shot with random examples
+Explanation
+Unstructured examples are less effective.
+Your answer is correct
+Chain-of-thought with step-by-step reasoning demonstrations
+Explanation
+CoT guides intermediate reasoning steps.
+Retrieval-augmented generation with math databases
+Explanation
+RAG helps facts, not pure reasoning.
+Overall explanation
+Chain-of-thought (CoT) prompting is an advanced prompt engineering technique that significantly enhances a large language model's (LLM) performance on complex reasoning tasks, such as multistep mathematical problems. By including examples that explicitly demonstrate step-by-step reasoning in the prompt, CoT guides the model to break down the problem into intermediate steps, improving accuracy and robustness. NVIDIA's NeMo documentation on prompt engineering highlights CoT as a powerful method for tasks requiring logical or sequential reasoning, as it leverages the model's ability to mimic structured problem-solving. Research by Wei et al. (2022) demonstrates that CoT outperforms other methods for mathematical reasoning. Option A (zero-shot) is less effective for complex tasks due to lack of guidance. Option B (few-shot with random examples) is suboptimal without structured reasoning. Option D (RAG) is useful for factual queries but less relevant for pure reasoning tasks.
+Domain
+Data Science
+Question 24
+Incorrect
+Which prompt engineering method helps LLMs produce more precise and suitable responses?
+Adding more training data
+Explanation
+That's model training.
+Correct answer
+Using the system message
+Explanation
+System messages set role and constraints.
+Your answer is incorrect
+Increasing parameter size
+Explanation
+Larger models are architectural changes.
+Switching model architecture
+Explanation
+Architecture change is not prompting.
+Overall explanation
+Prompt engineering involves designing inputs to guide large language models (LLMs) to produce desired outputs without modifying the model itself. Leveraging the system message is a key technique, where a predefined instruction or context is provided to the LLM to set the tone, role, or constraints for its responses. NVIDIA's NeMo framework documentation on conversational AI highlights the use of system messages to improve the contextual accuracy of LLMs, especially in dialogue systems or task-specific applications. For instance, a system message like "You are a helpful technical assistant" ensures responses align with the intended role. Options A, C, and D involve model training or architectural changes, which are not part of prompt engineering.
+Domain
+Data Science
+Question 25
+Correct
+What is the goal of few-shot learning in prompt engineering?
+Your answer is correct
+Providing the model with example demonstrations
+Explanation
+Few-shot shows input-output pairs in prompts.
+Training a model from the ground up
+Explanation
+That's full training.
+Optimizing hyperparameters
+Explanation
+Hyperparameters are tuned separately.
+Fine-tuning on huge datasets
+Explanation
+Few-shot avoids retraining.
+Overall explanation
+Few-shot learning in prompt engineering involves providing a small number of examples (demonstrations) within the prompt to guide a large language model (LLM) to perform a specific task without modifying its weights. NVIDIA’s NeMo documentation on prompt-based learning explains that few-shot prompting leverages the model’s pre-trained knowledge by showing it a few input-output pairs, enabling it to generalize to new tasks. For example, providing two examples of sentiment classification in a prompt helps the model understand the task. Option B is incorrect, as few-shot learning does not involve training from scratch. Option C is wrong, as hyperparameter optimization is a separate process. Option D is false, as few-shot learning avoids large-scale fine-tuning.
+Domain
+Data Science

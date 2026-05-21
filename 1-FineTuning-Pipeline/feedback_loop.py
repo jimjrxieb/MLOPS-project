@@ -23,8 +23,9 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
 # Directories
-GLUE_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/1-GP-GLUE")
-CLARIFY_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/4-GP-CLARIFY")
+from pipeline_config import pipeline_dir, gp_model_ops
+GLUE_DIR = pipeline_dir
+CLARIFY_DIR = gp_model_ops / "4-eval-clarify"
 RESULTS_DIR = CLARIFY_DIR / "3-results"
 RAW_LAKE_DIR = GLUE_DIR / "01-raw-data-lake" / "eval-gaps"
 

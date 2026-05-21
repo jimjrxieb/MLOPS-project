@@ -22,9 +22,12 @@ from pathlib import Path
 from datetime import datetime
 
 # Directories
-MODEL_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/3-jade-model-versions/v1.0")
+from pipeline_config import cfg, gp_model_ops
+_model_name = cfg["run"]["model_name"]
+_version = cfg["run"]["version"]
+MODEL_DIR = gp_model_ops / "3-model-registry" / _model_name / _version
 STATE_FILE = MODEL_DIR / "training_state.json"
-OUTPUT_DIR = MODEL_DIR / "jade-v1.0-merged"
+OUTPUT_DIR = MODEL_DIR / f"{_model_name}-merged"
 
 # Model config
 MAX_SEQ_LENGTH = 4096

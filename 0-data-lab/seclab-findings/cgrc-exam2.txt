@@ -1,0 +1,1000 @@
+Question 51
+Skipped
+Which of the following most accurately summarizes the comprehensive approach to supply chain risk monitoring discussed in the lecture?
+Correct answer
+Identification, contracts, monitoring, incident response, and leveraging data
+Explanation
+Correct. The comprehensive approach includes identification, contracts, monitoring, incident response, and data leverage, as detailed in the lecture.
+Hiring more employees
+Explanation
+Hiring more staff is not the comprehensive process discussed.
+Reducing the number of suppliers to one
+Explanation
+Reducing to one supplier is risky and unrealistic.
+Only focusing on internal risks
+Explanation
+Focusing only on internal risks ignores external threats.
+Overall explanation
+The comprehensive approach includes identification, contracts, monitoring, incident response, and data leverage, as detailed in the lecture.
+Domain
+56 - Supply Chain Risk Monitoring and Third-Party Oversight
+Question 52
+Skipped
+When identifying critical suppliers, which factor is LEAST relevant?
+Sensitivity of the data handled
+Explanation
+Data sensitivity is crucial for assessing risk.
+Services provided by the supplier
+Explanation
+The nature of services provided directly affects criticality.
+Correct answer
+Supplier's company size
+Explanation
+Correct. Company size is less relevant than factors like data sensitivity, services provided, and potential impact when classifying critical suppliers.
+Potential impact of supplier disruption
+Explanation
+The impact of disruption is a key consideration.
+Overall explanation
+Company size is less relevant than factors like data sensitivity, services provided, and potential impact when classifying critical suppliers.
+Domain
+56 - Supply Chain Risk Monitoring and Third-Party Oversight
+Question 53
+Skipped
+Which set of controls best represent preventive, detective, and corrective measures, respectively?
+Encryption, employee training, video surveillance
+Explanation
+Employee training is administrative, not detective; surveillance is physical.
+Correct answer
+Strong authentication, intrusion detection, backup restoration
+Explanation
+Correct. Strong authentication is preventive (blocks unauthorized access), intrusion detection is detective (alerts on incidents), and backup restoration is corrective (recovers from incidents).
+Incident response, access logs, patch management
+Explanation
+Incident response is corrective, not preventive; access logs are detective.
+Keycards, audit logs, password policies
+Explanation
+Keycards are physical (preventive), audit logs are detective, but password policies are preventive.
+Overall explanation
+Strong authentication is preventive (blocks unauthorized access), intrusion detection is detective (alerts on incidents), and backup restoration is corrective (recovers from incidents).
+Domain
+37 - Applying Layered Defenses and Defense-in-Depth Strategi
+Question 54
+Skipped
+Regular security assessments and simulations are useful because they:
+Are required only for compliance
+Explanation
+They serve broader purposes than just compliance.
+Correct answer
+Test and improve the effectiveness of layered defenses
+Explanation
+Correct. Security assessments and simulations such as penetration tests help organizations test and improve the effectiveness of their layered defenses.
+Replace the need for ongoing user training
+Explanation
+Training is still necessary alongside assessments.
+Guarantee that no attacks will ever succeed
+Explanation
+No assessment can guarantee perfect security.
+Overall explanation
+Security assessments and simulations such as penetration tests help organizations test and improve the effectiveness of their layered defenses.
+Domain
+37 - Applying Layered Defenses and Defense-in-Depth Strategi
+Question 55
+Skipped
+Which of the following statements is TRUE regarding defense-in-depth?
+It is only applicable to enterprise networks, not personal devices
+Explanation
+It applies to personal devices, enterprises, and beyond.
+Correct answer
+It emphasizes adapting controls to changing technology and threats
+Explanation
+Correct. Defense-in-depth stresses the need to continually adapt controls to new technologies and evolving threats to maintain effective protection.
+It requires only technical controls for effectiveness
+Explanation
+Administrative and physical controls are also vital.
+It guarantees complete immunity from compromise
+Explanation
+No strategy can guarantee absolute immunity.
+Overall explanation
+Defense-in-depth stresses the need to continually adapt controls to new technologies and evolving threats to maintain effective protection.
+Domain
+37 - Applying Layered Defenses and Defense-in-Depth Strategi
+Question 56
+Skipped
+Using both signature-based and behavior-based antivirus software exemplifies which principle?
+Redundancy
+Explanation
+Redundancy is about backups, not varied methods.
+Correct answer
+Diversity
+Explanation
+Correct. Using both signature-based and behavior-based antivirus solutions demonstrates diversity, as they detect threats using different methods.
+Usability
+Explanation
+Usability is not illustrated by this example.
+Least privilege
+Explanation
+Least privilege is about user access, not antivirus diversity.
+Overall explanation
+Using both signature-based and behavior-based antivirus solutions demonstrates diversity, as they detect threats using different methods.
+Domain
+37 - Applying Layered Defenses and Defense-in-Depth Strategi
+Question 57
+Skipped
+What is a recommended response following a privacy incident involving a data breach?
+Ignore the incident if it seems minor
+Explanation
+Ignoring incidents risks compliance and reputation.
+Correct answer
+Notify affected individuals and regulators, take corrective actions, and update incident response plans
+Explanation
+Correct. Following a breach, organizations must notify affected parties and regulators, take corrective actions, and update response plans to comply with laws and maintain trust.
+Immediately delete all company records
+Explanation
+Deleting all records may destroy necessary evidence or data.
+Only notify internal staff
+Explanation
+Only notifying staff is insufficient by law.
+Overall explanation
+Following a breach, organizations must notify affected parties and regulators, take corrective actions, and update response plans to comply with laws and maintain trust.
+Domain
+27 - Privacy Requirements and Data Lifecycle Management
+Question 58
+Skipped
+What is the primary purpose of conducting data inventories and mapping in the context of privacy management?
+To prepare for marketing campaigns
+Explanation
+The primary goal is not marketing but risk identification.
+Correct answer
+To identify privacy risks and support compliance efforts
+Explanation
+Correct. Data inventories and mapping help organizations identify privacy risks and ensure compliance by visualizing information flows and pinpointing where data is collected, stored, and accessed.
+To streamline IT system performance
+Explanation
+Improving performance is not the focus here.
+To determine database storage capacity
+Explanation
+Storage planning is not the main objective of these exercises.
+Overall explanation
+Data inventories and mapping help organizations identify privacy risks and ensure compliance by visualizing information flows and pinpointing where data is collected, stored, and accessed.
+Domain
+27 - Privacy Requirements and Data Lifecycle Management
+Question 59
+Skipped
+When sharing data with third parties, organizations should:
+Trust third parties to manage privacy without oversight
+Explanation
+Blind trust undermines compliance.
+Correct answer
+Specify obligations in contracts and conduct due diligence to ensure adequate safeguards
+Explanation
+Correct. Organizations must specify privacy obligations in contracts and perform due diligence to ensure third parties provide adequate data protection.
+Share all collected data without restriction
+Explanation
+Unrestricted sharing is risky and likely illegal.
+Leave all compliance responsibilities to the third party
+Explanation
+Organizations retain compliance responsibilities even when working with third parties.
+Overall explanation
+Organizations must specify privacy obligations in contracts and perform due diligence to ensure third parties provide adequate data protection.
+Domain
+27 - Privacy Requirements and Data Lifecycle Management
+Question 60
+Skipped
+Why is secure deletion of backup copies important in data lifecycle management?
+Backups are immune to privacy regulations
+Explanation
+Backups are subject to privacy laws.
+Correct answer
+Outdated backups may contain sensitive data that could be recovered if not securely erased
+Explanation
+Correct. Secure deletion of backups is necessary because they may contain outdated but still sensitive information, which could be compromised if not properly erased.
+Backups cannot be accessed by unauthorized parties
+Explanation
+Unauthorized access to backups is possible.
+Secure deletion interferes with business continuity
+Explanation
+Secure deletion does not interfere with business continuity if done properly.
+Overall explanation
+Secure deletion of backups is necessary because they may contain outdated but still sensitive information, which could be compromised if not properly erased.
+Domain
+27 - Privacy Requirements and Data Lifecycle Management
+Question 61
+Skipped
+Why is a risk-based approach recommended for data classification and protection?
+It allows all data to be treated identically
+Explanation
+Treating all data identically ignores varying risk levels.
+Correct answer
+It helps balance security with business usability and addresses varying risk profiles
+Explanation
+Correct. A risk-based approach ensures security measures are proportional to risk, balancing protection with business usability and effectiveness.
+It ignores the potential impact of data breaches
+Explanation
+The approach is specifically about considering impact.
+It requires no involvement from business leaders
+Explanation
+Business leader involvement is important for context and buy-in.
+Overall explanation
+A risk-based approach ensures security measures are proportional to risk, balancing protection with business usability and effectiveness.
+Domain
+26 - Data Classification and Protection Policies
+Question 62
+Skipped
+What is a potential consequence of over-classifying data within an organization?
+Increased efficiency in business processes
+Explanation
+Over-classification creates inefficiency, not increased efficiency.
+Correct answer
+Unnecessary restrictions that hinder productivity
+Explanation
+Correct. Over-classifying data imposes unnecessary restrictions, slowing down business processes and harming productivity.
+Complete elimination of security risks
+Explanation
+No system can fully eliminate security risks.
+Guaranteed compliance with all regulations
+Explanation
+Over-classification does not guarantee compliance and may hinder it.
+Overall explanation
+Over-classifying data imposes unnecessary restrictions, slowing down business processes and harming productivity.
+Domain
+26 - Data Classification and Protection Policies
+Question 63
+Skipped
+How does aligning data classification with the Risk Management Framework (RMF) benefit an organization?
+It ensures all data is encrypted regardless of risk
+Explanation
+Encrypting all data regardless of risk is inefficient and unnecessary.
+Correct answer
+It tailors security controls to the specific risk profile of each classification
+Explanation
+Correct. Aligning classification with RMF allows security controls to be tailored to the risk level of each data category, preventing both over- and under-protection.
+It standardizes all data handling procedures without exception
+Explanation
+Standardizing all procedures ignores risk differences between data types.
+It eliminates the need for periodic reviews
+Explanation
+Periodic reviews are still necessary to maintain effectiveness.
+Overall explanation
+Aligning classification with RMF allows security controls to be tailored to the risk level of each data category, preventing both over- and under-protection.
+Domain
+26 - Data Classification and Protection Policies
+Question 64
+Skipped
+Which statement best summarizes the importance of data classification in organizational resilience?
+It prevents all forms of cyber attacks
+Explanation
+No security measure prevents all attacks.
+Correct answer
+It supports systematic protection of sensitive data, preventing incidents and earning stakeholder trust
+Explanation
+Correct. Effective data classification systematically protects sensitive data, helps prevent incidents, and builds stakeholder trustâ€”key to organizational resilience.
+It is only important for compliance but not business objectives
+Explanation
+Classification supports both compliance and business objectives.
+It is only necessary for organizations in regulated industries
+Explanation
+All organizations benefit, not just those in regulated industries.
+Overall explanation
+Effective data classification systematically protects sensitive data, helps prevent incidents, and builds stakeholder trustâ€”key to organizational resilience.
+Domain
+26 - Data Classification and Protection Policies
+Question 65
+Skipped
+What role does transparency about challenges and setbacks play in sustaining leadership support for GRC?
+It undermines trust and funding.
+Explanation
+Openness strengthens, not undermines, trust.
+Correct answer
+It builds credibility and demonstrates proactive problem-solving.
+Explanation
+Correct. Transparency about setbacks builds trust and shows leadership that the team is proactive in addressing issues.
+It should be avoided to protect the teamâ€™s reputation.
+Explanation
+Avoiding challenges erodes credibility.
+It is irrelevant to executive decision-making.
+Explanation
+Executive decisions are based on full and accurate information.
+Overall explanation
+Transparency about setbacks builds trust and shows leadership that the team is proactive in addressing issues.
+Domain
+10 - Developing Business Cases and Securing Management Buy-I
+Question 66
+Skipped
+When framing a GRC proposal, what is the most persuasive approach for executives?
+Emphasize regulatory requirements over business objectives.
+Explanation
+Focusing only on compliance misses broader business objectives.
+Correct answer
+Highlight how GRC enables growth and shareholder value.
+Explanation
+Correct. Linking GRC to growth and shareholder value is most persuasive for executives, aligning with their priorities.
+Focus on the complexity of technical controls.
+Explanation
+Technical complexity is less relevant to executive concerns.
+Present GRC as a barrier to innovation.
+Explanation
+Presenting GRC as a barrier discourages support.
+Overall explanation
+Linking GRC to growth and shareholder value is most persuasive for executives, aligning with their priorities.
+Domain
+10 - Developing Business Cases and Securing Management Buy-I
+Question 67
+Skipped
+When calculating ROI for a GRC initiative, what should be included?
+Only the cost of new software.
+Explanation
+Only considering software cost omits broader financial impacts.
+Correct answer
+Projected savings from risk reduction and operational improvements.
+Explanation
+Correct. A comprehensive ROI calculation includes projected savings from risk reduction and operational improvements.
+Employee satisfaction ratings.
+Explanation
+Employee satisfaction, while important, is not a primary ROI factor here.
+The number of compliance training sessions conducted.
+Explanation
+Number of training sessions is not a direct financial metric.
+Overall explanation
+A comprehensive ROI calculation includes projected savings from risk reduction and operational improvements.
+Domain
+10 - Developing Business Cases and Securing Management Buy-I
+Question 68
+Skipped
+How does presenting GRC risk reduction metrics help secure management buy-in?
+By emphasizing technical complexity.
+Explanation
+Technical complexity is less relevant to executive decisions.
+Correct answer
+By quantifying reductions in operational, financial, reputational, and regulatory risks.
+Explanation
+Correct. Quantifying broad categories of risk reduction helps leadership see the concrete business value of GRC.
+By showing how GRC increases reporting workload.
+Explanation
+Increased reporting workload is a negative, not a benefit.
+By focusing only on regulatory fines.
+Explanation
+Focusing solely on fines overlooks other crucial risk areas.
+Overall explanation
+Quantifying broad categories of risk reduction helps leadership see the concrete business value of GRC.
+Domain
+10 - Developing Business Cases and Securing Management Buy-I
+Question 69
+Skipped
+Why is mapping boundaries to data flows particularly important in complex organizations?
+Correct answer
+Data often moves fluidly across systems and departments, requiring controls to be aligned with actual information movement
+Explanation
+Correct. In complex organizations, data moves across systems and departments, so mapping boundaries to flows ensures controls match real-world data use.
+It reduces the need for documentation
+Explanation
+Less documentation increases risk.
+It guarantees regulatory compliance without further action
+Explanation
+Mapping alone does not guarantee compliance.
+It eliminates the need for physical security controls
+Explanation
+Physical controls remain relevant.
+Overall explanation
+In complex organizations, data moves across systems and departments, so mapping boundaries to flows ensures controls match real-world data use.
+Domain
+48 - Authorization Boundaries and Scoping
+Question 70
+Skipped
+What challenge is introduced by the use of unsanctioned â€œshadow ITâ€ within organizations?
+Improved transparency and control over IT assets
+Explanation
+Shadow IT reduces transparency.
+Correct answer
+Hidden data flows and entry points that fall outside established authorization boundaries
+Explanation
+Correct. Shadow IT introduces hidden data flows and entry points outside established boundaries, making control and oversight difficult.
+Reduced risk of regulatory violations
+Explanation
+It actually increases regulatory risk.
+Easier management of security controls
+Explanation
+It complicates, not eases, management.
+Overall explanation
+Shadow IT introduces hidden data flows and entry points outside established boundaries, making control and oversight difficult.
+Domain
+48 - Authorization Boundaries and Scoping
+Question 71
+Skipped
+When mapping boundaries to data flows, which practice most effectively ensures that security controls are aligned with actual data movement?
+Relying on annual security audits alone
+Explanation
+Annual audits alone are insufficient for ongoing alignment.
+Correct answer
+Creating detailed data flow diagrams and mapping controls like encryption and access management to each flow
+Explanation
+Correct. Creating data flow diagrams and mapping controls to each flow ensures controls align with real data movements, increasing effectiveness.
+Applying the same controls to all data regardless of flow
+Explanation
+Uniform controls ignore the nuances of different data flows.
+Limiting data movement between systems
+Explanation
+Limiting movement is restrictive and does not ensure proper control alignment.
+Overall explanation
+Creating data flow diagrams and mapping controls to each flow ensures controls align with real data movements, increasing effectiveness.
+Domain
+48 - Authorization Boundaries and Scoping
+Question 72
+Skipped
+Which statement about guidelines is correct?
+Guidelines are mandatory and enforceable.
+Explanation
+Guidelines are not enforceable or mandatory.
+Correct answer
+Guidelines provide recommendations and are not mandatory.
+Explanation
+Correct. Guidelines are recommendations and not mandatory, offering flexibility in how requirements are met.
+Guidelines specify required technical controls.
+Explanation
+Standards, not guidelines, specify required controls.
+Guidelines are always approved by the board.
+Explanation
+Guidelines do not always require board approval.
+Overall explanation
+Guidelines are recommendations and not mandatory, offering flexibility in how requirements are met.
+Domain
+11 - Policies Standards Procedures and Guidelines Roles Diff
+Question 73
+Skipped
+What is the main purpose of version control for governance documents?
+To limit access to documents to senior management only
+Explanation
+Access should not be restricted to management only.
+Correct answer
+To ensure documents are current, traceable, and old versions are archived
+Explanation
+Correct. Version control ensures that documents are up-to-date, changes are traceable, and previous versions are properly archived for reference.
+To allow employees to freely modify documents as needed
+Explanation
+Employee modifications should be controlled, not free-form.
+To remove obsolete documents from all records immediately
+Explanation
+Obsolete documents should be archived, not deleted immediately.
+Overall explanation
+Version control ensures that documents are up-to-date, changes are traceable, and previous versions are properly archived for reference.
+Domain
+11 - Policies Standards Procedures and Guidelines Roles Diff
+Question 74
+Skipped
+Which of the following best describes the primary role of a policy within an organization's governance framework?
+It provides detailed, step-by-step instructions for operational tasks.
+Explanation
+This describes procedures, not policies.
+Correct answer
+It sets high-level intentions and objectives, stating the "what" and "why."
+Explanation
+Correct. Policies are high-level statements set by senior management to communicate intentions, objectives, and directionâ€”the "what" and "why" of governance.
+It offers flexible recommendations for best practices.
+Explanation
+Guidelines, not policies, provide flexible recommendations.
+It defines the specific technical requirements for compliance.
+Explanation
+Standards, not policies, define specific technical requirements.
+Overall explanation
+Policies are high-level statements set by senior management to communicate intentions, objectives, and directionâ€”the "what" and "why" of governance.
+Domain
+11 - Policies Standards Procedures and Guidelines Roles Diff
+Question 75
+Skipped
+In the provided real-world example, what compensating controls were implemented when encryption was not possible for a legacy system?
+Stronger password requirements.
+Explanation
+Stronger passwords were not possible due to system constraints.
+Correct answer
+Isolation, restricted access, and advanced monitoring.
+Explanation
+Correct. In the example, the organization used isolation, restricted access, and advanced monitoring as compensating controls for encryption limitations in a legacy system.
+Data masking and tokenization.
+Explanation
+Data masking and tokenization were not used in this example.
+Disabling all user accounts.
+Explanation
+Disabling all user accounts is not a compensating control and would halt operations.
+Overall explanation
+In the example, the organization used isolation, restricted access, and advanced monitoring as compensating controls for encryption limitations in a legacy system.
+Domain
+33 - Compensating Controls and Residual Risk Considerations
+Question 76
+Skipped
+Which of the following best defines a compensating control in information security?
+A temporary workaround that delays the implementation of a standard control.
+Explanation
+Temporary workarounds do not necessarily fulfill the original control's intent.
+Correct answer
+An alternative security measure that meets the intent of the original requirement when direct implementation is infeasible.
+Explanation
+Correct. Compensating controls are alternative security measures that fulfill the intent of the original security requirement when direct implementation is not feasible, providing protection equivalent to what was intended by the original control.
+Any additional control implemented to exceed regulatory requirements.
+Explanation
+Compensating controls are not about exceeding requirements, but meeting them equivalently.
+A security measure that is easier and less expensive than the original control.
+Explanation
+Ease or cost is not the defining factor; equivalency and intent are.
+Overall explanation
+Compensating controls are alternative security measures that fulfill the intent of the original security requirement when direct implementation is not feasible, providing protection equivalent to what was intended by the original control.
+Domain
+33 - Compensating Controls and Residual Risk Considerations
+Question 77
+Skipped
+What should be done if, during residual risk reassessment, new threats or system changes are identified?
+Ignore the new threats until the next scheduled review.
+Explanation
+Ignoring new threats is negligent.
+Correct answer
+Update the risk assessment and adjust controls as necessary.
+Explanation
+Correct. When new threats or system changes are identified, risk assessments should be updated and controls adjusted to maintain effective risk management.
+Remove all existing controls.
+Explanation
+Removing controls increases risk.
+Only document the changes without taking further action.
+Explanation
+Documentation alone is insufficient; action is required.
+Overall explanation
+When new threats or system changes are identified, risk assessments should be updated and controls adjusted to maintain effective risk management.
+Domain
+33 - Compensating Controls and Residual Risk Considerations
+Question 78
+Skipped
+Which of the following best characterizes the conclusion of the lecture regarding system retirement?
+It is solely a technical process without strategic implications.
+Explanation
+Technical focus ignores the strategic dimension.
+Correct answer
+It is a critical opportunity to transform experience into actionable knowledge for continuous improvement.
+Explanation
+Correct. The lecture concludes that system retirement is a strategic opportunity for actionable knowledge and continuous improvement.
+It is primarily focused on vendor contract termination.
+Explanation
+Vendor contract management is not central.
+It should be avoided to maintain legacy systems.
+Explanation
+Avoiding retirement prevents organizational growth.
+Overall explanation
+The lecture concludes that system retirement is a strategic opportunity for actionable knowledge and continuous improvement.
+Domain
+62 - Lessons Learned and Updating Organizational Knowledge B
+Question 79
+Skipped
+If a retired systemâ€™s decommissioning exposed a lack of documentation and unclear component ownership, what organizational improvement does this highlight?
+The need for more manual workarounds
+Explanation
+More manual workarounds add inefficiency.
+Correct answer
+Improved governance and clearer role assignments
+Explanation
+Correct. Exposing documentation and ownership gaps highlights the need for better governance and role clarity.
+Increased outsourcing of IT functions
+Explanation
+Outsourcing does not address underlying governance issues.
+Reduced compliance monitoring
+Explanation
+Reduced compliance monitoring would worsen the problem.
+Overall explanation
+Exposing documentation and ownership gaps highlights the need for better governance and role clarity.
+Domain
+62 - Lessons Learned and Updating Organizational Knowledge B
+Question 80
+Skipped
+Which methodology is recommended for capturing lessons learned in post-decommission debriefs?
+Brainstorming without structure
+Explanation
+Lack of structure can result in missed insights.
+Correct answer
+After-action reviews and root cause analysis
+Explanation
+Correct. Structured methodologies like after-action reviews and root cause analysis ensure lessons are captured deeply and systematically.
+Unstructured interviews only
+Explanation
+Unstructured interviews lack depth and repeatability.
+Informal discussions among IT staff
+Explanation
+Informal discussions may miss broader organizational issues.
+Overall explanation
+Structured methodologies like after-action reviews and root cause analysis ensure lessons are captured deeply and systematically.
+Domain
+62 - Lessons Learned and Updating Organizational Knowledge B
+Question 81
+Skipped
+Why must risk treatment plans be aligned with regulatory and contractual obligations?
+To avoid incurring unnecessary technology expenses
+Explanation
+Avoiding technology expenses is not the driver for compliance.
+Correct answer
+Failure to align can result in legal penalties, loss of trust, or loss of license
+Explanation
+Correct. Aligning risk treatment with regulatory and contractual obligations is critical because failure to do so can result in legal penalties, reputational loss, or loss of license.
+Compliance is only optional for most organizations
+Explanation
+Compliance is mandatory in many industries.
+Contractual obligations are less important than internal policies
+Explanation
+Contractual obligations are as important as internal policies.
+Overall explanation
+Aligning risk treatment with regulatory and contractual obligations is critical because failure to do so can result in legal penalties, reputational loss, or loss of license.
+Domain
+19 - Risk Evaluation and Treatment Planning
+Question 82
+Skipped
+What is a primary limitation of the risk transfer strategy?
+It requires eliminating all risky activities
+Explanation
+Avoidance, not transfer, involves eliminating activities.
+It can only be applied to internal organizational processes
+Explanation
+Transfer can apply externally (e.g., outsourcing), not just internally.
+Correct answer
+It incurs costs and depends on the third partyâ€™s risk management capabilities
+Explanation
+Correct. Transferring risk incurs costs and depends on the capabilities of the third party to manage the risk effectively, which can be a limitation if the partner is not reliable.
+It always reduces the likelihood of a risk occurring
+Explanation
+Transfer does not always reduce likelihood; sometimes only the impact is shifted.
+Overall explanation
+Transferring risk incurs costs and depends on the capabilities of the third party to manage the risk effectively, which can be a limitation if the partner is not reliable.
+Domain
+19 - Risk Evaluation and Treatment Planning
+Question 83
+Skipped
+What is a common pitfall organizations may face when prioritizing remediation?
+Focusing exclusively on strategic, long-term issues
+Explanation
+Exclusively focusing on long-term issues is less common and not the pitfall described.
+Correct answer
+Neglecting systemic, long-term issues in favor of immediate, visible risks
+Explanation
+Correct. A frequent pitfall is over-focusing on immediate, visible risks and neglecting underlying systemic or long-term issues, which can lead to bigger problems later.
+Always prioritizing complex solutions over quick wins
+Explanation
+Prioritizing only complex solutions is not typical; quick wins are often used.
+Ignoring compliance requirements in risk treatment
+Explanation
+Ignoring compliance is a risk, but not the pitfall described here.
+Overall explanation
+A frequent pitfall is over-focusing on immediate, visible risks and neglecting underlying systemic or long-term issues, which can lead to bigger problems later.
+Domain
+19 - Risk Evaluation and Treatment Planning
+Question 84
+Skipped
+Which is the BEST example of a practical challenge organizations face when retiring security controls?
+Overly detailed configuration management databases
+Explanation
+Overly detailed databases are not a challenge; lack of detail is.
+Correct answer
+Incomplete documentation of system changes over time
+Explanation
+Correct. Incomplete documentation is a real-world challenge that makes identifying controls difficult during decommissioning.
+Too many compliance audits
+Explanation
+Many audits are not a core challenge here.
+Excess budget for decommissioning
+Explanation
+Excess budget is rarely an issue.
+Overall explanation
+Incomplete documentation is a real-world challenge that makes identifying controls difficult during decommissioning.
+Domain
+60 - Retiring or Reassigning Security Controls
+Question 85
+Skipped
+What is the key purpose of control mapping during decommissioning?
+To automate the firewall configuration
+Explanation
+Firewall automation is not the purpose.
+Correct answer
+To visualize dependencies and interconnections among controls and assets
+Explanation
+Correct. Control mapping helps visualize how controls relate to assets and each other, ensuring all dependencies are managed during decommissioning.
+To generate audit reports for compliance teams
+Explanation
+Audit reports are a byproduct, not the main goal.
+To monitor network traffic
+Explanation
+Network traffic monitoring is unrelated.
+Overall explanation
+Control mapping helps visualize how controls relate to assets and each other, ensuring all dependencies are managed during decommissioning.
+Domain
+60 - Retiring or Reassigning Security Controls
+Question 86
+Skipped
+Which regulatory framework is mentioned as relevant to decommissioning processes in the lecture?
+ISO 9001
+Explanation
+ISO 9001 is for quality, not IT security.
+Correct answer
+PCI DSS
+Explanation
+Correct. PCI DSS is specifically mentioned in the lecture as a relevant standard for compliance during decommissioning.
+COBIT 5
+Explanation
+COBIT 5 is a framework, but not specifically emphasized in the lecture.
+ITIL
+Explanation
+ITIL focuses on IT service management, not security control decommissioning.
+Overall explanation
+PCI DSS is specifically mentioned in the lecture as a relevant standard for compliance during decommissioning.
+Domain
+60 - Retiring or Reassigning Security Controls
+Question 87
+Skipped
+How can organizations best address resource and integration challenges during the implementation phase?
+Ignore low-priority controls
+Explanation
+Ignoring controls increases risk.
+Correct answer
+Adopt a flexible, risk-based approach and provide user training
+Explanation
+Correct. Flexible, risk-based approaches and robust user training help organizations address resource and integration challenges effectively.
+Only implement controls on new systems
+Explanation
+Limiting to new systems leaves gaps.
+Delay implementation until threats subside
+Explanation
+Delaying is not a proactive solution.
+Overall explanation
+Flexible, risk-based approaches and robust user training help organizations address resource and integration challenges effectively.
+Domain
+35 - Implementing Selected Security and Privacy Controls
+Question 88
+Skipped
+Which of the following is NOT a benefit of integrating controls with existing IT operations?
+Supports change management and incident response
+Explanation
+Integration does support change management.
+Ensures controls align with business goals
+Explanation
+It ensures alignment with business.
+Correct answer
+Creates silos between security and operational teams
+Explanation
+Correct. Creating silos is a negative outcome; true integration with IT operations supports change management, alignment with business goals, and user adoption.
+Helps with user adoption
+Explanation
+Integration helps with user adoption.
+Overall explanation
+Creating silos is a negative outcome; true integration with IT operations supports change management, alignment with business goals, and user adoption.
+Domain
+35 - Implementing Selected Security and Privacy Controls
+Question 89
+Skipped
+Which of the following is NOT a typical activity during the planning phase of control implementation?
+Assigning roles and responsibilities
+Explanation
+Assigning roles is essential in planning.
+Establishing deployment timelines
+Explanation
+Establishing timelines is a standard planning activity.
+Correct answer
+Physically installing security appliances
+Explanation
+Correct. Physically installing security appliances occurs during deployment, not in the planning phase, which focuses on roles, timelines, and dependencies.
+Identifying dependencies and prerequisites
+Explanation
+Identifying dependencies is crucial for effective planning.
+Overall explanation
+Physically installing security appliances occurs during deployment, not in the planning phase, which focuses on roles, timelines, and dependencies.
+Domain
+35 - Implementing Selected Security and Privacy Controls
+Question 90
+Skipped
+What is the PRIMARY benefit of integrating patch management with change management processes?
+Reduces the need for user communication
+Explanation
+User communication remains important.
+Correct answer
+Ensures updates are reviewed, approved, and documented, reducing risk of outages and supporting compliance
+Explanation
+Correct. Integrating patch and change management ensures structured, documented, and approved updates, reducing risk and aiding compliance.
+Allows patches to be installed without testing
+Explanation
+Testing is still necessary to prevent issues.
+Eliminates the need for rollback procedures
+Explanation
+Rollback procedures are still needed in case of problems.
+Overall explanation
+Integrating patch and change management ensures structured, documented, and approved updates, reducing risk and aiding compliance.
+Domain
+54 - Vulnerability Management Patch Management and Updates
+Question 91
+Skipped
+When prioritizing vulnerabilities for remediation, which factor should be considered MOST critical?
+Asset location in the network
+Explanation
+Asset location matters, but exploit availability is usually more urgent.
+Correct answer
+Availability of a public exploit for the vulnerability
+Explanation
+Correct. The availability of a public exploit greatly increases risk, making such vulnerabilities a top remediation priority.
+Vendor reputation
+Explanation
+Vendor reputation does not directly impact vulnerability prioritization.
+Number of users affected
+Explanation
+Number of users affected is important but less critical than the existence of an active exploit.
+Overall explanation
+The availability of a public exploit greatly increases risk, making such vulnerabilities a top remediation priority.
+Domain
+54 - Vulnerability Management Patch Management and Updates
+Question 92
+Skipped
+What is typically the FIRST step in the vulnerability scanning methodology?
+Assigning CVSS risk scores
+Explanation
+Assigning CVSS scores happens after vulnerabilities are identified.
+Correct answer
+Asset discovery
+Explanation
+Correct. Asset discovery comes first to ensure all devices, software, and applications are identified before scanning for vulnerabilities.
+Deploying emergency patches
+Explanation
+Emergency patches are not part of the initial scanning methodology.
+Conducting authenticated scans
+Explanation
+Authenticated scans occur after initial scans and asset discovery.
+Overall explanation
+Asset discovery comes first to ensure all devices, software, and applications are identified before scanning for vulnerabilities.
+Domain
+54 - Vulnerability Management Patch Management and Updates
+Question 93
+Skipped
+What is a common challenge in the authorization process that organizations must address?
+Excessive automation of compliance activities
+Explanation
+Excessive automation isnâ€™t identified as a common challenge.
+Correct answer
+Resource constraints and evolving threat landscapes
+Explanation
+Correct. Resource constraints and evolving threats are major challenges that organizations must manage in the authorization process.
+Overreliance on manual documentation repositories
+Explanation
+Automation, not manual repositories, addresses documentation challenges.
+Lack of any regulatory requirements
+Explanation
+Regulatory requirements are significant and must be managed.
+Overall explanation
+Resource constraints and evolving threats are major challenges that organizations must manage in the authorization process.
+Domain
+49 - Roles and Responsibilities in the Authorization Process
+Question 94
+Skipped
+Why is ongoing training important for both AOs and SCAs in the authorization process?
+To enable them to bypass regulatory requirements
+Explanation
+Training is not intended to bypass regulations.
+Correct answer
+To ensure they stay updated on evolving threats and best practices
+Explanation
+Correct. Ongoing training ensures AOs and SCAs remain knowledgeable about new threats and best practices, supporting effective decision-making and assessments.
+To allow them to delegate all responsibilities
+Explanation
+Delegation of all responsibilities is not the goal of training.
+To eliminate the need for collaboration
+Explanation
+Training supports, not replaces, collaboration.
+Overall explanation
+Ongoing training ensures AOs and SCAs remain knowledgeable about new threats and best practices, supporting effective decision-making and assessments.
+Domain
+49 - Roles and Responsibilities in the Authorization Process
+Question 95
+Skipped
+What role does the compliance team play in the authorization process?
+Setting the organizationâ€™s risk tolerance
+Explanation
+Setting risk tolerance is a risk management function.
+Correct answer
+Ensuring adherence to external laws, regulations, and internal policies
+Explanation
+Correct. Compliance teams ensure that systems comply with all relevant external and internal requirements, including laws and policies.
+Conducting technical vulnerability assessments
+Explanation
+Technical vulnerability assessments are performed by SCAs.
+Developing the System Security Plan
+Explanation
+The ISO develops the System Security Plan.
+Overall explanation
+Compliance teams ensure that systems comply with all relevant external and internal requirements, including laws and policies.
+Domain
+49 - Roles and Responsibilities in the Authorization Process
+Question 96
+Skipped
+What is a possible consequence of miscommunication or unclear rules of engagement during penetration testing?
+Enhanced system uptime
+Explanation
+Disruptions, not improvements, are likely.
+Correct answer
+Operational disruptions or unintentional harm to critical systems
+Explanation
+Correct. Miscommunication or unclear rules may result in operational disruptions or harm to critical systems, as testers may inadvertently affect important assets.
+Reduced coverage of testing
+Explanation
+Coverage is not directly impacted; harm and disruption are the main risks.
+Improved regulatory compliance
+Explanation
+Miscommunication undermines, not improves, compliance.
+Overall explanation
+Miscommunication or unclear rules may result in operational disruptions or harm to critical systems, as testers may inadvertently affect important assets.
+Domain
+42 - Performing Security Testing Vulnerability Scanning and
+Question 97
+Skipped
+In the context of vulnerability management, why is collaboration between security, system owners, and business leaders important?
+It ensures only IT teams are responsible for remediation
+Explanation
+Remediation is not solely an IT responsibility.
+Correct answer
+It helps prioritize remediation based on technical and business priorities
+Explanation
+Correct. Collaboration ensures that remediation is prioritized based on both technical and business priorities, balancing security with operational needs.
+It delays the remediation process
+Explanation
+Collaboration is meant to speed and improve remediation, not delay it.
+It removes the need for risk matrices
+Explanation
+Risk matrices remain useful for visualization and tracking.
+Overall explanation
+Collaboration ensures that remediation is prioritized based on both technical and business priorities, balancing security with operational needs.
+Domain
+42 - Performing Security Testing Vulnerability Scanning and
+Question 98
+Skipped
+Which of the following statements about the relevance of security testing is most accurate?
+It is only relevant for large enterprises
+Explanation
+Testing is important for both small and large organizations.
+Correct answer
+It is essential for organizations of all sizes to prevent breaches and protect sensitive data
+Explanation
+Correct. Security testing is essential for all organizations, regardless of size, to prevent breaches, protect data, and maintain trust.
+It is unnecessary if strong firewalls are in place
+Explanation
+Firewalls alone are insufficient for security.
+It is only required during regulatory audits
+Explanation
+Testing should be ongoing, not just during audits.
+Overall explanation
+Security testing is essential for all organizations, regardless of size, to prevent breaches, protect data, and maintain trust.
+Domain
+42 - Performing Security Testing Vulnerability Scanning and
+Question 99
+Skipped
+What is the main role of internal audit teams in ongoing assessments?
+Representing only IT department interests
+Explanation
+Audits serve the organization, not just IT.
+Correct answer
+Providing independent assurance and identifying gaps between policy and reality
+Explanation
+Correct. Internal audit teams provide independent assurance and can identify gaps between policy and how things actually operate.
+Writing software code for new controls
+Explanation
+Auditors do not write code.
+Marketing security practices to customers
+Explanation
+Auditâ€™s role is assurance, not marketing.
+Overall explanation
+Internal audit teams provide independent assurance and can identify gaps between policy and how things actually operate.
+Domain
+53 - Ongoing Security and Privacy Assessments
+Question 100
+Skipped
+Which regulation is an example of a legal obligation considered in privacy assessments?
+PCI DSS
+Explanation
+PCI DSS is focused on payment card security, not privacy.
+ISO 9001
+Explanation
+ISO 9001 relates to quality management, not privacy.
+Correct answer
+GDPR
+Explanation
+Correct. GDPR is a major privacy regulation considered in privacy assessments, focusing on data protection and individual rights.
+ITIL
+Explanation
+ITIL is an IT service management framework.
+Overall explanation
+GDPR is a major privacy regulation considered in privacy assessments, focusing on data protection and individual rights.
+Domain
+53 - Ongoing Security and Privacy Assessments

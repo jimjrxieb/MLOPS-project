@@ -1,0 +1,1360 @@
+Question 101
+Skipped
+Which practice can help organizations balance the resource demands of frequent assessments?
+Conducting only annual comprehensive reviews
+Explanation
+Only annual reviews may miss emerging risks.
+Correct answer
+Alternating lighter, targeted reviews with deeper, comprehensive ones
+Explanation
+Correct. Alternating lighter, targeted reviews with deeper comprehensive assessments helps balance visibility with resource constraints.
+Outsourcing all assessments to external vendors
+Explanation
+Outsourcing may help, but balance is about assessment scope and frequency, not just vendor use.
+Ignoring technological changes
+Explanation
+Ignoring tech changes increases risk.
+Overall explanation
+Alternating lighter, targeted reviews with deeper comprehensive assessments helps balance visibility with resource constraints.
+Domain
+53 - Ongoing Security and Privacy Assessments
+Question 102
+Skipped
+What is the main role of the executive summary in a SAR?
+To detail every technical vulnerability found
+Explanation
+Technical details belong elsewhere, not in the executive summary.
+Correct answer
+To summarize key findings and recommendations in business-focused language
+Explanation
+Correct. The executive summary distills key findings and recommendations into an accessible, business-focused narrative for stakeholders, emphasizing risks, impacts, and clear next steps.
+To present only non-compliance issues to auditors
+Explanation
+It covers all major risks, not just non-compliance for auditors.
+To list all the tools and methods used during the assessment
+Explanation
+The methodology section is where tools and methods are listed.
+Overall explanation
+The executive summary distills key findings and recommendations into an accessible, business-focused narrative for stakeholders, emphasizing risks, impacts, and clear next steps.
+Domain
+45 - Documenting Assessment Findings and Recommendations
+Question 103
+Skipped
+Which of the following is an example of a high-risk finding?
+A minor misconfiguration in a test environment
+Explanation
+Minor misconfigurations in test environments are not typically high risk.
+Correct answer
+Remote desktop services enabled and accessible from the internet without adequate protection
+Explanation
+Correct. Remote desktop services exposed to the internet without adequate protection are high risk due to high likelihood of exploitation and severe potential impact.
+Outdated contact information in a policy document
+Explanation
+Outdated contact information is low risk.
+Slightly outdated user interface on an internal application
+Explanation
+UI issues do not pose significant security risks.
+Overall explanation
+Remote desktop services exposed to the internet without adequate protection are high risk due to high likelihood of exploitation and severe potential impact.
+Domain
+45 - Documenting Assessment Findings and Recommendations
+Question 104
+Skipped
+What should recommendations for non-compliance findings in the SAR reference?
+General industry best practices
+Explanation
+General best practices lack regulatory specificity.
+Correct answer
+The specific policy or regulation that was violated
+Explanation
+Correct. Recommendations for non-compliance findings should reference the specific violated policy or regulation, making the path to compliance clear.
+Only internal IT procedures
+Explanation
+Only referencing internal IT procedures may miss regulatory requirements.
+Irrelevant regulatory frameworks
+Explanation
+Irrelevant frameworks do not address actual compliance needs.
+Overall explanation
+Recommendations for non-compliance findings should reference the specific violated policy or regulation, making the path to compliance clear.
+Domain
+45 - Documenting Assessment Findings and Recommendations
+Question 105
+Skipped
+Why is building and maintaining a comprehensive asset inventory considered the cornerstone of effective IT management?
+Because it helps reduce costs by eliminating unused hardware only
+Explanation
+Cost reduction is a secondary benefit, not the primary purpose.
+Correct answer
+Because it enables vulnerability management, patching, and effective incident response
+Explanation
+Correct. A comprehensive asset inventory enables vulnerability management, patching, and incident response by providing visibility into all assets that need protection or remediation.
+Because it improves employee satisfaction with IT services
+Explanation
+Employee satisfaction is not a direct outcome of inventory accuracy.
+Because it is only required for regulatory compliance
+Explanation
+It is not just for compliance but for overall IT security and management.
+Overall explanation
+A comprehensive asset inventory enables vulnerability management, patching, and incident response by providing visibility into all assets that need protection or remediation.
+Domain
+25 - IT Asset Management and Shadow IT Risks
+Question 106
+Skipped
+What is the primary goal of integrating automated asset discovery with cloud providers?
+Correct answer
+To ensure up-to-date and accurate inventories across dynamic environments
+Explanation
+Correct. Integrating automated discovery with cloud providers ensures inventories are always current, reflecting dynamic changes in cloud environments and reducing unmanaged risk.
+To reduce the number of cloud-based assets
+Explanation
+The goal is to track, not reduce, cloud assets.
+To eliminate the need for patch management
+Explanation
+Patch management remains essential regardless.
+To allow uncontrolled deployment of cloud resources
+Explanation
+Uncontrolled deployment increases risk; integration aims to prevent this.
+Overall explanation
+Integrating automated discovery with cloud providers ensures inventories are always current, reflecting dynamic changes in cloud environments and reducing unmanaged risk.
+Domain
+25 - IT Asset Management and Shadow IT Risks
+Question 107
+Skipped
+Why must asset management processes be integrated with procurement and decommissioning workflows?
+Correct answer
+To ensure inventories are regularly updated with additions and removals
+Explanation
+Correct. Integration with procurement and decommissioning ensures inventories are kept current as assets are added or removed, closing security and compliance gaps.
+To allow staff to purchase equipment without oversight
+Explanation
+Unsupervised purchases undermine inventory accuracy.
+To reduce the frequency of inventory audits
+Explanation
+Integration should not reduce audit frequency.
+To improve relationships with vendors
+Explanation
+Vendor relationships benefit, but that's not the main reason.
+Overall explanation
+Integration with procurement and decommissioning ensures inventories are kept current as assets are added or removed, closing security and compliance gaps.
+Domain
+25 - IT Asset Management and Shadow IT Risks
+Question 108
+Skipped
+In the RMF lifecycle, what is the main function of initial authorization?
+To grant permanent approval for system operation
+Explanation
+Authorization is not permanent; ongoing reviews are required.
+Correct answer
+To conduct a full security review and risk analysis before operational use
+Explanation
+Correct. Initial authorization is the process of conducting a full security review and risk analysis before the system is used operationally.
+To temporarily approve a system while issues are fixed
+Explanation
+Interim authorization handles temporary approval, not initial.
+To delegate risk acceptance to low-level staff
+Explanation
+Risk acceptance is a senior management responsibility.
+Overall explanation
+Initial authorization is the process of conducting a full security review and risk analysis before the system is used operationally.
+Domain
+46 - Purpose and Importance of System Authorization
+Question 109
+Skipped
+Why is it incorrect to believe that only the IT department is responsible for system authorization?
+Because only auditors should be responsible
+Explanation
+Auditors review, but do not own, authorization responsibility.
+Because system authorization only involves technical tasks
+Explanation
+Authorization includes managerial and compliance tasks, not just technical.
+Correct answer
+Because it is a shared responsibility involving system owners, security professionals, and senior management
+Explanation
+Correct. System authorization requires collaboration among system owners, security professionals, and management, not just IT.
+Because IT cannot understand compliance requirements
+Explanation
+IT often understands compliance, but responsibility is broader.
+Overall explanation
+System authorization requires collaboration among system owners, security professionals, and management, not just IT.
+Domain
+46 - Purpose and Importance of System Authorization
+Question 110
+Skipped
+In the example of a hospital launching a new electronic health record system, why is system authorization especially critical?
+To speed up patient onboarding
+Explanation
+Speeding up onboarding is not the focus; security and trust are.
+Correct answer
+To protect patient privacy and maintain organizational trust
+Explanation
+Correct. System authorization in healthcare is critical to protect sensitive patient data and maintain trust, not just for operational efficiency.
+To reduce system development costs
+Explanation
+Cost reduction is not the main concern of authorization.
+To bypass regulatory reviews
+Explanation
+Authorization ensures regulatory compliance, not bypasses it.
+Overall explanation
+System authorization in healthcare is critical to protect sensitive patient data and maintain trust, not just for operational efficiency.
+Domain
+46 - Purpose and Importance of System Authorization
+Question 111
+Skipped
+Which challenge is commonly faced during system decommissioning, and what is a recommended mitigation strategy?
+Resistance to change; resolve by restricting user access immediately
+Explanation
+Restricting access increases resistance and risk.
+Correct answer
+Data loss risk; resolve by testing migration processes and maintaining multiple backups
+Explanation
+Correct. Data loss risk is a major challenge; testing migration and maintaining backups help prevent irreversible loss during decommissioning.
+Decreased energy usage; resolve by increasing server load
+Explanation
+Energy usage is not a primary concern here.
+User enthusiasm; resolve by limiting communication
+Explanation
+User enthusiasm is not a typical challenge.
+Overall explanation
+Data loss risk is a major challenge; testing migration and maintaining backups help prevent irreversible loss during decommissioning.
+Domain
+58 - Triggers for System Decommissioning End of Life Migrati
+Question 112
+Skipped
+What is the main risk of failing to account for backup and retention requirements during decommissioning?
+Reduced network speed
+Explanation
+Network speed is unaffected by backup retention.
+Correct answer
+Data loss that could result in compliance violations or hinder audits
+Explanation
+Correct. Not retaining backups can lead to data loss, compliance violations, and failed audits, potentially incurring legal or regulatory penalties.
+Increased software licensing fees
+Explanation
+Licensing fees are unrelated to backup retention.
+Enhanced system security
+Explanation
+Security is not inherently improved by neglecting backup requirements.
+Overall explanation
+Not retaining backups can lead to data loss, compliance violations, and failed audits, potentially incurring legal or regulatory penalties.
+Domain
+58 - Triggers for System Decommissioning End of Life Migrati
+Question 113
+Skipped
+What is the primary distinction between end-of-life (EOL) and end-of-support (EOS)?
+EOL occurs only in hardware; EOS applies to software
+Explanation
+EOL/EOS distinction is not based solely on hardware vs. software.
+Correct answer
+EOS may allow for paid or extended support before full EOL, while EOL means complete cessation of all vendor support
+Explanation
+Correct. EOS may still permit paid or extended support, whereas EOL means all support ends; organizations must distinguish these to plan transitions.
+EOL is determined by users; EOS is set by the vendor
+Explanation
+Both are vendor-defined, not user-determined.
+EOS triggers immediate system shutdown, EOL does not
+Explanation
+Neither EOS nor EOL force immediate system shutdown.
+Overall explanation
+EOS may still permit paid or extended support, whereas EOL means all support ends; organizations must distinguish these to plan transitions.
+Domain
+58 - Triggers for System Decommissioning End of Life Migrati
+Question 114
+Skipped
+When managing sensitive and high-profile risk disclosures, organizations should:
+Share all technical details regardless of audience.
+Explanation
+Sharing all technical details can overwhelm or confuse non-technical audiences.
+Correct answer
+Use factual, empathetic, and actionable communication.
+Explanation
+Correct. Sensitive disclosures should be managed with facts, empathy, and actionable steps to address concerns and maintain trust.
+Avoid training spokespersons to prevent bias.
+Explanation
+Untrained spokespersons may mishandle sensitive information.
+Withhold all information until the crisis is over.
+Explanation
+Withholding information can breed mistrust and speculation.
+Overall explanation
+Sensitive disclosures should be managed with facts, empathy, and actionable steps to address concerns and maintain trust.
+Domain
+20 - Risk Reporting Communication and Stakeholder Engagement
+Question 115
+Skipped
+What is a core principle of effective risk reporting and communication highlighted in the session?
+One-size-fits-all reporting is most efficient.
+Explanation
+One-size-fits-all is ineffective.
+Correct answer
+Tailoring communication, using visuals, and promoting transparency drive better outcomes.
+Explanation
+Correct. Tailored communication, visuals, and transparency are emphasized as keys to effective risk management and outcomes.
+Technical jargon should be maximized in all reports.
+Explanation
+Technical jargon should be minimized for non-experts.
+Stakeholder engagement is unnecessary for risk management.
+Explanation
+Engagement is foundational, not unnecessary.
+Overall explanation
+Tailored communication, visuals, and transparency are emphasized as keys to effective risk management and outcomes.
+Domain
+20 - Risk Reporting Communication and Stakeholder Engagement
+Question 116
+Skipped
+Why is flexibility in reporting formats and frequency important in risk management?
+Regular formats are always sufficient for all scenarios.
+Explanation
+Regular formats may miss urgent, out-of-cycle risks.
+Correct answer
+It allows organizations to respond promptly to emerging or sudden risks.
+Explanation
+Correct. Flexibility allows organizations to adjust reporting in response to sudden or emergent risks, ensuring timely and relevant stakeholder communication.
+It limits the flow of information to only annual cycles.
+Explanation
+Limiting to annual cycles can leave organizations unprepared for fast-moving risks.
+It ensures only executives receive risk updates.
+Explanation
+All stakeholdersâ€”not just executivesâ€”need updates.
+Overall explanation
+Flexibility allows organizations to adjust reporting in response to sudden or emergent risks, ensuring timely and relevant stakeholder communication.
+Domain
+20 - Risk Reporting Communication and Stakeholder Engagement
+Question 117
+Skipped
+Which CGRC domain and RMF step focus on deploying selected controls and encountering practical challenges?
+Domain 2 / Categorize
+Explanation
+Domain 2/Categorize is about system boundaries, not implementation.
+Correct answer
+Domain 4 / Implement
+Explanation
+Correct. Domain 4 (Implementation) and the 'Implement' step focus on deploying selected controls and managing practical deployment challenges.
+Domain 6 / Monitor
+Explanation
+Domain 6/Monitor is about ongoing oversight, not initial control deployment.
+Domain 7 / Integration
+Explanation
+Domain 7/Integration is about holistic RMF embedding, not implementation.
+Overall explanation
+Domain 4 (Implementation) and the 'Implement' step focus on deploying selected controls and managing practical deployment challenges.
+Domain
+5 - Mapping CGRC Domains to NIST RMF and Real-World Practice
+Question 118
+Skipped
+Which phase of the RMF emphasizes ongoing oversight, periodic reassessment, and adaptation to emerging threats?
+Prepare
+Explanation
+'Prepare' is for establishing governance.
+Categorize
+Explanation
+'Categorize' defines system boundaries and impact.
+Correct answer
+Monitor
+Explanation
+Correct. The 'Monitor' step and its CGRC counterpart emphasize ongoing awareness, periodic reassessment, and adaptation to new threats.
+Authorize
+Explanation
+'Authorize' is about risk-based approval, not ongoing oversight.
+Overall explanation
+The 'Monitor' step and its CGRC counterpart emphasize ongoing awareness, periodic reassessment, and adaptation to new threats.
+Domain
+5 - Mapping CGRC Domains to NIST RMF and Real-World Practice
+Question 119
+Skipped
+What is a practical benefit of overlapping domains in the CGRC and RMF mapping?
+Increases redundancy and confusion
+Explanation
+The overlap is purposeful and clarifies responsibilities.
+Correct answer
+Reinforces key practices and creates a common language among teams
+Explanation
+Correct. Overlapping domains reinforce essential practices and create a shared language, promoting collaboration and reducing miscommunication.
+Makes documentation unnecessary
+Explanation
+Overlap actually emphasizes the importance of documentation.
+Limits collaboration between departments
+Explanation
+It enhances, not limits, collaboration.
+Overall explanation
+Overlapping domains reinforce essential practices and create a shared language, promoting collaboration and reducing miscommunication.
+Domain
+5 - Mapping CGRC Domains to NIST RMF and Real-World Practice
+Question 120
+Skipped
+What risk do organizations face if monitoring alerts are not effectively linked to incident response workflows?
+Alerts are automatically resolved without action
+Explanation
+Alerts are not auto-resolved; inaction is the risk.
+Correct answer
+Threats may go undetected or unaddressed for extended periods
+Explanation
+Correct. Without effective linkage, alerts can be missed or ignored, allowing threats to persist undetected.
+Compliance requirements are eliminated
+Explanation
+Compliance is still required.
+All alerts become false positives
+Explanation
+Not all alerts become false positives; real threats may be missed.
+Overall explanation
+Without effective linkage, alerts can be missed or ignored, allowing threats to persist undetected.
+Domain
+55 - Incident Response Integration with Continuous Monitorin
+Question 121
+Skipped
+Which statement BEST characterizes the impact of seamless integration between ConMon and IR?
+It slows down response times to ensure thorough documentation.
+Explanation
+Integration accelerates, not slows, response.
+Correct answer
+It enables rapid and effective threat detection and mitigation.
+Explanation
+Correct. Seamless integration allows for rapid detection and effective mitigation, addressing threats before they escalate.
+It reduces the need for collaboration across teams.
+Explanation
+Collaboration is increased, not reduced.
+It increases the frequency of minor incidents.
+Explanation
+Incident frequency is not a direct result.
+Overall explanation
+Seamless integration allows for rapid detection and effective mitigation, addressing threats before they escalate.
+Domain
+55 - Incident Response Integration with Continuous Monitorin
+Question 122
+Skipped
+Why are comprehensive audit trails critical in the context of integrated IR and ConMon?
+They enable organizations to ignore minor incidents.
+Explanation
+Audit trails are for accountability, not ignoring incidents.
+Correct answer
+They provide evidence for regulatory compliance and support investigations.
+Explanation
+Correct. Audit trails provide the necessary evidence for compliance and support investigations and post-incident analysis.
+They eliminate the need for centralized log management.
+Explanation
+Centralized log management is necessary for integrity.
+They reduce the need for teamwork between SOC and IR.
+Explanation
+Audit trails enhance, not reduce, teamwork.
+Overall explanation
+Audit trails provide the necessary evidence for compliance and support investigations and post-incident analysis.
+Domain
+55 - Incident Response Integration with Continuous Monitorin
+Question 123
+Skipped
+How does providing organized and sufficient evidence mapped to controls benefit the assessment process?
+It increases the number of follow-up questions from assessors.
+Explanation
+It reduces, not increases, follow-ups.
+Correct answer
+It streamlines assessments and demonstrates organizational readiness.
+Explanation
+Correct. Well-organized evidence mapped to controls streamlines the assessment process and shows preparedness, reducing assessment friction.
+It hides deficiencies from auditors.
+Explanation
+Deficiencies are revealed, not hidden, with good evidence.
+It makes assessments redundant.
+Explanation
+Assessments remain necessary.
+Overall explanation
+Well-organized evidence mapped to controls streamlines the assessment process and shows preparedness, reducing assessment friction.
+Domain
+39 - Documenting Control Implementation Details
+Question 124
+Skipped
+Why is documentation critical after the implementation of a control?
+It eliminates the need for future audits.
+Explanation
+Audits are still necessary regardless of documentation.
+Correct answer
+It ensures real-world effectiveness and compliance with standards.
+Explanation
+Correct. Documentation after control implementation ensures the controls are effective and compliant with standards by providing verifiable records of what was done.
+It allows for immediate decommissioning of controls.
+Explanation
+Decommissioning controls is unrelated to documentationâ€™s purpose.
+It replaces the need for technical controls.
+Explanation
+Documentation complements, not replaces, technical controls.
+Overall explanation
+Documentation after control implementation ensures the controls are effective and compliant with standards by providing verifiable records of what was done.
+Domain
+39 - Documenting Control Implementation Details
+Question 125
+Skipped
+What is the most important reason to document configuration management details, such as baseline states and deviations?
+To facilitate outsourcing of IT operations.
+Explanation
+Outsourcing is not the main reason for configuration documentation.
+Correct answer
+To identify unauthorized changes and maintain system integrity.
+Explanation
+Correct. Documenting configuration management details helps maintain system integrity and allows detection of unauthorized or accidental changes, which could introduce vulnerabilities.
+To create marketing material for security products.
+Explanation
+Marketing is unrelated to configuration management.
+To automate password resets.
+Explanation
+Password resets are not the focus of configuration documentation.
+Overall explanation
+Documenting configuration management details helps maintain system integrity and allows detection of unauthorized or accidental changes, which could introduce vulnerabilities.
+Domain
+39 - Documenting Control Implementation Details
+Question 126
+Skipped
+What is the primary objective of a security control assessment according to NIST SP 800-53A?
+To identify the organizationâ€™s most valuable assets
+Explanation
+Identifying valuable assets is part of risk assessment, not the control assessment objective.
+Correct answer
+To provide evidence-based assurance of security and privacy control effectiveness
+Explanation
+Correct. The primary objective of a security control assessment is to provide evidence-based assurance that security and privacy controls are not only present, but effective in achieving their intended purpose.
+To develop new security controls for the organization
+Explanation
+Developing new controls is not the focus; assessment evaluates existing controls.
+To eliminate all system vulnerabilities
+Explanation
+Eliminating all vulnerabilities is unrealistic and not the assessmentâ€™s goal.
+Overall explanation
+The primary objective of a security control assessment is to provide evidence-based assurance that security and privacy controls are not only present, but effective in achieving their intended purpose.
+Domain
+40 - Security Control Assessment Process Overview SP 800-53A
+Question 127
+Skipped
+What is the role of clear communication in the assessment process?
+To ensure no findings are reported
+Explanation
+The goal is to report findings, not suppress them.
+Correct answer
+To document findings clearly, track remediation, and maintain accountability
+Explanation
+Correct. Clear communication ensures findings are well-documented, remediation is tracked, and accountability is maintained throughout the assessment process.
+To replace the need for formal reports
+Explanation
+Formal reports are still necessary.
+To speed up the assessment process regardless of accuracy
+Explanation
+Speed should not come at the expense of accuracy.
+Overall explanation
+Clear communication ensures findings are well-documented, remediation is tracked, and accountability is maintained throughout the assessment process.
+Domain
+40 - Security Control Assessment Process Overview SP 800-53A
+Question 128
+Skipped
+How do assessment results influence the Risk Management Framework (RMF)?
+They serve as the sole basis for personnel promotions
+Explanation
+Assessment results are unrelated to promotions.
+Correct answer
+They inform system authorization decisions and continuous monitoring activities
+Explanation
+Correct. Assessment results are integral to system authorization decisions and inform ongoing continuous monitoring in the RMF.
+They are not considered in the RMF
+Explanation
+They are a core consideration in the RMF, not ignored.
+They only impact technical controls
+Explanation
+They impact all relevant controls, not just technical.
+Overall explanation
+Assessment results are integral to system authorization decisions and inform ongoing continuous monitoring in the RMF.
+Domain
+40 - Security Control Assessment Process Overview SP 800-53A
+Question 129
+Skipped
+Investing in reliable data sources and cross-functional collaboration leads to:
+Increased subjectivity in risk assessments
+Explanation
+These practices increase objectivity, not subjectivity.
+Correct answer
+Improved data quality and richer risk insights
+Explanation
+Correct. Reliable data sources and cross-functional collaboration enhance data quality and provide deeper, broader risk insights across the organization.
+Elimination of the need for human judgment
+Explanation
+Human judgment remains important even with good data.
+A reduction in stakeholder engagement
+Explanation
+Stakeholder engagement is typically increased, not reduced.
+Overall explanation
+Reliable data sources and cross-functional collaboration enhance data quality and provide deeper, broader risk insights across the organization.
+Domain
+18 - Risk Analysis and Impact Assessment
+Question 130
+Skipped
+What is a major limitation of qualitative risk analysis?
+It requires advanced statistical modeling
+Explanation
+Statistical modeling is part of quantitative, not qualitative, analysis.
+Correct answer
+It can be subjective and influenced by personal perceptions
+Explanation
+Correct. A key limitation of qualitative analysis is its subjectivity, as results depend on personal perceptions rather than hard data.
+It always takes longer than quantitative analysis
+Explanation
+Qualitative analysis is usually faster, not slower, than quantitative.
+It cannot be used for initial risk triage
+Explanation
+It is often used for initial triage due to its speed.
+Overall explanation
+A key limitation of qualitative analysis is its subjectivity, as results depend on personal perceptions rather than hard data.
+Domain
+18 - Risk Analysis and Impact Assessment
+Question 131
+Skipped
+Quantitative risk analysis is most effective when:
+There is little to no historical data available
+Explanation
+Lack of data hinders quantitative analysis.
+Risks need to be described in terms of subjective perception
+Explanation
+Subjective perceptions are used in qualitative, not quantitative, approaches.
+Correct answer
+Precise numerical probabilities and expected losses are required
+Explanation
+Correct. Quantitative analysis is best when precise probabilities and expected losses are needed, backed by sufficient data and expertise.
+The organization has minimal expertise in risk management
+Explanation
+Minimal expertise is inadequate for quantitative methods.
+Overall explanation
+Quantitative analysis is best when precise probabilities and expected losses are needed, backed by sufficient data and expertise.
+Domain
+18 - Risk Analysis and Impact Assessment
+Question 132
+Skipped
+Why is underestimating risk during system categorization particularly dangerous?
+It leads to excessive security spending
+Explanation
+Excessive security spending is a result of overestimating, not underestimating, risk.
+It results in unnecessary documentation
+Explanation
+Documentation is necessary regardless of risk estimation.
+Correct answer
+It exposes the organization to threats and regulatory penalties
+Explanation
+Correct. Underestimating risk leads to insufficient security, exposing the organization to threats and potential regulatory penalties.
+It improves operational efficiency
+Explanation
+Underestimating risk does not improve efficiency; it increases danger.
+Overall explanation
+Underestimating risk leads to insufficient security, exposing the organization to threats and potential regulatory penalties.
+Domain
+22 - Information System Categorization Principles
+Question 133
+Skipped
+Assigning a high impact level to a non-critical public website exemplifies which risk?
+Underprotection
+Explanation
+Underprotection is the opposite â€“ insufficient controls.
+Non-compliance
+Explanation
+Non-compliance is not directly indicated by overprotection.
+Correct answer
+Overprotection
+Explanation
+Correct. Overprotection occurs when excessive controls are applied to non-critical systems, wasting resources and adding unnecessary complexity.
+Data integrity loss
+Explanation
+Data integrity loss is a type of impact, not a categorization risk.
+Overall explanation
+Overprotection occurs when excessive controls are applied to non-critical systems, wasting resources and adding unnecessary complexity.
+Domain
+22 - Information System Categorization Principles
+Question 134
+Skipped
+Which of the following statements is TRUE regarding system categorization and external compliance?
+Regulators begin audits without considering categorization
+Explanation
+Audits start with categorization review.
+Correct answer
+Failure to categorize systems correctly can lead to audit findings and fines
+Explanation
+Correct. Failure in accurate categorization can result in audit findings and fines, as regulators use categorization to check compliance.
+Compliance standards do not reference categorization
+Explanation
+Compliance standards do require categorization.
+Categorization is only important for internal security
+Explanation
+Categorization is important for both internal and external needs.
+Overall explanation
+Failure in accurate categorization can result in audit findings and fines, as regulators use categorization to check compliance.
+Domain
+22 - Information System Categorization Principles
+Question 135
+Skipped
+Which tool is commonly used to make gap prioritization decisions more objective and transparent?
+Customer satisfaction surveys
+Explanation
+Customer surveys are not relevant for objective gap prioritization.
+Correct answer
+Risk matrices or heat maps
+Explanation
+Correct. Risk matrices and heat maps are standard tools for making prioritization objective and transparent.
+Employee suggestion boxes
+Explanation
+Suggestion boxes do not provide systematic, risk-based prioritization.
+Annual holiday calendars
+Explanation
+Holiday calendars are irrelevant to risk assessment or prioritization.
+Overall explanation
+Risk matrices and heat maps are standard tools for making prioritization objective and transparent.
+Domain
+13 - Gap Analysis and Maturity Assessment
+Question 136
+Skipped
+Which strategic benefit can organizations gain from mastering gap analysis and maturity assessment?
+Reduced need for customer feedback
+Explanation
+Customer feedback remains important for improvement.
+Correct answer
+Ability to anticipate risks and allocate resources wisely
+Explanation
+Correct. Mastery of these practices enables organizations to anticipate risks and allocate resources wisely, supporting adaptability and strategic achievement.
+Decreased importance of regulatory alignment
+Explanation
+Regulatory alignment is essential, not diminished.
+Elimination of all business risks
+Explanation
+No organization can eliminate all business risks.
+Overall explanation
+Mastery of these practices enables organizations to anticipate risks and allocate resources wisely, supporting adaptability and strategic achievement.
+Domain
+13 - Gap Analysis and Maturity Assessment
+Question 137
+Skipped
+What is a potential risk of failing to communicate gap remediation in business terms to executives?
+Executives may request more technical details
+Explanation
+Executives prefer concise, business-focused communication.
+Correct answer
+Remediation may not receive necessary resources and support
+Explanation
+Correct. Without communication in business terms, executives may not allocate the needed resources or support for remediation.
+The IT team will be overstaffed
+Explanation
+Staffing is unrelated to communication style.
+Auditors will be satisfied without further explanation
+Explanation
+Auditors require clear evidence and rationale, not less explanation.
+Overall explanation
+Without communication in business terms, executives may not allocate the needed resources or support for remediation.
+Domain
+13 - Gap Analysis and Maturity Assessment
+Question 138
+Skipped
+Why do organizations pursue the harmonization of controls across jurisdictions?
+To comply only with the least strict regulation
+Explanation
+Following only the least strict law increases risk of noncompliance.
+Correct answer
+To streamline compliance and reduce duplication by meeting the strictest requirements
+Explanation
+Correct. Harmonization aims to meet the strictest requirements across jurisdictions, reducing duplication and streamlining compliance.
+To avoid all forms of local legal compliance
+Explanation
+Ignoring local requirements is not a valid strategy.
+To focus exclusively on technical safeguards
+Explanation
+Technical safeguards are part of the process, but harmonization includes broader controls.
+Overall explanation
+Harmonization aims to meet the strictest requirements across jurisdictions, reducing duplication and streamlining compliance.
+Domain
+12 - Global Regulatory Landscape and Cross-Border Compliance
+Question 139
+Skipped
+Which of the following best exemplifies a regulatory conflict in the context of cross-border data flows?
+Correct answer
+The need to comply with both GDPR and US law enforcement data requests
+Explanation
+Correct. Conflicts can arise when, for example, US law requires disclosure of data that GDPR considers protected, creating legal risk.
+The use of two-factor authentication for system access
+Explanation
+Two-factor authentication is a security measure, not a regulatory conflict.
+Implementing a single privacy policy worldwide
+Explanation
+A single privacy policy may not address conflicting regulations.
+Data encryption requirements within a single country
+Explanation
+Encryption within one country typically does not constitute a cross-border conflict.
+Overall explanation
+Conflicts can arise when, for example, US law requires disclosure of data that GDPR considers protected, creating legal risk.
+Domain
+12 - Global Regulatory Landscape and Cross-Border Compliance
+Question 140
+Skipped
+Which of the following best describes the concept of "jurisdictional overlap" in the context of global compliance?
+When a single country enacts multiple conflicting regulations
+Explanation
+Only one country is involved, not multiple.
+Correct answer
+When multiple countries claim authority over the same business activity
+Explanation
+Correct. Jurisdictional overlap occurs when multiple countries claim authority over the same business activity, especially relevant in digital services and cross-border operations.
+When two companies operate in the same sector within one country
+Explanation
+This refers to competition within a sector, not legal jurisdiction.
+When a company operates only within its country of incorporation
+Explanation
+No cross-border element or conflict exists.
+Overall explanation
+Jurisdictional overlap occurs when multiple countries claim authority over the same business activity, especially relevant in digital services and cross-border operations.
+Domain
+12 - Global Regulatory Landscape and Cross-Border Compliance
+Question 141
+Skipped
+Why should control enhancements not be applied indiscriminately across all systems?
+They are always ineffective
+Explanation
+Enhancements are effective if properly applied.
+Correct answer
+They can waste resources and add complexity
+Explanation
+Correct. Indiscriminate use of enhancements can lead to wasted resources and unnecessary complexity.
+They are universally mandated by regulators
+Explanation
+They are not always mandated by regulators.
+They guarantee 100% security
+Explanation
+No set of controls guarantees absolute security.
+Overall explanation
+Indiscriminate use of enhancements can lead to wasted resources and unnecessary complexity.
+Domain
+31 - Applying Control Enhancements for Higher Assurance
+Question 142
+Skipped
+In which scenario would a control enhancement such as multi-factor authentication be most justified?
+A small business handling only public information
+Explanation
+Low-risk environments may not need such enhancements.
+Correct answer
+A health care provider managing millions of patient records
+Explanation
+Correct. Environments like large healthcare providers with sensitive data justify enhancements such as multi-factor authentication due to higher risk.
+A retail storeâ€™s marketing campaign
+Explanation
+Marketing campaigns generally lack sensitive data.
+A local community newsletter
+Explanation
+Newsletters usually do not manage high-risk information.
+Overall explanation
+Environments like large healthcare providers with sensitive data justify enhancements such as multi-factor authentication due to higher risk.
+Domain
+31 - Applying Control Enhancements for Higher Assurance
+Question 143
+Skipped
+What is a potential drawback of implementing too many control enhancements without proper analysis?
+Correct answer
+Increased operational costs and workflow disruption
+Explanation
+Correct. Too many enhancements without analysis can lead to high costs and workflow disruptions.
+Complete elimination of all risks
+Explanation
+No set of enhancements can eliminate all risk.
+Immediate improvement in user satisfaction
+Explanation
+User satisfaction may decrease due to added complexity.
+Direct reduction in compliance requirements
+Explanation
+Compliance requirements could actually increase.
+Overall explanation
+Too many enhancements without analysis can lead to high costs and workflow disruptions.
+Domain
+31 - Applying Control Enhancements for Higher Assurance
+Question 144
+Skipped
+An effective way to address documentation challenges is to:
+Avoid standard templates to promote creativity
+Explanation
+Standard templates promote, not hinder, good documentation.
+Correct answer
+Foster a culture of accountability and transparency in record-keeping
+Explanation
+Correct. Fostering accountability and transparency ensures staff value and correctly maintain records, addressing documentation challenges.
+Store records wherever is most convenient for each employee
+Explanation
+Decentralized storage reduces document reliability.
+Rely solely on legal teams to manage all records
+Explanation
+Sole reliance on legal teams is inadequate.
+Overall explanation
+Fostering accountability and transparency ensures staff value and correctly maintain records, addressing documentation challenges.
+Domain
+61 - Documentation of Decommissioned Systems for Compliance
+Question 145
+Skipped
+How does updating organizational knowledge bases after decommissioning benefit an organization?
+Makes compliance audits harder
+Explanation
+It makes audits easier, not harder.
+Correct answer
+Helps future teams learn from past challenges and best practices
+Explanation
+Correct. Updating knowledge bases helps future teams by sharing lessons learned and best practices.
+Reduces transparency in asset management
+Explanation
+It increases, not reduces, transparency.
+Eliminates the need to track retired systems
+Explanation
+It ensures tracking of retired systems.
+Overall explanation
+Updating knowledge bases helps future teams by sharing lessons learned and best practices.
+Domain
+61 - Documentation of Decommissioned Systems for Compliance
+Question 146
+Skipped
+Why is it important to have retention policies for decommissioning records?
+To reduce the need for secure storage
+Explanation
+Secure storage remains necessary.
+Correct answer
+To ensure records are kept for appropriate periods and protected from unauthorized access
+Explanation
+Correct. Retention policies ensure records are kept as required and are protected from unauthorized access.
+To allow anyone to modify records as needed
+Explanation
+Only authorized personnel should modify records.
+To comply only with internal policies, not regulations
+Explanation
+Policies must comply with regulations, not just internal rules.
+Overall explanation
+Retention policies ensure records are kept as required and are protected from unauthorized access.
+Domain
+61 - Documentation of Decommissioned Systems for Compliance
+Question 147
+Skipped
+What is a risk-based approach to monitoring, as emphasized by NIST SP 800-137?
+Monitoring only low-risk assets
+Explanation
+High-risk assets require more monitoring, not less.
+Correct answer
+Adjusting monitoring frequency and rigor based on asset risk level
+Explanation
+Correct. Risk-based monitoring means adjusting how often and how rigorously assets are monitored based on their risk level.
+Focusing exclusively on compliance metrics
+Explanation
+Compliance metrics are part of, but not the whole of, risk-based monitoring.
+Using only manual monitoring tools
+Explanation
+Both automated and manual tools can be used.
+Overall explanation
+Risk-based monitoring means adjusting how often and how rigorously assets are monitored based on their risk level.
+Domain
+52 - Designing a Continuous Monitoring Program SP 800-137
+Question 148
+Skipped
+Which step is NOT explicitly part of NIST SP 800-137's structured ConMon process?
+Establishing a monitoring strategy
+Explanation
+Monitoring strategy is a key step.
+Selecting appropriate metrics
+Explanation
+Metric selection is a key step.
+Correct answer
+Developing a data backup policy
+Explanation
+Correct. Data backup policy development is not one of NIST SP 800-137â€™s explicit ConMon steps; the others are clearly articulated as part of the process.
+Implementing monitoring mechanisms
+Explanation
+Implementing monitoring mechanisms is a key step.
+Overall explanation
+Data backup policy development is not one of NIST SP 800-137â€™s explicit ConMon steps; the others are clearly articulated as part of the process.
+Domain
+52 - Designing a Continuous Monitoring Program SP 800-137
+Question 149
+Skipped
+In aligning monitoring frequency with risk, which of the following factors is LEAST likely to affect how often monitoring occurs?
+Sensitivity of protected data
+Explanation
+Data sensitivity is a key factor.
+Potential impact of a breach
+Explanation
+Breach impact is highly relevant.
+Correct answer
+Employee vacation schedules
+Explanation
+Correct. Employee vacation schedules have little to no impact on monitoring frequency compared to data sensitivity, breach impact, and regulations.
+Regulatory mandates
+Explanation
+Regulations often set minimum monitoring intervals.
+Overall explanation
+Employee vacation schedules have little to no impact on monitoring frequency compared to data sensitivity, breach impact, and regulations.
+Domain
+52 - Designing a Continuous Monitoring Program SP 800-137
+Question 150
+Skipped
+What is the main function of an asset-threat-vulnerability matrix?
+To automate patch management for all assets
+Explanation
+Patch management is not the primary function.
+Correct answer
+To visualize and prioritize risk mitigation by mapping assets, threats, and vulnerabilities
+Explanation
+Correct. The matrix helps visualize the relationships among assets, threats, and vulnerabilities to prioritize risk mitigation.
+To limit the number of assets discovered during inventory
+Explanation
+The matrix aims for comprehensive, not limited, inventory.
+To enforce password policies across the organization
+Explanation
+Enforcing password policies is a control, not a matrix function.
+Overall explanation
+The matrix helps visualize the relationships among assets, threats, and vulnerabilities to prioritize risk mitigation.
+Domain
+17 - Identifying Risks Threats Vulnerabilities and Asset Pro
+Question 151
+Skipped
+Which method is most suitable for discovering offline organizational assets such as paper records or disconnected equipment?
+Automated network scanning
+Explanation
+Automated scans only find network-connected devices.
+Social engineering tests
+Explanation
+Social engineering tests target people, not asset discovery.
+Correct answer
+Manual surveys and interviews
+Explanation
+Correct. Manual surveys and interviews are best for discovering offline or disconnected assets, which automated scans cannot detect.
+Vulnerability scanning tools
+Explanation
+Vulnerability scanning tools cannot inventory offline assets.
+Overall explanation
+Manual surveys and interviews are best for discovering offline or disconnected assets, which automated scans cannot detect.
+Domain
+17 - Identifying Risks Threats Vulnerabilities and Asset Pro
+Question 152
+Skipped
+Which of the following best illustrates a weakness that can be uncovered during an audit?
+Unpatched software on a server
+Explanation
+Unpatched software is typically found in scans.
+Correct answer
+Backup procedures not being followed as documented
+Explanation
+Correct. Audits can reveal process weaknesses like backup procedures not being followed, which might otherwise go unnoticed.
+Outdated network diagrams
+Explanation
+Outdated diagrams indicate poor documentation, not necessarily a vulnerability.
+Well-trained employees responding to phishing simulations
+Explanation
+Well-trained employees responding correctly is a strength, not a weakness.
+Overall explanation
+Audits can reveal process weaknesses like backup procedures not being followed, which might otherwise go unnoticed.
+Domain
+17 - Identifying Risks Threats Vulnerabilities and Asset Pro
+Question 153
+Skipped
+If an IT manager and a business executive interpret the term â€œlow riskâ€ differently, what potential problem does this illustrate?
+Overestimation of risk appetite
+Explanation
+Appetite is not about miscommunication.
+Correct answer
+Inconsistent taxonomy leading to miscommunication
+Explanation
+Correct. This scenario shows inconsistent taxonomy, where different interpretations of terms cause miscommunication and potential risk.
+Excessive control strength
+Explanation
+Control strength is unrelated here.
+Reduced inherent risk
+Explanation
+The problem is not about inherent risk reduction.
+Overall explanation
+This scenario shows inconsistent taxonomy, where different interpretations of terms cause miscommunication and potential risk.
+Domain
+16 - Risk Concepts and Terminology
+Question 154
+Skipped
+A manufacturing company installs fire suppression systems and trains staff to reduce the risk of chemical fires. What is the risk that remains called?
+Inherent risk
+Explanation
+Inherent risk is before controls.
+Absolute risk
+Explanation
+Absolute risk is not a standard risk management term here.
+Correct answer
+Residual risk
+Explanation
+Correct. Residual risk is the risk that remains after controls are implemented to reduce inherent risk.
+Control risk
+Explanation
+Control risk is not the residual risk; it's a different concept.
+Overall explanation
+Residual risk is the risk that remains after controls are implemented to reduce inherent risk.
+Domain
+16 - Risk Concepts and Terminology
+Question 155
+Skipped
+Which of the following is TRUE about control strength and effectiveness?
+Control strength measures practical performance, while effectiveness is theoretical
+Explanation
+The definitions are reversed.
+Correct answer
+Control strength is theoretical robustness; effectiveness is real-world performance
+Explanation
+Correct. Control strength refers to theoretical robustness; effectiveness is how well the control works in practice.
+Both refer solely to the configuration of controls
+Explanation
+Both concepts encompass more than just configuration.
+Assurance is unrelated to either concept
+Explanation
+Assurance is directly related to both strength and effectiveness.
+Overall explanation
+Control strength refers to theoretical robustness; effectiveness is how well the control works in practice.
+Domain
+16 - Risk Concepts and Terminology
+Question 156
+Skipped
+Which statement best describes the advantage of getting authorization right on the first submission?
+It only fulfills a compliance requirement
+Explanation
+The benefits extend beyond compliance.
+Correct answer
+It results in enhanced security and greater organizational efficiency
+Explanation
+Correct. Getting authorization right on the first submission results in enhanced security, reduced risk, and greater organizational efficiency.
+It eliminates the need for documentation updates
+Explanation
+Documentation updates remain necessary.
+It allows for less rigorous evidence collection
+Explanation
+Rigorous evidence collection is still required.
+Overall explanation
+Getting authorization right on the first submission results in enhanced security, reduced risk, and greater organizational efficiency.
+Domain
+51 Common Causes of Authorization Failures and How to Avoid
+Question 157
+Skipped
+Which of the following is NOT a recommended strategy for demonstrating effective control implementation?
+Providing logs and screenshots as evidence
+Explanation
+Providing logs and screenshots is a best practice.
+Including audit trails and maintenance records
+Explanation
+Including audit trails and maintenance records is appropriate evidence.
+Correct answer
+Waiting until the authorization review to collect evidence
+Explanation
+Correct. Waiting until the authorization review to collect evidence leads to incomplete or missing records, which is not recommended.
+Integrating evidence collection into regular operations
+Explanation
+Integrating evidence collection into regular operations is recommended.
+Overall explanation
+Waiting until the authorization review to collect evidence leads to incomplete or missing records, which is not recommended.
+Domain
+51 Common Causes of Authorization Failures and How to Avoid
+Question 158
+Skipped
+Which of the following summarizes the main causes of authorization failures?
+Overuse of automation and excessive documentation
+Explanation
+Overuse of automation and excessive documentation are not cited as main causes.
+Lack of compliance training for all staff
+Explanation
+Lack of compliance training is not the central issue.
+Correct answer
+Incomplete documentation, inadequate controls, poor communication, and misalignment between categorization and controls
+Explanation
+Correct. The main causes of authorization failures are incomplete documentation, inadequate controls, poor communication, and misalignment between categorization and controls.
+Excessive use of multidisciplinary teams
+Explanation
+Multidisciplinary teams are a recommended best practice, not a cause of failure.
+Overall explanation
+The main causes of authorization failures are incomplete documentation, inadequate controls, poor communication, and misalignment between categorization and controls.
+Domain
+51 Common Causes of Authorization Failures and How to Avoid
+Question 159
+Skipped
+Which of the following best describes the foundational role of FIPS 199 and NIST SP 800-60 in information security?
+They provide optional suggestions for technology purchases
+Explanation
+The standards are mandatory, not optional suggestions.
+Correct answer
+They establish the baseline for all further security planning and control selection
+Explanation
+Correct. FIPS 199 and NIST SP 800-60 establish the baseline for all subsequent security planning and control selection.
+They are only relevant for legacy systems
+Explanation
+They are relevant for all systems, not just legacy ones.
+They replace the need for periodic reviews
+Explanation
+Periodic reviews remain necessary.
+Overall explanation
+FIPS 199 and NIST SP 800-60 establish the baseline for all subsequent security planning and control selection.
+Domain
+23 - Applying FIPS 199 and NIST SP 800-60
+Question 160
+Skipped
+Which of the following is NOT one of the three core security objectives defined by FIPS 199?
+Confidentiality
+Explanation
+Confidentiality is a core objective.
+Correct answer
+Authenticity
+Explanation
+Correct. Authenticity is not one of the three core security objectives defined by FIPS 199. The standard focuses on confidentiality, integrity, and availability.
+Integrity
+Explanation
+Integrity is a core objective.
+Availability
+Explanation
+Availability is a core objective.
+Overall explanation
+Authenticity is not one of the three core security objectives defined by FIPS 199. The standard focuses on confidentiality, integrity, and availability.
+Domain
+23 - Applying FIPS 199 and NIST SP 800-60
+Question 161
+Skipped
+Which statement accurately describes the relationship between FIPS 199, NIST SP 800-60, and NIST SP 800-53?
+FIPS 199 and NIST SP 800-60 determine security controls directly
+Explanation
+The standards do not directly determine controls.
+Correct answer
+Security categorization under FIPS 199 and NIST SP 800-60 guides selection of controls from NIST SP 800-53
+Explanation
+Correct. Security categorization under FIPS 199 and NIST SP 800-60 guides the selection of appropriate controls from NIST SP 800-53.
+NIST SP 800-53 defines impact levels for information types
+Explanation
+NIST SP 800-53 does not define impact levels.
+NIST SP 800-60 replaces the need for FIPS 199
+Explanation
+NIST SP 800-60 complements, not replaces, FIPS 199.
+Overall explanation
+Security categorization under FIPS 199 and NIST SP 800-60 guides the selection of appropriate controls from NIST SP 800-53.
+Domain
+23 - Applying FIPS 199 and NIST SP 800-60
+Question 162
+Skipped
+Why is securing senior leadership buy-in for governance initiatives often challenging?
+Leaders always view security as the highest priority
+Explanation
+Leaders may have competing priorities.
+Correct answer
+Security is often perceived as a cost center rather than a value driver
+Explanation
+Correct. Leadership buy-in is challenging because security is often seen as a cost center, requiring effort to demonstrate its value.
+Leadership is not responsible for resource allocation
+Explanation
+Leadership is responsible for resources.
+Buy-in is unnecessary if frameworks are in place
+Explanation
+Buy-in is essential for effective governance, regardless of frameworks.
+Overall explanation
+Leadership buy-in is challenging because security is often seen as a cost center, requiring effort to demonstrate its value.
+Domain
+6 - Governance Principles and Strategic Alignment
+Question 163
+Skipped
+Which of the following would NOT be considered a function of effective governance?
+Guiding decision-making and resource allocation
+Explanation
+This is a governance function.
+Fostering accountability at every organization level
+Explanation
+Accountability is a key aspect of governance.
+Ensuring activities align with mission and vision
+Explanation
+Alignment with mission and vision is essential.
+Correct answer
+Creating silos between business and IT units
+Explanation
+Correct. Effective governance breaks down silos; it does not create them. It guides decisions, fosters accountability, and ensures alignment.
+Overall explanation
+Effective governance breaks down silos; it does not create them. It guides decisions, fosters accountability, and ensures alignment.
+Domain
+6 - Governance Principles and Strategic Alignment
+Question 164
+Skipped
+Which of the following statements about governance and compliance is most accurate?
+Governance guarantees regulatory compliance regardless of context
+Explanation
+Governance supports but does not guarantee compliance in all cases.
+Correct answer
+Governance supports compliance while also enabling lasting value creation
+Explanation
+Correct. Governance supports compliance while also creating lasting value, not just meeting regulatory requirements.
+Governance is only necessary in regulated industries
+Explanation
+Governance is valuable in all sectors, not just regulated ones.
+Governance eliminates the need for audits
+Explanation
+Audits remain an important part of governance.
+Overall explanation
+Governance supports compliance while also creating lasting value, not just meeting regulatory requirements.
+Domain
+6 - Governance Principles and Strategic Alignment
+Question 165
+Skipped
+What is the main role of the Authorizing Official in the Authorize step?
+To develop technical controls
+Explanation
+Developing controls is not their role.
+Correct answer
+To review assessment results and decide on risk acceptance for system operation
+Explanation
+Correct. The Authorizing Officialâ€™s role in Authorize is to review assessment outcomes and formally decide if the system's risk is acceptable, documenting the decision.
+To conduct penetration testing
+Explanation
+Penetration testing is part of Assess.
+To monitor daily system activity
+Explanation
+Monitoring is the Monitor step.
+Overall explanation
+The Authorizing Officialâ€™s role in Authorize is to review assessment outcomes and formally decide if the system's risk is acceptable, documenting the decision.
+Domain
+4 - Understanding the NIST Risk Management Framework RMF Lif
+Question 166
+Skipped
+Which of the following is a key difference between RMF and COBIT?
+RMF is a high-level IT governance framework, while COBIT is more granular and control-focused
+Explanation
+The descriptions are reversed.
+Correct answer
+RMF is focused on technical and procedural controls for risk mitigation, while COBIT provides high-level IT management objectives
+Explanation
+Correct. RMF is focused on detailed technical and procedural controls for risk mitigation, while COBIT provides high-level objectives and processes for IT management.
+Both frameworks are legally required for all U.S. businesses
+Explanation
+Neither framework is legally required for all businesses.
+COBIT mandates continuous monitoring, while RMF does not
+Explanation
+Both frameworks encourage monitoring, but RMF emphasizes it as a distinct step.
+Overall explanation
+RMF is focused on detailed technical and procedural controls for risk mitigation, while COBIT provides high-level objectives and processes for IT management.
+Domain
+4 - Understanding the NIST Risk Management Framework RMF Lif
+Question 167
+Skipped
+During which RMF step is the organizational context established and stakeholders identified?
+Categorize
+Explanation
+Categorize is for system impact classification.
+Select
+Explanation
+Select is about choosing controls.
+Correct answer
+Prepare
+Explanation
+Correct. The Prepare step, newly emphasized in the latest revision, is where organizations establish context, identify stakeholders, and set the risk management strategy.
+Monitor
+Explanation
+Monitor is about ongoing oversight, not initial context.
+Overall explanation
+The Prepare step, newly emphasized in the latest revision, is where organizations establish context, identify stakeholders, and set the risk management strategy.
+Domain
+4 - Understanding the NIST Risk Management Framework RMF Lif
+Question 168
+Skipped
+In real-world application, how might a small business approach baseline selection for a new customer portal?
+Apply the high baseline regardless of risk
+Explanation
+High baseline for all systems is inefficient and unnecessary for low-risk contexts.
+Correct answer
+Start with the low baseline and enhance controls as risk profile evolves
+Explanation
+Correct. A small business might start with the low baseline and enhance controls as its user base and risk profile grow, reflecting real-world application.
+Ignore baselines and select controls randomly
+Explanation
+Random selection ignores risk and compliance needs.
+Adopt only the controls required for federal agencies
+Explanation
+Federal requirements may not apply to non-federal organizations.
+Overall explanation
+A small business might start with the low baseline and enhance controls as its user base and risk profile grow, reflecting real-world application.
+Domain
+30 - Selecting Security and Privacy Controls Based on Baseli

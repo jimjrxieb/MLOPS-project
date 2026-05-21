@@ -7,9 +7,10 @@ from pathlib import Path
 from typing import List, Dict
 
 # Directories
-BASE_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/1-GP-GLUE")
+from pipeline_config import pipeline_dir
+BASE_DIR = pipeline_dir
 UNTRAINED_DIR = BASE_DIR / "03-chunked-untrained"
-ENRICHED_DIR = BASE_DIR / "04-enriched-trained"
+ENRICHED_DIR = BASE_DIR / "04-trained-data"
 
 # Metadata for enrichment
 ENRICHMENT_METADATA = {

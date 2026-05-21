@@ -1,0 +1,10 @@
+{
+  "created": "2026-05-20T13:29:16.090238",
+  "holdout_pct": 5,
+  "seed": 42,
+  "num_examples": 96,
+  "total_before_split": 1928,
+  "source_files": [
+    "jade_v10_etl_20260520_132552.jsonl"
+  ]
+}
