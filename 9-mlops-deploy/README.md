@@ -1,155 +1,140 @@
-# 9-MLOPS-DEPLOY
+# 9-mlops-deploy — MLOps Operational Toolkit
 
-> End-to-end MLOps pipeline deployment — from training data to production model serving.
+Deployment scripts, GitHub Actions workflows, and monitoring setup for production MLOps pipelines. Battle-tested on BERU (3B GRC analyst), JADE (8B DevSecOps), and Katie (3B K8s engineer) trained on this repo's pipeline.
 
----
-
-## What This Package Does
-
-Deploys a production-grade MLOps platform. Two tracks: **Kubeflow** (K8s-native, portable) and **SageMaker** (AWS-managed). Covers the full model lifecycle: data quality gates, KFP training pipelines, model registry, KServe serving, evaluation benchmarks, and model CI/CD. Battle-tested on JADE (8B) and Katie (3B) — two LLaMA models serving autonomous security remediation in production.
-
-| Metric | Impact |
-|--------|--------|
-| Training pipeline automation | 7-step KFP pipeline — validate to promote in one command |
-| Data quality enforcement | 300k examples curated to 44k (85% garbage removed) |
-| Model promotion gates | Zero untested models reach production |
-| RAG knowledge base | 33k+ documents across 7 collections |
-| Model serving | Sub-second inference via KServe + vLLM on K8s |
-| Experiment reproducibility | Every run tracked — KFP artifacts, metrics, lineage |
+Covers the operational half of the model lifecycle: submit training runs, enforce data quality gates, detect drift, and roll out new model versions with promotion gates.
 
 ---
 
-## What's Included
+## What's Here
 
 ```
-9-MLOPS-DEPLOY/
-├── README.md                      ← You are here
-├── ENGAGEMENT-GUIDE.md            ← Agent brain — phases, timelines, decisions
-├── playbooks/                     ← 17 numbered playbooks (Kubeflow + SageMaker tracks)
-│   └── README.md
+9-mlops-deploy/
 ├── tools/                         ← Deployment and orchestration scripts
-│   └── README.md
-├── 01-kubeflow-platform/          ← KFP + KServe deployment manifests
-│   ├── manifests/                 ← Helm values (KFP standalone, KServe standalone)
-│   └── kfp-components/            ← Reusable pipeline components
-├── 02-training-pipeline/          ← Training configs + KFP pipeline definitions
-│   ├── configs/
-│   ├── kfp/                       ← KFP v2 training pipeline Python code
-│   └── sagemaker/
-├── 03-model-registry/             ← Model versioning + Modelfile templates
-│   └── templates/
-├── 04-model-serving/              ← KServe + vLLM serving configs
-│   ├── kserve/                    ← InferenceService, ServingRuntime, KEDA
-│   └── vllm/
-├── 05-rag-pipeline/               ← ChromaDB + embedding configs
-│   └── configs/
-├── 06-model-cicd/                 ← GitHub Actions for model lifecycle
+│   ├── run-ml-audit.sh            ← Assess current ML infrastructure maturity
+│   ├── deploy-kubeflow.sh         ← KFP standalone on K8s (MySQL + S3)
+│   ├── deploy-kserve.sh           ← KServe + vLLM + KEDA on K8s
+│   ├── train-eval-promote.sh      ← Submit KFP pipeline, wait, check gate
+│   ├── validate-training-data.py  ← Data quality gates (format, scope, dedup)
+│   ├── generate-compliance-report.sh  ← Lineage + provenance + eval history
+│   ├── deploy-sagemaker-training.py   ← SageMaker training job launcher
+│   ├── setup-sagemaker.sh         ← SageMaker IAM roles + S3 buckets
+│   └── sagemaker-lifecycle.py     ← SageMaker model lifecycle management
+├── 06-model-cicd/
 │   └── github-actions/
-├── 07-monitoring/                 ← Drift detection + dashboards
+│       ├── validate-training-data.yml  ← Gate on data pushes
+│       ├── train-eval-promote.yml      ← Full training cycle (chained from validate)
+│       └── weekly-eval.yml             ← Scheduled eval against production model
+├── 07-monitoring/
 │   └── drift-detection/
-├── examples/                      ← Battle-tested references (Katie, JADE)
-└── outputs/                       ← Where audit results land
+│       ├── servicemonitor.yaml    ← Prometheus ServiceMonitor for ML metrics
+│       └── compare-eval.py        ← Compare current eval scores against baseline
+├── examples/
+│   ├── katie-training-cycle.md    ← Complete Katie v2 training lifecycle (reference)
+│   └── jade-rag-ingestion.md      ← JADE RAG pipeline: 33k+ docs, 7 collections
+├── outputs/                       ← Where audit results land (gitignored in client repos)
+├── ENGAGEMENT-GUIDE.md            ← 6-phase engagement playbook
+└── README.md                      ← You are here
 ```
 
 ---
 
-## Two Tracks
+## Two Infrastructure Tracks
 
-| | Kubeflow Track (K8s-native) | SageMaker Track (AWS-managed) |
+| | Kubeflow (K8s-native) | SageMaker (AWS-managed) |
 |---|---|---|
-| **Pipeline orchestration** | KFP (Kubeflow Pipelines) | SageMaker Pipelines |
+| **Pipeline orchestration** | KFP v2 | SageMaker Pipelines |
 | **Experiment tracking** | KFP experiments + artifacts | SageMaker Experiments |
-| **Model registry** | S3-based + registry.json | SageMaker Model Registry |
+| **Model registry** | S3-based + `registry.json` | SageMaker Model Registry |
 | **Model serving** | KServe + vLLM | SageMaker Endpoints |
 | **Autoscaling** | KEDA (custom vLLM metrics) | Built-in |
 | **Monitoring** | Prometheus + vLLM metrics | SageMaker Model Monitor |
-| **Cost** | Infra-only (self-managed) | Pay per use (managed) |
-| **Portability** | Any K8s cluster | AWS only |
 | **Best for** | K8s-native teams, multi-cloud | AWS-native, compliance-required |
 
 ---
 
 ## MLOps Maturity Model
 
-| Level | Description | Playbooks |
-|-------|-------------|-----------|
-| **L0 — Manual** | Models trained on laptops, no versioning, manual deployment | 01 (assess) |
-| **L1 — Tracked** | Experiment tracking, model registry, manual promotion | 02, 03, 05 |
-| **L2 — Automated** | KFP pipelines, data quality gates, automated eval | 03, 04, 07 |
-| **L3 — CI/CD** | Model CI/CD, automated promotion, canary serving | 09, 10 |
-| **L4 — Full Loop** | Drift detection, feedback loops, self-healing retraining | 10, 11, 12 |
+| Level | Description | How to get there |
+|-------|-------------|-----------------|
+| **L0 — Manual** | Models trained on laptops, no versioning, manual deployment | `run-ml-audit.sh` to baseline |
+| **L1 — Tracked** | Experiment tracking, model registry, manual promotion | `deploy-kubeflow.sh` |
+| **L2 — Automated** | KFP pipelines, data quality gates, automated eval | `train-eval-promote.sh` |
+| **L3 — CI/CD** | Model CI/CD, automated promotion, canary serving | `06-model-cicd/github-actions/` |
+| **L4 — Full Loop** | Drift detection, feedback loops, scheduled retraining | `07-monitoring/drift-detection/` |
 
 ---
 
-## Quick Start (Docker Desktop + WSL2)
+## Quick Start
 
 ```bash
-# 1. Deploy KFP (experiment tracking + pipeline orchestration)
+# 1. Assess current ML maturity
+bash tools/run-ml-audit.sh --target /path/to/ml-project
+
+# 2. Validate training data before any run
+python3 tools/validate-training-data.py --input corpus.jsonl --check all --strict
+
+# 3. Deploy Kubeflow (experiment tracking + pipeline orchestration)
 bash tools/deploy-kubeflow.sh --namespace kubeflow
 
-# 2. Verify KFP
-kubectl port-forward svc/ml-pipeline-ui -n kubeflow 8888:80
-# → http://localhost:8888
+# 4. Submit a training pipeline
+bash tools/train-eval-promote.sh \
+  --model beru \
+  --data s3://bucket/beru-corpus.jsonl \
+  --threshold 70
 
-# 3. GPU setup (one-time — see 01-kubeflow-platform/README.md)
-#    - Install nvidia-container-toolkit in WSL2
-#    - Set default-runtime: nvidia in Docker Desktop → Settings → Docker Engine
-#    - Apply & Restart
-
-# 4. Submit training pipeline
-kubectl port-forward svc/ml-pipeline -n kubeflow 8887:8888
-python3 02-training-pipeline/kfp/training_pipeline.py --submit \
-  --endpoint http://localhost:8887
-
-# 5. Or train locally (hybrid — local GPU, KFP for tracking)
-python3 1-data-pipeline/train_llama3b.py --version v2.0-3b --skip-eval
-```
-
-## Quick Start (EKS + Karpenter)
-
-```bash
-# 1. Deploy KFP
-bash tools/deploy-kubeflow.sh --namespace kubeflow
-
-# 2. Deploy NVIDIA device plugin
-kubectl apply -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.17.0/deployments/static/nvidia-device-plugin.yml
-
-# 3. Deploy KServe + vLLM (model serving)
+# 5. Deploy KServe + vLLM (model serving)
 bash tools/deploy-kserve.sh --namespace kserve
-
-# 4. Submit training pipeline (Karpenter provisions spot GPU on demand)
-python3 02-training-pipeline/kfp/training_pipeline.py --submit \
-  --endpoint http://kfp.kubeflow.svc:8888 \
-  --model katie-3b
 ```
 
 ---
 
-## Current Deployment (Mar 2026)
+## Model CI/CD
 
-Deployed on Docker Desktop K8s (v1.34.1) + WSL2 + RTX 5080 (16GB).
+The GitHub Actions workflows wire data validation into training automatically:
 
-| Component | Status | Namespace |
-|-----------|--------|-----------|
-| KFP v2.16.0 (14 pods) | Running | `kubeflow` |
-| SeaweedFS (S3-compatible) | Running | `kubeflow` |
-| Model registry (registry.json) | Deployed | `ml-artifacts` bucket |
-| Training pipeline | Compiled + tested | KFP experiment `katie-3b-training` |
-| Data quality gates | Validated (33k examples) | `validate-training-data.py` |
-| GPU passthrough | Working | `default-runtime: nvidia` |
-| Katie v2.0-3b | 2/5 chunks trained (20k examples) | `3-model-registry/v2.0-3b/` |
+```
+Push to data branch
+  → validate-training-data.yml (quality gates)
+  → IF pass: train-eval-promote.yml submits KFP pipeline
+    → IF eval ≥ threshold: model promoted, KServe InferenceService patched
+    → IF eval < threshold: GitHub issue opened with per-category breakdown
+  → weekly-eval.yml: scheduled eval against production model (drift signal)
+```
 
----
-
-## Related Packages
-
-| Package | When to Use |
-|---------|-------------|
-| 00-PLATFORM-SETUP | Cluster + ArgoCD must exist before deploying MLOps infra |
-| 02-CLUSTER-HARDEN | Harden the cluster before serving models |
-| 04-OPTIMIZE | Right-size GPU nodes, Karpenter for ML workloads |
-| 06-JADE-INTELLIGENCE | JADE AI system that this pipeline trains and serves |
+```bash
+# Copy workflows to your repo
+cp 06-model-cicd/github-actions/*.yml .github/workflows/
+```
 
 ---
 
-*Ghost Protocol — MLOps / Model Lifecycle Management*
+## Drift Detection
+
+`07-monitoring/drift-detection/` uses Prometheus metrics from vLLM to detect performance degradation:
+
+| Metric | What it signals |
+|--------|----------------|
+| `ml_eval_score` (Gauge) | Eval benchmark trending down → retrain trigger |
+| `ml_data_drift_score` (Gauge) | Input distribution shifted → data collection needed |
+| `ml_inference_latency_seconds` | Serving degradation |
+| `ml_prompt_category` | Domain shift in production traffic |
+
+```bash
+# Compare current eval scores against saved baseline
+python3 07-monitoring/drift-detection/compare-eval.py \
+  --baseline 5-experiments/exp-015-beru-v1.7/metrics.json \
+  --current 4-eval-clarify/3-results/beru/knowledge_brain/latest.json
+```
+
+---
+
+## Related
+
+| Directory | What it feeds |
+|-----------|--------------|
+| `0-data-lab/` | Raw training data — input to `validate-training-data.py` |
+| `1-FineTuning-Pipeline/` | ETL → train → merge → GGUF — what KFP wraps |
+| `4-eval-clarify/` | Eval suites — what promotion gates run |
+| `5-experiments/` | Per-run metrics — baseline for `compare-eval.py` |
+| `BERU-AI/` | FastAPI runtime — what KServe/Ollama serves |

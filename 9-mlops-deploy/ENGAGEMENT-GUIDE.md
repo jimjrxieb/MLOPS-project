@@ -32,7 +32,7 @@
 ## Phase 1: Assess (Week 1)
 
 **Goal:** Understand current ML maturity, identify gaps, establish baseline.
-**Playbook:** `01-assess-ml-maturity.md`
+**Tool:** `tools/run-ml-audit.sh`
 
 ### Summary
 1. Inventory existing models, training scripts, data sources
@@ -52,7 +52,7 @@
 ## Phase 2: Foundation (Weeks 2-3)
 
 **Goal:** Deploy pipeline orchestration, model registry, data quality gates.
-**Playbooks:** `02-deploy-kubeflow.md`, `03-setup-model-registry.md`, `04-setup-data-quality-gates.md`
+**Tools:** `tools/deploy-kubeflow.sh`, `tools/validate-training-data.py`
 
 ### Summary
 1. Deploy KFP standalone on K8s (MySQL metadata + S3 artifacts)
@@ -80,7 +80,7 @@
 ## Phase 3: Pipeline (Weeks 3-4)
 
 **Goal:** Automated KFP training pipeline with eval gates and model promotion.
-**Playbooks:** `05-setup-kfp-pipeline.md`, `06-setup-rag-pipeline.md`, `07-setup-model-eval.md`
+**Tools:** `tools/train-eval-promote.sh`, `4-eval-clarify/beru_eval_runner.py`
 
 ### Summary
 1. Build KFP v2 training pipeline (validate → ETL → train → merge → convert → eval → promote)
@@ -101,7 +101,7 @@ Pipeline submitted
 ### What We Deliver
 | Deliverable | Location |
 |-------------|----------|
-| KFP training pipeline | `02-training-pipeline/kfp/training_pipeline.py` |
+| KFP training pipeline | `tools/train-eval-promote.sh` → KFP |
 | RAG pipeline | `2-RagIngestion-Pipeline/` (7-stage NPC factory) |
 | Eval benchmark | `4-eval-clarify/` |
 | Promotion gates | Automated in KFP pipeline |
@@ -111,7 +111,7 @@ Pipeline submitted
 ## Phase 4: Serving (Week 5)
 
 **Goal:** Deploy model serving via KServe with vLLM backend, autoscaling, canary rollouts.
-**Playbook:** `08-deploy-kserve.md`
+**Tool:** `tools/deploy-kserve.sh`
 
 ### Summary
 1. Deploy KServe standalone + vLLM ServingRuntime
@@ -139,7 +139,7 @@ Pipeline submitted
 ## Phase 5: CI/CD + Monitoring (Week 6)
 
 **Goal:** Model CI/CD pipeline, drift detection, production monitoring.
-**Playbooks:** `09-deploy-model-cicd.md`, `10-setup-drift-detection.md`
+**Tools:** `06-model-cicd/github-actions/`, `07-monitoring/drift-detection/`
 
 ### Summary
 1. GitHub Actions: data push → quality gate → submit KFP pipeline → wait → rollout KServe
@@ -169,7 +169,7 @@ Push to data branch
 ## Phase 6: Optimize + Report (Week 7)
 
 **Goal:** Cost optimization, compliance documentation, handoff.
-**Playbooks:** `11-optimize-ml-costs.md`, `12-mlops-compliance-report.md`
+**Tool:** `tools/generate-compliance-report.sh`
 
 ### Summary
 1. Right-size GPU nodes (Karpenter NodePools for ML workloads, spot instances)

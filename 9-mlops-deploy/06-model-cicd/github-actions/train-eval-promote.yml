@@ -32,21 +32,21 @@ jobs:
           pip install jsonlines pandas scikit-learn
 
       - name: Run ETL
-        run: python3 1-data-pipeline/etl_pipeline.py
+        run: python3 1-FineTuning-Pipeline/etl_pipeline.py
 
       - name: Chunk data
-        run: python3 1-data-pipeline/chunk_data.py
+        run: python3 1-FineTuning-Pipeline/chunk_data.py
 
       - name: Train (LoRA fine-tune)
-        run: python3 1-data-pipeline/train_v11.py
+        run: python3 1-FineTuning-Pipeline/train_v11.py
 
       - name: Merge LoRA adapters
-        run: python3 1-data-pipeline/merge_model.py
+        run: python3 1-FineTuning-Pipeline/merge_model.py
 
       - name: Run evaluation
         id: eval
         run: |
-          python3 1-data-pipeline/eval_bridge.py --output eval-results.json
+          python3 1-FineTuning-Pipeline/eval_bridge.py --output eval-results.json
           SCORE=$(python3 -c "import json; r=json.load(open('eval-results.json')); print(r.get('weighted_score', 0))")
           echo "score=$SCORE" >> $GITHUB_OUTPUT
           echo "Weighted eval score: ${SCORE}%"
@@ -60,7 +60,7 @@ jobs:
       - name: Promote model
         if: ${{ steps.eval.outputs.score >= 60 }}
         run: |
-          python3 1-data-pipeline/convert_gguf.py
+          python3 1-FineTuning-Pipeline/convert_gguf.py
           echo "Model promoted with score: ${{ steps.eval.outputs.score }}%"
 
       - name: Open issue on failure
