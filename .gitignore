@@ -26,6 +26,7 @@
 # --- Training corpus (regenerable, large — do not push to GitHub) ---
 1-FineTuning-Pipeline/01-raw-data-lake/*.jsonl
 1-FineTuning-Pipeline/06-eval-holdout/
+1-FineTuning-Pipeline/katie-jade-staging/
 BERU-AI/training-data/chatml-examples/*.jsonl
 # eval suites (small, hand-authored) ARE tracked — only result dumps are excluded
 
