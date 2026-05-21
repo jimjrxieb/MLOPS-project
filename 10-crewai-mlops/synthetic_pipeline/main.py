@@ -126,7 +126,7 @@ def _cli():
         print(result)
 
     elif args.command == "serve":
-        uvicorn.run("crew.main:app", host="0.0.0.0", port=8001, reload=False)
+        uvicorn.run(app, host="0.0.0.0", port=8001, reload=False)
 
     else:
         parser.print_help()

@@ -7,6 +7,7 @@ Three agents cover the pipeline's three decision points:
   3. Report Generator — synthesizes into coverage analysis and recommendations
 """
 
+import os
 from crewai import Agent
 from .tools import (
     discover_sources,
@@ -15,6 +16,8 @@ from .tools import (
     validate_output_file,
     get_batch_stats,
 )
+
+LLM_MODEL = os.getenv("CREWAI_LLM", "ollama/llama3.2")
 
 
 def pipeline_orchestrator() -> Agent:
@@ -34,6 +37,7 @@ def pipeline_orchestrator() -> Agent:
             "examples teach escalation and human-in-the-loop decisions."
         ),
         tools=[discover_sources, run_full_pipeline, run_pipeline_for_instance],
+        llm=LLM_MODEL,
         verbose=True,
     )
 
@@ -56,6 +60,7 @@ def quality_auditor() -> Agent:
             "before they enter the training corpus."
         ),
         tools=[validate_output_file, get_batch_stats],
+        llm=LLM_MODEL,
         verbose=True,
     )
 
@@ -76,5 +81,6 @@ def report_generator() -> Agent:
             "round of synthetic data generation."
         ),
         tools=[get_batch_stats],
+        llm=LLM_MODEL,
         verbose=True,
     )

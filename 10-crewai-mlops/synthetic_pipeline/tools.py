@@ -145,7 +145,6 @@ def get_batch_stats(file_path: str) -> str:
     """
     import json as _json
     from pathlib import Path as _Path
-    from models import TrainingExample
 
     fpath = _Path(file_path)
     if not fpath.exists():

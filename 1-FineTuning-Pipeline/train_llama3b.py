@@ -29,21 +29,21 @@ except ImportError:
     HAS_TRAINING_DEPS = False
 
 # Directories
-BASE_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/1-FineTuning-Pipeline")
-GP_ROOT = Path("/home/jimmie/linkops-industries/GP-copilot")
+from pipeline_config import cfg, pipeline_dir, gp_model_ops, repo_root
+BASE_DIR = pipeline_dir
 CHUNK_DIR = BASE_DIR / "03-chunked-untrained"
 HOLDOUT_DIR = BASE_DIR / "03-eval-holdout"
 TRAINED_DIR = BASE_DIR / "04-trained-data"
-MODEL_BASE_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/3-model-registry")
-LLAMA_CPP_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/llama.cpp")
-CLARIFY_DIR = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/4-eval-clarify")
-REPORTS_DIR = GP_ROOT / "GP-S3" / "3-mlops-reports" / "3-trained-data"
+MODEL_BASE_DIR = gp_model_ops / "3-model-registry"
+LLAMA_CPP_DIR = gp_model_ops / "llama.cpp"
+CLARIFY_DIR = gp_model_ops / "4-eval-clarify"
+REPORTS_DIR = repo_root / "GP-S3" / "3-mlops-reports" / "3-trained-data"
 
-# Default version for Llama 3B
-DEFAULT_VERSION = "v1.1-3b"
+# Default version (read from pipeline.yaml)
+DEFAULT_VERSION = cfg["run"]["version"]
 
-# Base model
-BASE_MODEL = "unsloth/Llama-3.2-3B-Instruct"
+# Base model (read from pipeline.yaml — change there, not here)
+BASE_MODEL = cfg["base_model"]
 
 # Model configuration
 MAX_SEQ_LENGTH = 2048

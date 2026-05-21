@@ -4,9 +4,9 @@ import httpx
 from crewai import Agent
 from crewai.tools import tool
 
+from config_loader import make_llm  # noqa: F401 -- re-exported for backwards compat
+
 BERU_API_URL = os.getenv("BERU_API_URL", "http://beru-api:8088")
-LLM_MODEL = os.getenv("CREWAI_LLM", "ollama/llama3.2")
-OLLAMA_BASE = os.getenv("OLLAMA_BASE_URL", "http://ollama:11434")
 
 
 @tool("beru_assess")
@@ -47,11 +47,6 @@ def beru_health() -> str:
         return resp.json()
     except Exception as e:
         return f"BERU health error: {e}"
-
-
-def make_llm():
-    from crewai import LLM
-    return LLM(model=LLM_MODEL, base_url=OLLAMA_BASE)
 
 
 @tool("assess_control")

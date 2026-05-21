@@ -61,15 +61,24 @@ Agent pool (6 agents):
   assessor       sar_writer     poam_writer
 
 Sub-crews:
-  beru_audit.py       — 2 agents: triage → audit finding
-  ssp_to_poam.py      — 4 agents: review → assess → SAR → POA&M
-  ac_access_control/  — 3 agents + pure Python collectors (kubectl/AWS CLI)
+  beru_audit.py         — 2 agents: triage → audit finding
+  ssp_to_poam.py        — 4 agents: review → assess → SAR → POA&M
+  ac-access-control/    — collectors + assessor → SAR → POA&M (NIST AC-2/3/6/17)
+  ai-safety-m23-07/     — collectors + assessor → SAR → POA&M (M-23-07 / EO 14110 AI safety)
+  au-logging-maturity/  — collectors + assessor → SAR → POA&M (M-21-31 logging maturity, EL0–EL3)
+  icam-m24-04/          — collectors + assessor → SAR → POA&M (M-24-04 phishing-resistant MFA/ICAM)
+  zt-zero-trust/        — collectors + assessor → SAR → POA&M (M-22-09 Zero Trust pillars)
 ```
 
 **Source system:** `BERU-AI/`
 
 ```bash
-python3 -m crewai_mlops.beru.main run
+# Audit a finding (CLI)
+python3 -m crewai_mlops.beru.main audit "AC-6 violation: service account has cluster-admin binding"
+
+# SSP → POA&M conversion (CLI)
+python3 -m crewai_mlops.beru.main ssp path/to/ssp.txt "System Name" path/to/findings.txt
+
 # or via Docker (port 8089):
 docker compose -f BERU-AI/docker-compose.yml up
 ```
@@ -131,7 +140,11 @@ curl -X POST http://localhost:8002/run/rag-prep -H 'Content-Type: application/js
     crews/
       beru_audit.py
       ssp_to_poam.py
-      ac_access_control/
+      ac-access-control/
+      ai-safety-m23-07/
+      au-logging-maturity/
+      icam-m24-04/
+      zt-zero-trust/
   rag_ingestion/
     __init__.py
     main.py       ← FastAPI + CLI (port 8002)
@@ -157,11 +170,11 @@ from crewai_mlops.beru.agents import beru_auditor
 
 ## LLM Configuration
 
-All crews read `CREWAI_LLM` from the environment. Default: `ollama/llama3.1` (local, no API cost).
+All crews read `CREWAI_LLM` from the environment. Default: `ollama/llama3.2` (local, no API cost).
 
 ```bash
 # Local (default)
-CREWAI_LLM=ollama/llama3.1 python3 -m crewai_mlops.rag_ingestion.main run
+CREWAI_LLM=ollama/llama3.2 python3 -m crewai_mlops.rag_ingestion.main run
 
 # Claude (for production quality)
 CREWAI_LLM=claude-3-5-haiku-20241022 python3 -m crewai_mlops.rag_ingestion.main run

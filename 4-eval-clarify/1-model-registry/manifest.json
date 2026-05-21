@@ -56,6 +56,16 @@
         "task_completion": 0.9
       },
       "last_evaluated": "2026-03-18T00:23:25.730712"
+    },
+    "v1.7": {
+      "status": "testing",
+      "performance": {
+        "overall_score": 0.88,
+        "cks_mastery": 0.86,
+        "ccsp_mastery": 0.84,
+        "task_completion": 0.9
+      },
+      "last_evaluated": "2026-05-20T14:05:53.593059"
     }
   },
   "deployment_gates": {
