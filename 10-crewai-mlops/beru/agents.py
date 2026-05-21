@@ -14,12 +14,16 @@ def beru_assess(finding: str) -> str:
     """Submit a security finding to BERU for NIST 800-53 assessment and POA&M generation."""
     try:
         resp = httpx.post(
-            f"{BERU_API_URL}/api/beru/assess",
-            json={"finding": finding},
+            f"{BERU_API_URL}/api/beru/ask",
+            json={"text": finding},
             timeout=60,
         )
         resp.raise_for_status()
-        return resp.json().get("result", resp.text)
+        data = resp.json()
+        findings = data.get("findings", [])
+        if findings:
+            return "\n".join(f.get("raw", "") for f in findings)
+        return data.get("errors", [str(data)])[0] if data.get("errors") else str(data)
     except Exception as e:
         return f"BERU assess error: {e}"
 
@@ -29,12 +33,16 @@ def beru_poam(control_id: str, finding: str) -> str:
     """Ask BERU to generate a POA&M item for a specific NIST control and finding."""
     try:
         resp = httpx.post(
-            f"{BERU_API_URL}/api/beru/poam",
-            json={"control_id": control_id, "finding": finding},
+            f"{BERU_API_URL}/api/beru/ask",
+            json={"text": f"Generate a FedRAMP-compliant POA&M item for {control_id}: {finding}"},
             timeout=60,
         )
         resp.raise_for_status()
-        return resp.json().get("result", resp.text)
+        data = resp.json()
+        findings = data.get("findings", [])
+        if findings:
+            return "\n".join(f.get("raw", "") for f in findings)
+        return str(data)
     except Exception as e:
         return f"BERU POA&M error: {e}"
 
@@ -59,14 +67,17 @@ def assess_control(control_id: str, narrative: str, evidence_summary: str) -> st
         resp = httpx.post(
             f"{BERU_API_URL}/api/beru/assess",
             json={
-                "control_id": control_id,
-                "narrative": narrative,
-                "evidence": evidence_summary,
+                "ssp_text": f"Control {control_id}:\n{narrative}",
+                "evidence_text": [evidence_summary],
             },
             timeout=60,
         )
         resp.raise_for_status()
-        return resp.json().get("result", resp.text)
+        data = resp.json()
+        findings = data.get("findings", [])
+        if findings:
+            return "\n".join(f.get("raw", "") for f in findings)
+        return str(data)
     except Exception as e:
         # Degrade gracefully — agent still has LLM reasoning to fall back on
         return (

@@ -79,7 +79,7 @@ services:
 
   crewai:
     build:
-      context: ./crew
+      context: ../10-crewai-mlops/beru
       dockerfile: Dockerfile
     image: beru-crewai:1.0
     container_name: beru-crewai
@@ -91,8 +91,8 @@ services:
       # Use beru:v1.4 as the crew LLM (already registered in Ollama)
       CREWAI_LLM: "ollama/beru:v1.4"
     volumes:
-      # Live-reload: edit crew/ files without rebuilding the image
-      - ./crew:/app
+      # Live-reload: edit 10-crewai-mlops/beru/ files without rebuilding the image
+      - ../10-crewai-mlops/beru:/app
     restart: unless-stopped
 
   n8n:
