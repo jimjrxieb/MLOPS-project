@@ -1,8 +1,8 @@
 # M8 — Capstone: BERU End-to-End
 
 > **Goal:** Wire everything together. Run the full pipeline from one command. Tell the story in 5 minutes.
-> **Build:** The complete BERU demo — one-command end-to-end from scanner input to evidence package.
-> **Gate:** `python3 BERU-AI/agent.py --input sample-trivy.json --output /tmp/beru-demo/` produces all four artifacts.
+> **Build:** The complete BERU demo — API/graph path from scanner or SSP evidence to evidence package.
+> **Gate:** `DEMO.md` checks pass and the stack boots through `BERU-AI/docker-compose.yml`.
 
 ---
 
@@ -30,7 +30,7 @@ Input:  scanner output file (Trivy JSON)
    (beru-nist-800-53 collection)
            │
            ▼
-   [4] beru:v1.0 via Ollama      → 10-field BERU finding (LLM call)
+   [4] BERU model via Ollama     → structured BERU finding (LLM call)
            │
            ▼
    [5] validate_control_id()     → catches hallucinated IDs before they leave
@@ -46,12 +46,12 @@ Every box is a module you built:
 - Box 1 → M0 (core/tool_output_parser.py)
 - Box 2 → M0 (core/nist_mapper.py)
 - Box 3 → M2 (ChromaDB beru-nist-800-53)
-- Box 4 → M1+M3 (Modelfile_beru3b + fine-tuned weights)
+- Box 4 → M1+M3 (`BERU-AI/modelfiles/Modelfile_beru3b` + model registry)
 - Box 5 → M1 (validate_control_id)
 - Box 6 → M0 (tools/hitl_router.py — built in Phase 2)
 - Box 7 → M0 (tools/evidence_packager.py — built in Phase 2)
 
-The agent (`agent.py`, built in M4) is the orchestrator that calls each box in sequence.
+The LangGraph agent (`BERU-AI/agent/graph.py` + `BERU-AI/agent/nodes.py`) is the orchestrator that calls each box in sequence.
 
 ---
 
@@ -86,7 +86,7 @@ assert len(docs["documents"][0]) > 0, f"No docs found for {primary_control}"
 ```python
 # Verify the LLM receives the control text in context
 rag_context = docs["documents"][0][0]
-# This must appear in the user message sent to beru:v1.0
+# This must appear in the user message sent to the BERU model.
 # If it's not there, BERU is answering from weights only
 ```
 
@@ -128,29 +128,11 @@ Practice this until it's automatic. This is what you run in an interview when th
 # Terminal 1: start Ollama (should already be running in prod)
 ollama serve
 
-# Terminal 2: run the demo
-cd /home/jimmie/linkops-industries/GP-copilot
-
-# 1. Show the input (10 seconds)
-cat GP-S3/6-seclab-reports/cybersec-evidence/sample-trivy.json | head -30
-
-# 2. Run BERU (this takes 20-40 seconds on GPU)
-python3 GP-MODEL-OPS/BERU-AI/agent.py \
-  --input GP-S3/6-seclab-reports/cybersec-evidence/sample-trivy.json \
-  --system "NovaSec Cloud" \
-  --output /tmp/beru-demo/
-
-# 3. Show the outputs (60 seconds)
-echo "=== BERU Findings ===" && cat /tmp/beru-demo/findings.jsonl | python3 -m json.tool | head -40
-echo "=== POA&M Draft ===" && cat /tmp/beru-demo/poam.md
-echo "=== CISO Briefing ===" && cat /tmp/beru-demo/ciso-briefing.md
-echo "=== Evidence Package ===" && ls -la /tmp/beru-demo/evidence-*.zip
-
-# 4. Show the HITL queue (if any B/S findings)
-cat /tmp/beru-hitl-queue/pending.jsonl
-
-# 5. Show MLflow (if running)
-# Open http://localhost:5000 — show the eval run, score, params
+# Terminal 2: run the reviewer path
+cd /home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS
+sed -n '1,220p' CAPSTONE-PROJECT/DEMO.md
+python3 -m pytest 8-tests/test_rag_ingestion_crew.py 8-tests/test_crewai_beru_schemas.py -q
+cd BERU-AI && docker compose up --build
 ```
 
 ---
@@ -159,11 +141,11 @@ cat /tmp/beru-hitl-queue/pending.jsonl
 
 When they ask "tell me about a project you're proud of," this is the answer. Say it out loud until it takes 90 seconds or less:
 
-> "I built BERU — a dual-framework GRC analyst (NIST 800-53 + NIST AI RMF) running on LLaMA 3.2-3B that I fine-tuned with LoRA to speak compliance language with auditor-grade citation. It ingests security scanner output from Trivy, kube-bench, and Prowler — and AI-specific tools like garak and promptfoo for AI risk findings — maps results to controls via a RAG pipeline over NIST 800-53 + AI RMF + MITRE ATLAS in ChromaDB, and produces structured audit findings, POA&M items, and CISO briefings with dual citation. The entire pipeline runs in a LangGraph agentic loop, served through FastAPI, with MLflow tracking every eval run and a GitHub Actions gate that blocks promotion if accuracy drops below 70%. I baselined the model before fine-tuning so the lift is measurable, not assumed.
+> "I built BERU — a guarded GRC analyst model and workflow system for NIST 800-53 and NIST AI RMF. It ingests scanner output and SSP evidence, maps findings to controls through RAG over bundled governance knowledge, and produces structured findings, POA&M drafts, and CISO summaries. The runtime path uses LangGraph, governance workflows use CrewAI, serving is through FastAPI and Ollama, and MLflow tracks eval and inference runs. I baseline-tested before fine-tuning so model lift is measured, not assumed.
 >
-> What makes it interesting is that it follows two frameworks simultaneously — NIST 800-53 for IT infrastructure findings, and NIST AI RMF for findings about AI systems themselves. So when BERU assesses a Kubernetes cluster running Ollama, it can produce both an infrastructure finding about the RBAC configuration AND an AI governance finding about whether the model has a registered inventory entry. B-rank and S-rank findings are architecturally blocked from auto-output — they go to a human review queue enforced by the HITL router.
+> What makes it interesting is that it follows two frameworks simultaneously — NIST 800-53 for IT infrastructure findings and NIST AI RMF for findings about AI systems themselves. So when BERU assesses a Kubernetes cluster running Ollama, it can produce both an infrastructure finding about RBAC configuration and an AI governance finding about whether the model has a registered inventory entry. B-rank and S-rank findings are architecturally blocked from auto-output — they go to a human review queue enforced by the HITL router.
 >
-> I used it on a real Kubernetes cluster — the same methodology GuidePoint and Deloitte use on enterprise engagements, open source, end to end."
+> The model has not passed my autonomous promotion gate yet. That is part of the project: the gate blocks promotion while I improve dual citation, evidence-gap detection, and ATLAS-mapped AI risk coverage."
 
 ---
 
@@ -188,12 +170,12 @@ When they ask "tell me about a project you're proud of," this is the answer. Say
 
 | Symptom | Module | Fix |
 |---------|--------|-----|
-| `ModuleNotFoundError` when running agent.py | Path setup | Check `sys.path` includes `GP-MODEL-OPS` and `GP-MODEL-OPS/BERU-AI` |
+| `ModuleNotFoundError` when importing BERU modules | Path setup | Run from `GP-MODEL-OPS/` or use the FastAPI service path |
 | ChromaDB returns empty results | M2 ingestion not run | Run the ingestion script against NIST control files first |
 | LLM output missing fields | M1 system prompt not loaded | Check Modelfile TEMPLATE — system prompt must be in the conversation history |
 | B-rank findings in output files | M4 HITL not wired | Check `route_by_rank` node calls `HITLRouter` before `produce_outputs` |
 | Evidence package verify fails | M5 packaging order | Write all artifacts before calling `packager.package()` — don't package partial results |
-| `ollama: model 'beru:v1.0' not found` | M5 model not registered | `ollama create beru:v1.0 -f BERU-AI/Modelfile_beru3b` |
+| `ollama: model not found` | M5 model not registered | Check `BERU-AI/docker-compose.yml` and the mounted model registry path |
 | Demo runs but output is empty | M4 state not flowing | Print state at each node boundary to find where data stops |
 | MLflow run not showing up | M5 tracking URI | Check `mlflow.set_tracking_uri()` matches the path where the runs are stored |
 
@@ -210,7 +192,7 @@ When every row is checked, you're done.
 | `beru-nist-800-53` collection populated | M2 | Query "least privilege" → AC-6 |
 | 200+ training examples pass quality gates | M3 | `pytest test_data_quality.py` |
 | Fine-tuned BERU beats base model on 30-question eval | M3 | MLflow before/after scores |
-| `agent.py` runs end-to-end from one command | M4 | Demo script runs clean |
+| BERU graph/API path runs end-to-end | M4 | Demo script runs clean |
 | `/api/beru` endpoint responds | M5 | `curl /api/beru/health` → 200 |
 | MLflow `beru-eval` experiment has at least one run | M5 | MLflow UI |
 | GitHub Actions workflow passes | M5 | Green checkmark on latest commit |

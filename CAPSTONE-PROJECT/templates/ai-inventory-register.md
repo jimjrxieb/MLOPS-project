@@ -22,7 +22,7 @@ A system that isn't in this register isn't authorized. Discovery of an unregiste
 |---|---|---|---|---|---|---|---|---|
 | JSA-AI-001 | JADE | DEVOPS-LENS execution engine | LLaMA 3.1-8B | v1.1 | Limited Risk | Active | 2026-03-25 | 2026-05-07 |
 | JSA-AI-002 | Katie | K8s operations agent | LLaMA 3.2-3B | v1.1 | Limited Risk | Active | 2026-03-25 | 2026-05-07 |
-| JSA-AI-003 | BERU | NIST-800-53 + AI RMF GRC analyst | LLaMA 3.2-3B | v1.0 | Minimal Risk | In Development | 2026-05-07 | 2026-05-08 |
+| JSA-AI-003 | BERU | NIST-800-53 + AI RMF GRC analyst | LLaMA 3.2-3B | v1.6 champion / v1.7 challenger | Minimal Risk | Guarded prototype | 2026-05-07 | 2026-05-21 |
 | JSA-AI-004 | RANK-AI | E/D/C/B/S rank classifier | sklearn | v1.0 | Minimal Risk | Active | 2026-03-25 | 2026-05-07 |
 
 ---
@@ -74,9 +74,9 @@ A system that isn't in this register isn't authorized. Discovery of an unregiste
 | **Human Oversight** | Always — all B/S-rank findings go to review queue |
 | **Data Processed** | Scanner output (JSON), NIST control text (public), SSP narratives (internal) |
 | **HITL Enforced** | Yes — HITL router required before any B/S output |
-| **Serving** | Ollama (pending), FastAPI /api/beru (pending) |
-| **Monitoring** | MLflow experiment 'beru-eval' (pending) |
-| **Known Limitations** | See BERU-COVERAGE.md — partial coverage of 20 NIST families |
+| **Serving** | Ollama + FastAPI `/api/beru`; Docker Compose stack in `BERU-AI/docker-compose.yml` |
+| **Monitoring** | MLflow training and inference tracking under `BERU-AI/mlops/` |
+| **Known Limitations** | See `BERU-AI/BERU-COVERAGE.md` — model is below autonomous promotion gate |
 | **Registration Link** | `CAPSTONE-PROJECT/intake/ai-system-registration.md` |
 
 **AI RMF Coverage (target):**
@@ -127,8 +127,8 @@ ollama list
 # Find all AI-related deployments in K8s
 kubectl get deployments -A -o json | jq '.items[] | select(.metadata.name | test("ai|llm|model|ollama|jade|katie|beru"; "i")) | {ns: .metadata.namespace, name: .metadata.name}'
 
-# Find all FastAPI routes with AI-related paths
-grep -r "api/jade\|api/katie\|api/beru\|api/ai\|api/llm" GP-INFRA/GP-API/
+# Find AI-related FastAPI routes in this repo
+grep -r "api/jade\|api/katie\|api/beru\|api/ai\|api/llm" . --include="*.py"
 ```
 
 Compare against this register. Any system found but not registered → BERU generates GOVERN 1.1 FAIL finding.

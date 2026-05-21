@@ -214,5 +214,5 @@ Your answer: "200+ Gemini-generated synthetic examples. No real client data. Syn
 
 | Subcategory | What it maps to | Audit answer |
 |-------------|----------------|--------------|
-| **MEASURE-2.5** — AI system is demonstrated to be valid and reliable | The eval gate (≥70% overall, ≥60% per control family, zero hallucinated IDs) is the validity gate before any version is promoted | "BERU v1.0 passed the eval gate: score is in `5-experiments/exp-004-beru-v1.0/metrics.json`. The gate criteria are in `CLAUDE.md`." |
+| **MEASURE-2.5** — AI system is demonstrated to be valid and reliable | The eval gate (>=70% overall, >=60% per control family, zero hallucinated IDs) is the validity gate before any version is promoted | "BERU has not passed the autonomous promotion gate yet. The blocked run history is in `5-experiments/COMPARISON.md`, and that is evidence the gate is real." |
 | **MANAGE-2.4** — Mechanisms to sustain deployed AI systems | MLflow tracks training loss, eval scores, and data version per run — performance regressions are detectable | "MLflow experiment tracking lets us compare any two BERU versions on the same eval suite. A regression shows up before deployment." |

@@ -20,7 +20,7 @@ After completion, this form is signed by the ISSO and retained as a system autho
 | Field | Value |
 |---|---|
 | **System Name** | |
-| **System Identifier** | (e.g., BERU-v1.0, unique ID for tracking) |
+| **System Identifier** | (e.g., BERU-v1.6, unique ID for tracking) |
 | **Version** | |
 | **Deployment Date** | |
 | **Last Updated** | |
@@ -182,13 +182,13 @@ NIST AI 600-1 risk classification:
 
 ---
 
-## Completed Example — BERU v1.0
+## Completed Example — BERU Current Prototype
 
 | Field | Value |
 |---|---|
 | System Name | BERU |
-| System Identifier | BERU-v1.0 |
-| Version | v1.0 |
+| System Identifier | BERU-v1.6-champion / BERU-v1.7-challenger |
+| Version | champion v1.6, challenger v1.7 not promoted |
 | System Owner | J (jimjrxieb) |
 | ISSO | jimjrxieb |
 | Technical Contact | jimjrxieb (MLOps engineer) |
@@ -197,4 +197,4 @@ NIST AI 600-1 risk classification:
 
 **What it does NOT do:** Approve risk acceptances above C-rank. Execute remediation commands. Access production systems directly. Make B/S-rank decisions autonomously.
 
-**Risk Tier:** Minimal Risk — advisory output only. All B/S-rank findings routed to human review queue before finalization. Human confirms before any POA&M item is filed with AO.
+**Risk Tier:** Minimal Risk — advisory output only. All B/S-rank and guard-triggered findings route to human review. Human confirms before any POA&M item is filed with an authorizing official.

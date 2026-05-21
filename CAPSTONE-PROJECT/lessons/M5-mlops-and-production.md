@@ -28,17 +28,17 @@ Ollama is the local model server. You register a model with a Modelfile and Olla
 
 ```bash
 # Register BERU
-ollama create beru:v1.0 -f BERU-AI/Modelfile_beru3b
+ollama create beru:local -f BERU-AI/modelfiles/Modelfile_beru3b
 
 # List registered models
 ollama list
 
 # Run BERU interactively
-ollama run beru:v1.0
+ollama run beru:local
 
 # Call BERU via HTTP (same API as OpenAI)
 curl http://localhost:11434/api/chat -d '{
-  "model": "beru:v1.0",
+  "model": "beru:local",
   "messages": [{"role": "user", "content": "Assess: SI-2 — no patch management documented"}],
   "stream": false
 }'
@@ -48,23 +48,21 @@ curl http://localhost:11434/api/chat -d '{
 
 When you fine-tune a new version:
 1. Convert weights to GGUF: `python3 1-data-pipeline/convert_gguf.py`
-2. Update `Modelfile_beru3b` to point `FROM ./beru-llama3b-v1.1.gguf`
-3. `ollama create beru:v1.1 -f BERU-AI/Modelfile_beru3b`
+2. Update the relevant Modelfile to point to the new GGUF
+3. Register a versioned Ollama tag only after eval review
 4. Run eval suite against `beru:v1.1`
 5. If it passes → promote. `ollama tag beru:v1.1 beru:latest`
 
-Old version stays available (`beru:v1.0`) for rollback. Never delete a model that's passed eval until you're sure the new one works in production.
+Old versions stay available for rollback. Never delete a model that's passed eval until you're sure the new one works in production.
 
 ---
 
 ## Concept 2 — FastAPI Endpoint
 
-FastAPI is the web framework. The GP-API already runs on port 8000. You're adding one route: `/api/beru`.
-
-Look at the existing JADE route as the pattern: `GP-INFRA/GP-API/routes/jade.py`. BERU's route follows the same shape.
+FastAPI is the web framework. BERU exposes `/api/beru` from `BERU-AI/api/routes.py` and `BERU-AI/api/main.py`.
 
 ```python
-# GP-INFRA/GP-API/routes/beru.py
+# BERU-AI/api/routes.py
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
@@ -101,7 +99,7 @@ async def assess(request: BeruRequest):
 
 @router.get("/health")
 async def health():
-    # Check Ollama has beru:v1.0 loaded
+    # Check Ollama has a BERU model loaded
     async with httpx.AsyncClient() as client:
         r = await client.get("http://localhost:11434/api/tags")
         models = [m["name"] for m in r.json().get("models", [])]
@@ -109,23 +107,13 @@ async def health():
     return {"status": "ok" if beru_loaded else "degraded", "beru_model": beru_loaded}
 ```
 
-### Wiring it into main.py
-
-```python
-# GP-INFRA/GP-API/main.py — add one line
-from routes import jade, beru  # add beru
-
-app.include_router(jade.router)
-app.include_router(beru.router)  # add this
-```
-
 Test it:
 ```bash
 # Start the API
-cd GP-INFRA && uvicorn GP-API.main:app --reload --port 8000
+cd BERU-AI && uvicorn api.main:app --reload --port 8088
 
 # Call BERU
-curl -X POST http://localhost:8000/api/beru/assess \
+curl -X POST http://localhost:8088/api/beru/assess \
   -H "Content-Type: application/json" \
   -d '{"scanner": "trivy", "input": "{...}", "system_name": "NovaSec Cloud"}'
 ```
@@ -141,14 +129,14 @@ MLflow records every training and eval run so you can compare model versions, re
 ```python
 import mlflow
 
-with mlflow.start_run(run_name="beru-eval-v1.0"):
+with mlflow.start_run(run_name="beru-eval-current"):
     # Log what you tested with
-    mlflow.log_param("model", "beru:v1.0")
+    mlflow.log_param("model", "beru-current")
     mlflow.log_param("eval_questions", 30)
     mlflow.log_param("eval_suite", "grc-30q-v1")
 
     # Run your eval
-    results = run_eval_suite("beru:v1.0", questions)
+    results = run_eval_suite("beru-current", questions)
 
     # Log what you got
     mlflow.log_metric("overall_accuracy", results["overall"])
@@ -163,13 +151,13 @@ with mlflow.start_run(run_name="beru-eval-v1.0"):
 ### Starting the MLflow UI
 
 ```bash
-mlflow ui --backend-store-uri file:///home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/JADE-AI/mlruns/
+mlflow ui --backend-store-uri file:///home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/BERU-AI/mlruns/
 # Open http://localhost:5000
 ```
 
 You'll see every run, params, metrics, and the promotion decision. This is what you show the auditor.
 
-**The experiment name for BERU:** `beru-eval`. Every run goes into this experiment so you can compare v1.0 vs v1.1 side-by-side.
+**The experiment names for BERU:** `beru-training` and `beru-inference-tracking`. Every run records params, metrics, artifacts, and promotion status.
 
 ---
 
@@ -215,7 +203,7 @@ jobs:
       # or as a scheduled job, not on every push
 ```
 
-**Why the full eval isn't on every push:** The eval suite needs Ollama + beru:v1.0 loaded, which requires a GPU runner. GitHub's free runners don't have GPUs. The compromise: run the unit/integration tests on every push, run the full eval suite on a schedule or self-hosted runner.
+**Why the full eval isn't on every push:** The eval suite needs Ollama and the registered BERU model loaded, which may require a GPU runner. The compromise: run unit/integration tests on every push, then run full eval on a schedule or self-hosted runner.
 
 ---
 
@@ -244,7 +232,7 @@ USER beru
 # Ollama is a sidecar — BERU calls it via HTTP, doesn't contain it
 ENV OLLAMA_URL=http://ollama:11434
 
-CMD ["python3", "BERU-AI/agent.py", "--serve"]
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8088"]
 ```
 
 ### K8s minimal manifest for BERU
@@ -266,7 +254,7 @@ spec:
         runAsUser: 1000
       containers:
         - name: beru
-          image: gp-copilot/beru:v1.0
+          image: gp-copilot/beru-api:current
           resources:
             requests: { cpu: "500m", memory: "512Mi" }
             limits: { cpu: "2", memory: "2Gi" }
@@ -296,8 +284,8 @@ This shows you understand non-root containers, resource limits, and health probe
 ## What You Build
 
 Four artifacts:
-1. `ollama create beru:v1.0 -f BERU-AI/Modelfile_beru3b` — model registered
-2. `GP-INFRA/GP-API/routes/beru.py` — FastAPI route, health check, assess endpoint
+1. `BERU-AI/docker-compose.yml` — model registration and service stack
+2. `BERU-AI/api/routes.py` — FastAPI route, health check, assess endpoint
 3. MLflow run logged under experiment `beru-eval` with the 30-question results
 4. `.github/workflows/beru-eval.yml` — CI gate running unit + integration tests
 
@@ -313,7 +301,7 @@ curl -X POST http://localhost:8000/api/beru/assess \
 ```
 
 **3PAO question this answers:** "How do you know BERU v1.0 is better than the base model? How do you prevent a bad version from reaching production?"
-Your answer: "Every model version runs the 30-question eval suite, logged in MLflow. The GitHub Actions workflow blocks merges if the test suite fails. We have eval scores for every promoted version going back to the beginning."
+Your answer: "Every model version is evaluated and logged. The GitHub Actions workflow blocks merges if the test suite fails. The experiment history shows which versions were blocked and why."
 
 ---
 
@@ -325,7 +313,7 @@ Your answer: "Every model version runs the 30-question eval suite, logged in MLf
 
 | Control | What it maps to in M5 | Audit answer |
 |---------|----------------------|--------------|
-| **AU-3** — Content of Audit Records | MLflow logs model version, eval score, training data hash, and timestamp for every promoted model | "Every BERU version has an MLflow run ID. The run contains: eval scores, data version, hyperparams, and the artifact sha256. Nothing is inferred." |
+| **AU-3** — Content of Audit Records | MLflow logs model version, eval score, training data hash, and timestamp for every evaluated model | "Every BERU version has an experiment record. The run contains eval scores, data version, hyperparams, and artifacts where available. Nothing is inferred." |
 | **SI-7** — Software, Firmware, and Information Integrity | `EvidencePackager` generates sha256 checksums for every artifact in the evidence ZIP — the manifest is tamper-evident | "The evidence package for every assessment run includes a `manifest.json` with sha256 for each file. The archive itself has a detached `.sha256` checksum." |
 | **CM-3** — Configuration Change Control | GitHub Actions `beru-eval.yml` blocks merge if the test suite fails — no version ships without passing the gate | "The CI pipeline enforces the eval gate. A PR that breaks the test suite or drops coverage below threshold cannot be merged." |
 | **CA-7** — Continuous Monitoring | MLflow inference tracking logs every BERU API call in production — latency, model version, rank decision | "Production BERU logs every inference to MLflow. We can see if response quality drops after a model update without waiting for an audit." |

@@ -4,57 +4,64 @@ ChromaDB Audit Tool
 Deep inspection of vector database health and contents.
 """
 
-import chromadb
 from pathlib import Path
-import json
 from collections import Counter
 
-CHROMA_PATH = "2-RagIngestion-Pipeline/05-ragged-data/chroma"
+import chromadb
+
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+RAG_ROOT = SCRIPT_DIR.parent
+CHROMA_PATH = RAG_ROOT / "05-ragged-data" / "chroma"
+
 
 def audit_chroma():
-    if not Path(CHROMA_PATH).exists():
+    if not CHROMA_PATH.exists():
         print(f"Error: Chroma directory not found at {CHROMA_PATH}")
-        return
+        return 1
 
     print(f"--- Auditing ChromaDB at {CHROMA_PATH} ---")
-    client = chromadb.PersistentClient(path=CHROMA_PATH)
-    
+    client = chromadb.PersistentClient(path=str(CHROMA_PATH))
+
     collections = client.list_collections()
     print(f"Found {len(collections)} collections.")
-    
+
     total_docs = 0
-    
-    for coll in collections:
+
+    for coll in sorted(collections, key=lambda c: c.name):
         count = coll.count()
         total_docs += count
         print(f"\nCollection: {coll.name}")
         print(f"  Document Count: {count}")
-        
+
         if count > 0:
-            # Sample metadata to see what we have
             try:
                 sample = coll.get(limit=100, include=["metadatas"])
                 metadatas = sample["metadatas"]
-                
-                # Analyze metadata fields
+
                 keys = set()
                 domains = Counter()
                 ranks = Counter()
-                
-                for m in metadatas:
-                    if m:
-                        keys.update(m.keys())
-                        domains[m.get("domain", "unknown")] += 1
-                        ranks[m.get("rank", "unknown")] += 1
-                
-                print(f"  Metadata Keys: {sorted(list(keys))}")
+                frameworks = Counter()
+
+                for metadata in metadatas:
+                    if metadata:
+                        keys.update(metadata.keys())
+                        domains[metadata.get("domain", "unknown")] += 1
+                        ranks[metadata.get("rank", "unknown")] += 1
+                        frameworks[metadata.get("framework", "unknown")] += 1
+
+                print(f"  Metadata Keys: {sorted(keys)}")
                 print(f"  Domains: {dict(domains)}")
                 print(f"  Ranks: {dict(ranks)}")
+                print(f"  Frameworks: {dict(frameworks)}")
             except Exception as e:
                 print(f"  [ERROR] Could not sample metadata: {e}")
 
-    print(f"\n--- Audit Complete ---")
+    print("\n--- Audit Complete ---")
     print(f"Total Documents across all collections: {total_docs}")
+    return 0
+
 
 if __name__ == "__main__":
-    audit_chroma()
+    raise SystemExit(audit_chroma())

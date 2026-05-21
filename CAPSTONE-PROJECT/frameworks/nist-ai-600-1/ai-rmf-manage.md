@@ -71,12 +71,12 @@ MANAGE is the execution layer. GOVERN created the policies. MAP identified the r
 **BERU Evidence Required:**
 - `nist_mapper.py` — `validate_control_id()` rejects malformed IDs
 - System prompt hard stops — embedded in Modelfile, not just a readme
-- HITL router — `hitl_router.py` exists and is called in `agent.py`
+- HITL router — `hitl_router.py` exists and is called by `BERU-AI/agent/nodes.py`
 - Eval gate — GitHub Actions workflow blocks merge if eval score drops
 
 **Auditor Question:** "Show me where the 'BERU cannot approve B/S-rank findings' constraint is enforced in code, not just documentation."
 
-**Answer you must give:** Point to `agent.py` where `triage_engine.rank` B/S findings route to `hitl_router.py` before any output is written. Show the test that validates this path.
+**Answer you must give:** Point to `BERU-AI/agent/nodes.py` where B/S findings route to `hitl_router.py` before any output is written. Show the test that validates this path.
 
 ---
 

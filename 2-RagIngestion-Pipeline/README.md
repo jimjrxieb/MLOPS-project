@@ -1,4 +1,4 @@
-# 2-RagIngestion-Pipeline: RAG Pipeline
+# 2-RagIngestion-Pipeline
 
 Retrieval-Augmented Generation pipeline for the JSA AI fleet (JADE, Katie, BERU). Ingests security knowledge into ChromaDB vector embeddings + NetworkX knowledge graph for contextual responses.
 
@@ -21,13 +21,13 @@ Both write to the same ChromaDB store at `05-ragged-data/chroma/` but to differe
        |
 05-ragged-data/            ChromaDB vectors + knowledge graph
        |
-JADE-AI/core/              Query-time retrieval (hybrid RAG+Graph)
+JADE-AI/core/ and BERU-AI/ Query-time retrieval / assessment consumers
 ```
 
 ## Directory Structure
 
 ```
-GP-OPENSEARCH/
+2-RagIngestion-Pipeline/
 ├── 01-unprocessed/                  # Raw ingestion sources
 │   ├── claudecode-sessions/         # Claude Code session transcripts
 │   ├── consulting-knowledge/        # Client consulting knowledge

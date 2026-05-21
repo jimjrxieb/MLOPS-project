@@ -1,13 +1,14 @@
 # BERU Capstone Curriculum
 
-> Goal: Build BERU — a production GRC analyst agent — as the capstone that lands one of the four target roles.
-> Read the job requirements first: `jobdescriptions.md`
+> Goal: Build BERU — a guarded GRC analyst model and workflow system — as an
+> applied AI/MLOps capstone.
+> Current status lives in `STATUS.md`; demo path lives in `DEMO.md`.
 
 Every module has a **learn** phase and a **build** phase. The learn phase is concepts and tools. The build phase is a concrete artifact that goes in the BERU demo.
 
 ## How to Use This
 
-**Read the lesson first, then do the build.** Each module has a lesson file with definitions, analogies, what to look for, and troubleshooting. The lesson is in `docs/lessons/`. After you read it, come back here for the build goal.
+**Read the lesson first, then do the build.** Each module has a lesson file with definitions, analogies, what to look for, and troubleshooting. The lesson is in `lessons/`. After you read it, come back here for the build goal.
 
 | Module | Lesson | Status |
 | --- | --- | --- |
@@ -66,7 +67,7 @@ If anything above is missing, fix it first. Everything else builds on these.
 
 **What the roles want:** Working knowledge of GenAI tools. OpenAI/Anthropic API experience. Prompt engineering.
 
-**What you build:** BERU system prompt — `GP-MODEL-OPS/BERU-AI/Modelfile_beru3b`. The persona prompt that makes LLaMA 3.2-3B behave as a NIST-800-53 + AI RMF GRC analyst.
+**What you build:** BERU system prompt — `BERU-AI/modelfiles/Modelfile_beru3b`. The persona prompt that makes LLaMA 3.2-3B behave as a NIST-800-53 + AI RMF GRC analyst.
 
 **Learn:**
 - How LLMs work at the token level — context window, temperature, top-p
@@ -86,7 +87,7 @@ If anything above is missing, fix it first. Everything else builds on these.
 
 **What the roles want:** RAG implementation, embeddings, semantic search, vector databases.
 
-**What you build:** BERU's knowledge base — ChromaDB collection `beru-nist-800-53` populated with the NIST-800-53 controls and playbooks from `GP-CONSULTING/NIST-800-53/`.
+**What you build:** BERU's knowledge base — ChromaDB collection `beru-nist-800-53` populated with the NIST-800-53 controls and playbooks from `BERU-AI/knowledge/nist-800-53/`.
 
 **Learn:**
 - Embedding models — what they produce, why dimensions matter, nomic-embed-text vs OpenAI ada-002
@@ -97,7 +98,7 @@ If anything above is missing, fix it first. Everything else builds on these.
 - Reranking — cross-encoder reranking for precision
 
 **Build goal:** A RAG pipeline that:
-1. Reads all control files from `GP-CONSULTING/NIST-800-53/controls/`
+1. Reads all control files from `BERU-AI/knowledge/nist-800-53/controls/`
 2. Chunks them with metadata (family, control ID, section)
 3. Embeds with nomic-embed-text
 4. Stores in ChromaDB
@@ -137,7 +138,7 @@ Prove it works: query "least privilege access" → returns AC-6 content. Query "
 
 **What the roles want:** Agents, LangChain/LangGraph, tool use, autonomous reasoning loops.
 
-**What you build:** BERU agentic loop — `GP-MODEL-OPS/BERU-AI/agent.py`. Takes a scanner output file as input. Autonomously:
+**What you build:** BERU agentic loop — `BERU-AI/agent/graph.py` and `BERU-AI/agent/nodes.py`. Takes scanner output or SSP evidence as input and:
 1. Identifies which NIST control family applies
 2. Retrieves relevant controls from ChromaDB (Module 2)
 3. Produces BERU findings for each affected control
@@ -151,12 +152,12 @@ Prove it works: query "least privilege access" → returns AC-6 content. Query "
 - Error handling in agents — what happens when a tool call fails
 - Human-in-the-loop — when to pause and ask vs. proceed autonomously
 
-**Build goal:** `python3 BERU-AI/agent.py --input /path/to/trivy-output.json` produces:
+**Build goal:** the BERU API or graph entry point produces:
 - A structured findings list (JSON)
 - A POA&M draft (Markdown)
 - A CISO summary paragraph (text)
 
-All three outputs sourced from the playbooks, not hallucinated. The agent routes through the correct family playbook from `GP-CONSULTING/NIST-800-53/playbooks/`.
+All three outputs are sourced from bundled knowledge and evidence, not unsupported claims. The graph routes through the correct family playbook from `BERU-AI/knowledge/nist-800-53/playbooks/`.
 
 **Evidence for interviews:** "I built an agentic loop that takes Trivy scan output, maps findings to NIST-800-53 controls via RAG, and produces auditor-ready POA&M and CISO summary — following playbooks rather than improvising."
 
@@ -178,12 +179,12 @@ All three outputs sourced from the playbooks, not hallucinated. The agent routes
 - Monitoring basics — what to log, how to alert on quality drift
 
 **Build goal:**
-1. `BERU-AI/Modelfile_beru3b` — registered with Ollama as `beru:v1.0`
-2. FastAPI route `/api/beru` added to `GP-INFRA/GP-API/routes/beru.py`
+1. `BERU-AI/modelfiles/Modelfile_beru3b` — local Ollama registration path
+2. FastAPI route `/api/beru` implemented in `BERU-AI/api/routes.py`
 3. MLflow experiment `beru-eval` with tracked runs for each eval against the 30-question suite
 4. GitHub Actions workflow `.github/workflows/beru-eval.yml` that runs the eval suite on every push to `main`
 
-**Evidence for interviews:** "BERU runs as beru:v1.0 via Ollama, exposed through FastAPI, with MLflow tracking every eval run and GitHub Actions enforcing eval gates on every push."
+**Evidence for interviews:** "BERU runs through Ollama and FastAPI, with MLflow tracking eval and inference runs and CI enforcing tests before build."
 
 ---
 
@@ -202,7 +203,7 @@ All three outputs sourced from the playbooks, not hallucinated. The agent routes
 - Risk rank system — E/D/C/B/S, what each means, what authority level each requires
 - 3POA audit methodology — six phases, evidence interview, live validation
 
-**Build goal:** `GP-CONSULTING/NIST-800-53/BERU-COVERAGE.md` — a one-page table:
+**Build goal:** `BERU-AI/BERU-COVERAGE.md` — a coverage table:
 - Column 1: Control ID
 - Column 2: BERU can assess (yes/partial/no)
 - Column 3: Primary evidence tool (kubectl, Trivy, kube-bench, Prowler, etc.)
@@ -218,7 +219,7 @@ This is the honest coverage document. The 20% gap list is as important as the 80
 
 **What the roles want:** Commercial AI strategy literacy. Deployment models. Risk classification. Executive communication.
 
-**What you build:** BERU CISO briefing template — `GP-CONSULTING/NIST-800-53/playbooks/04-ciso-briefing.md` already exists. Extend it with a one-page executive summary template that answers three questions with real numbers.
+**What you build:** BERU CISO briefing template — `BERU-AI/knowledge/nist-800-53/playbooks/04-ciso-briefing.md` already exists. Extend it with a one-page executive summary template that answers three questions with real numbers.
 
 **Learn:**
 - Six commercial AI deployment models (A-F): Consumer, Integrator, Developer, Agentic, Decision Support, Embedded
@@ -235,7 +236,7 @@ This is the honest coverage document. The 20% gap list is as important as the 80
 
 Test it: show the template to someone non-technical and ask if they understand it. If they ask "what is AC-6?" you failed.
 
-**Evidence for interviews:** "I built executive briefing templates that translate NIST compliance findings into business risk language — the same deliverable PwC and Deloitte produce at the end of an engagement."
+**Evidence for interviews:** "I built executive briefing templates that translate NIST compliance findings into business risk language for non-technical decision makers."
 
 ---
 
@@ -258,27 +259,22 @@ Test it: show the template to someone non-technical and ask if they understand i
 8. GitHub Actions shows the eval passed
 ```
 
-The entire flow runs from one command:
-```bash
-python3 GP-MODEL-OPS/BERU-AI/agent.py \
-  --input GP-S3/6-seclab-reports/cybersec-evidence/sample-trivy.json \
-  --output /tmp/beru-demo-output/
-```
+The reviewable demo path is documented in `DEMO.md`.
 
 ### Capstone Checklist
 
 | Component | Module | Status |
 | --- | --- | --- |
 | Hardened CLI script (`gap-to-poam.py`) | M0 | |
-| System prompt (Modelfile_beru3b) | M1 | |
+| System prompt (`BERU-AI/modelfiles/Modelfile_beru3b`) | M1 | Done |
 | RAG pipeline (beru-nist-800-53 collection) | M2 | |
 | Training dataset (200+ examples) | M3 | |
-| Fine-tuned BERU model (`beru:v1.0`) | M3 | |
-| Agentic loop (`agent.py`) | M4 | |
-| FastAPI endpoint (`/api/beru`) | M5 | |
-| MLflow eval tracking | M5 | |
-| GitHub Actions eval gate | M5 | |
-| Coverage map (`BERU-COVERAGE.md`) | M6 | |
+| Fine-tuned BERU model | M3 | In progress — below promotion gate |
+| Agentic loop (`BERU-AI/agent/graph.py`) | M4 | Done |
+| FastAPI endpoint (`/api/beru`) | M5 | Done |
+| MLflow eval/inference tracking | M5 | Done |
+| GitHub Actions quality gate | M5 | Done |
+| Coverage map (`BERU-AI/BERU-COVERAGE.md`) | M6 | Done |
 | CISO briefing template | M7 | |
 | End-to-end demo (one command) | M8 | |
 
@@ -286,7 +282,7 @@ python3 GP-MODEL-OPS/BERU-AI/agent.py \
 
 When they ask "tell me about a project":
 
-> "I built BERU — a dual-framework GRC analyst agent (NIST 800-53 + NIST AI RMF) running on LLaMA 3.2-3B fine-tuned with LoRA. It ingests scanner output from Trivy, kube-bench, and Prowler — and AI-specific tooling like garak and promptfoo — maps findings to controls via RAG over NIST 800-53 + AI RMF + MITRE ATLAS documents in ChromaDB, and produces structured POA&M and CISO briefings with dual citation. The whole pipeline runs in a LangGraph agentic loop, served through FastAPI, with MLflow tracking every eval run. I baseline-tested the model before fine-tuning so the post-fine-tune lift is measurable. Same methodology GuidePoint and Deloitte use on enterprise engagements — open source, end to end, runs on a laptop."
+> "I built BERU — a guarded GRC analyst model and workflow system for NIST 800-53 and NIST AI RMF. It ingests scanner output and SSP evidence, maps findings to controls through RAG over bundled governance knowledge, and produces structured findings, POA&M drafts, and CISO summaries. The runtime path uses LangGraph, the governance workflows use CrewAI, serving is through FastAPI and Ollama, and MLflow tracks eval and inference runs. The model has not passed my autonomous promotion gate yet, so B/S-rank and guard-triggered findings route to human review."
 
 That story covers every checkmark in the cross-role skills matrix.
 
@@ -316,11 +312,11 @@ How each module satisfies each job's requirements:
 
 | Job Requirement | Primary Module | Secondary | Artifact |
 | --- | --- | --- | --- |
-| Python (production) | M0 | M4, M5 | `gap-to-poam.py`, `agent.py` |
+| Python (production) | M0 | M4, M5 | `BERU-AI/core/`, `BERU-AI/agent/`, CLI/API paths |
 | LLM/GenAI fundamentals | M1 | M3 | `Modelfile_beru3b`, system prompt |
 | RAG + vector databases | M2 | M4 | ChromaDB collection, `retrieve_control()` |
 | Fine-tuning (LoRA) | M3 | — | Training dataset, eval before/after |
-| Agents / agentic arch | M4 | M5 | `agent.py`, LangGraph StateGraph |
+| Agents / agentic arch | M4 | M5 | `BERU-AI/agent/graph.py`, LangGraph StateGraph |
 | MLOps + CI/CD | M5 | — | MLflow runs, GitHub Actions workflow |
 | Docker + Kubernetes | M5 | — | Dockerfile, K8s manifests |
 | Domain expertise (GRC) | M6 | M7 | `BERU-COVERAGE.md`, control families |
@@ -329,4 +325,5 @@ How each module satisfies each job's requirements:
 | Testing + code quality | M0 | M5 | pytest, mypy, CI gate |
 | OpenAI/Claude API | M1 | — | API calls in system prompt testing |
 
-Every row in the `jobdescriptions.md` cross-role matrix is covered.
+The capstone maps to production Python, RAG, fine-tuning, agents, MLOps, Docker,
+CI, and GRC domain requirements.

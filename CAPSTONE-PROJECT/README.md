@@ -1,6 +1,14 @@
 # BERU Capstone Project
 
 > Build a junior GRC analyst agent that a 3PAO auditor can interrogate and trust.
+> Current status: working prototype with real MLOps scaffolding; the model is
+> still below the autonomous promotion gate.
+
+Start here:
+
+- `STATUS.md` — current maturity, implemented evidence, and known gaps
+- `DEMO.md` — reviewer-facing demo runbook
+- `beru-design-decisions.md` — control-traceable engineering decisions
 
 ## Three Roles
 
@@ -34,6 +42,8 @@ See `beru-design-decisions.md` for the full decision log.
 ```
 CAPSTONE-PROJECT/
 ├── README.md                           → You are here
+├── STATUS.md                           → Current maturity and promotion status
+├── DEMO.md                             → Reproducible review/demo path
 ├── beru-design-decisions.md            → Why each design choice maps to a control
 ├── frameworks/
 │   ├── nist-ai-600-1/
@@ -48,7 +58,6 @@ CAPSTONE-PROJECT/
 └── templates/
     ├── ai-inventory-register.md         → Track all AI systems in the environment
     ├── ai-risk-assessment.md            → Risk assessment output format (AI systems)
-    └── ai-poam-extension.md             → POA&M with AI RMF columns alongside 800-53
 ```
 
 ## Auditor Questions You Must Be Able to Answer
@@ -61,16 +70,16 @@ These come up in every FedRAMP, NIST-based, or AI governance audit:
 - "Where is your AI system inventory?" → `templates/ai-inventory-register.md`
 
 **On the agent behavior:**
-- "How does BERU handle a finding it can't classify?" → `beru-design-decisions.md` §4
+- "How does BERU handle a finding it can't classify?" → `BERU-AI/agent/graph.py`, `BERU-AI/agent/nodes.py`
 - "Who reviews BERU's B/S-rank findings before action is taken?" → HITL workflow, MANAGE-2.2
 - "What prevents BERU from hallucinating control IDs?" → RAG grounding, MEASURE-2.5
 
 **On the ML pipeline:**
-- "What data was used to train this model and where did it come from?" → MAP-2.3, data lineage manifest
-- "How do you know the model is performing correctly in production?" → MEASURE-2.7, MLflow tracking
+- "What data was used to train this model and where did it come from?" → MAP-2.3, experiment notes, model cards, data lineage manifest
+- "How do you know the model is performing correctly?" → MEASURE-2.7, MLflow tracking, eval gate, `5-experiments/COMPARISON.md`
 - "What happens when the model drifts or degrades?" → MANAGE-4.1, eval gate, retraining trigger
 
 **On the output:**
 - "Show me a finding BERU produced and trace it back to the scanner evidence" → evidence packager output
 - "How do you ensure BERU's POA&M items are accurate?" → human review before any B/S-rank item is filed
-- "Is BERU's output admissible as audit evidence?" → depends on SSP narrative quality — see `NIST-800-53/playbooks/03-produce-ssp-narrative.md`
+- "Is BERU's output admissible as audit evidence?" → depends on SSP narrative quality — see `BERU-AI/knowledge/nist-800-53/playbooks/03-produce-ssp-narrative.md`

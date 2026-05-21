@@ -8,7 +8,7 @@
 
 ## Why This Module Exists
 
-The other six modules teach you to build. This module teaches you to sell — to a CISO, to a board, to a client, to a PwC or Deloitte hiring manager. The people who sign AI deployment decisions often have zero technical background. Your job is to give them exactly what they need to make a good decision, in plain English, without hiding behind acronyms.
+The other six modules teach you to build. This module teaches you to communicate value and risk to a CISO, board, client, or senior hiring manager. The people who sign AI deployment decisions often have zero technical background. Your job is to give them exactly what they need to make a good decision, in plain English, without hiding behind acronyms.
 
 **The analogy:** A doctor who can only explain a diagnosis in Latin isn't a good doctor. A senior security engineer who can only explain a finding in NIST control IDs isn't a good senior security engineer. The technical precision matters. The translation also matters.
 
@@ -46,7 +46,7 @@ The EU AI Act (effective 2024-2026) creates four tiers based on risk to fundamen
 
 **Where BERU lands:** Limited to Minimal Risk. It's an internal audit tool, not customer-facing, doesn't affect individuals' fundamental rights. But — if BERU's findings influenced hiring or access control decisions, it could move toward High-Risk. That's why the coverage map and honest gap documentation matter.
 
-**For the PwC/Deloitte roles:** EU AI Act compliance is a massive consulting opportunity right now. Every European company (and US companies operating in Europe) needs an AI inventory, risk assessment, and governance documentation. BERU's `CAPSTONE-PROJECT/` artifacts — intake form, inventory register, risk assessment template — are exactly the documents those engagements produce.
+**For AI governance consulting roles:** AI regulation and model risk management create real demand for AI inventory, risk assessment, and governance documentation. BERU's `CAPSTONE-PROJECT/` artifacts — intake form, inventory register, risk assessment template — are exactly the type of documents those engagements require.
 
 ---
 
@@ -114,7 +114,7 @@ Convert to dollars: 4 days × $150/hr GRC analyst × 4 cycles/year = $9,600/year
 Scale to team: 5 analysts = $48,000/year in recovered capacity.
 Reframe: that capacity goes to higher-value work (B/S-rank decisions, client communication, framework updates).
 
-This is the conversation PwC and Deloitte clients care about. Not "BERU uses LLaMA 3.2-3B with LoRA r=32." The conversation is: "You're paying for a GRC analyst to manually run kube-bench and format the output. BERU does that. Your analyst reviews the findings and makes decisions. That's a better use of both."
+This is the business conversation that matters. Not "BERU uses LLaMA 3.2-3B with LoRA r=32." The conversation is: "You're paying for a GRC analyst to manually interpret evidence and format findings. BERU structures that first pass. Your analyst reviews the findings and makes decisions."
 
 ---
 
@@ -132,7 +132,7 @@ This is the conversation PwC and Deloitte clients care about. Not "BERU uses LLa
 
 ## What You Build
 
-A one-page CISO briefing template at `GP-CONSULTING/NIST-800-53/playbooks/04-ciso-briefing.md`.
+A one-page CISO briefing template at `BERU-AI/knowledge/nist-800-53/playbooks/04-ciso-briefing.md`.
 
 The template has three sections:
 
@@ -171,7 +171,7 @@ Your answer: "BERU's CISO SUMMARY field strips all control IDs and produces busi
 |---------|----------------------|--------------|
 | **SA-9** — External System Services | The make/buy decision (Anthropic API vs. Ollama local vs. air-gap Ollama) is evaluated against data sensitivity and network requirements | "We documented three deployment models in M7. The choice depends on data classification. FedRAMP/HIPAA workloads use local Ollama — no data leaves the environment." |
 | **PM-9** — Risk Management Strategy | The 4 deployment tiers (cloud API, self-hosted, air-gap, fine-tuned) map to risk tolerance levels — C/B/S decisions for each tier | "The deployment model selection is a risk decision. We documented which tier is appropriate for each client classification in M7." |
-| **SC-28** — Protection of Information at Rest | For clients where data cannot leave the environment, local Ollama with GGUF models keeps all inference on-prem | "Clients with data residency requirements use the air-gap deployment. No external API calls. Model weights are on-prem. Evidence: Modelfile_beru3b loads a local GGUF." |
+| **SC-28** — Protection of Information at Rest | For environments where data cannot leave the boundary, local Ollama with GGUF models keeps inference local | "Data residency deployments use the local model path. No external API calls are required. Model weights are on-prem. Evidence: `BERU-AI/modelfiles/` and `BERU-AI/docker-compose.yml`." |
 
 **NIST AI RMF:**
 

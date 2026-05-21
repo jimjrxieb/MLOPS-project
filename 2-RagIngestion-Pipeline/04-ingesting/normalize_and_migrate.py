@@ -7,17 +7,19 @@ Fixes fragmented metadata and populates empty collections.
 import chromadb
 from pathlib import Path
 import sys
-import os
 from collections import Counter
 
-# Add pipeline root to path so we can import stages
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../02-preperation-factory')))
+SCRIPT_DIR = Path(__file__).resolve().parent
+RAG_ROOT = SCRIPT_DIR.parent
+FACTORY_DIR = RAG_ROOT / "02-preperation-factory"
+CHROMA_PATH = RAG_ROOT / "05-ragged-data" / "chroma"
+
+# Add pipeline root to path so we can import stages.
+sys.path.insert(0, str(FACTORY_DIR))
 from stages.schema_enforcement import validate_rag_item
 
-# Import the correct embedding function (768-dim nomic-embed-text via Ollama)
+# Import the correct embedding function (768-dim nomic-embed-text via Ollama).
 from ingest_to_chromadb import OllamaEmbeddingFunction
-
-CHROMA_PATH = "2-RagIngestion-Pipeline/05-ragged-data/chroma"
 
 # CRITICAL: Always use OllamaEmbeddingFunction (768-dim nomic-embed-text).
 # Without this, ChromaDB defaults to all-MiniLM-L6-v2 (384-dim) which is
@@ -34,7 +36,7 @@ COLLECTION_MAP = {
 
 def migrate():
     print(f"--- Starting Migration and Normalization ---")
-    client = chromadb.PersistentClient(path=CHROMA_PATH)
+    client = chromadb.PersistentClient(path=str(CHROMA_PATH))
     
     for src_name, target_name in COLLECTION_MAP.items():
         try:

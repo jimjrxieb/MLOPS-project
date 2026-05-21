@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 RAG to Training Data Migration Script
-Migrates processed RAG data from GP-OPENSEARCH to GP-MODEL-OPS for JADE training.
+Migrates processed RAG data from 2-RagIngestion-Pipeline to GP-MODEL-OPS for JADE training.
 
 Usage:
     python3 migrate_rag_to_training.py --dry-run    # Preview what will be moved
@@ -16,9 +16,10 @@ from typing import Dict, List, Tuple
 from collections import defaultdict
 
 # Paths
-OPENSEARCH_ROOT = Path("/home/jimmie/linkops-industries/GP-copilot/GP-OPENSEARCH")
+SCRIPT_DIR = Path(__file__).resolve().parent
+RAG_PIPELINE_ROOT = SCRIPT_DIR
 SAGEMAKER_ROOT = Path("/home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS")
-RAG_DATA_DIR = OPENSEARCH_ROOT / "05-ragged-data"
+RAG_DATA_DIR = RAG_PIPELINE_ROOT / "05-ragged-data"
 RAW_DATA_LAKE = SAGEMAKER_ROOT / "1-GP-GLUE" / "01-raw-data-lake"
 
 # Categories for organization
@@ -68,7 +69,7 @@ def scan_rag_data() -> Dict[str, List[Tuple[Path, int]]]:
     """Scan 05-ragged-data for training-ready files."""
     files_by_category = defaultdict(list)
 
-    print("🔍 Scanning GP-OPENSEARCH/05-ragged-data...")
+    print("🔍 Scanning 2-RagIngestion-Pipeline/05-ragged-data...")
 
     # Find all JSONL and MD files (excluding ChromaDB)
     for ext in [".jsonl", ".md"]:
@@ -152,7 +153,7 @@ def execute_migration(files_by_category: Dict[str, List[Tuple[Path, int]]], dry_
             size_kb = file_path.stat().st_size / 1024
             example_info = f"({example_count} examples)" if example_count > 0 else ""
             print(f"  {'→' if not dry_run else '•'} {file_path.name} {example_info}")
-            print(f"    Source: {file_path.relative_to(OPENSEARCH_ROOT)}")
+            print(f"    Source: {file_path.relative_to(RAG_PIPELINE_ROOT)}")
             print(f"    Dest:   {dest_path.relative_to(SAGEMAKER_ROOT)}")
             print(f"    Size:   {size_kb:.1f}KB")
 
@@ -224,7 +225,7 @@ def main():
 ╔══════════════════════════════════════════════════════════════════════════╗
 ║                                                                          ║
 ║   RAG → Training Data Migration                                         ║
-║   GP-OPENSEARCH/05-ragged-data → GP-MODEL-OPS/1-GP-GLUE/01-raw-data-lake║
+║   2-RagIngestion-Pipeline/05-ragged-data → 1-GP-GLUE/01-raw-data-lake  ║
 ║                                                                          ║
 ╚══════════════════════════════════════════════════════════════════════════╝
 """)
@@ -248,7 +249,7 @@ def main():
         print("Run without --dry-run to execute migration\n")
         execute_migration(files_by_category, dry_run=True)
     else:
-        print("\n⚠️  This will COPY files from GP-OPENSEARCH to GP-MODEL-OPS")
+        print("\n⚠️  This will COPY files from 2-RagIngestion-Pipeline to GP-MODEL-OPS")
         print("Original files will remain in RAG for continued use")
         confirm = input("\nProceed with migration? (yes/no): ")
 

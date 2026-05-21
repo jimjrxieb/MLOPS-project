@@ -64,7 +64,7 @@ MEASURE is the evaluation layer. GOVERN created the policies. MAP identified the
 **Subcategory:** The functionality and behavior of the AI system are monitored
 **BERU Evidence Required:**
 - MLflow inference tracking via `JADE-AI/mlops/inference_tracker.py` — every inference call logs model version, latency, RAG context IDs, output fingerprint
-- Prometheus + Grafana monitoring stack (`GP-INFRA/LinkOps-Manifests/helm/monitoring/`) with 9 PromQL alert rules
+- Monitoring stack evidence is tracked outside this capstone; BERU-specific inference metrics live in `BERU-AI/mlops/inference_tracker.py`
 - Drift-detection rule mapped to CM-3 in lineage manifest
 
 ---
@@ -117,7 +117,7 @@ MEASURE is the evaluation layer. GOVERN created the policies. MAP identified the
 **In plain English:** You checked whether BERU treats similar findings consistently across system types and contexts
 **BERU Evidence Required:**
 - Bias detection scripts in `4-eval-clarify/2-test-data/evaluation/bias-detection/detect_training_bias.py`
-- Fairness audit script: `GP-CONSULTING/AI-SEC-LENS/10-AI-SECURITY/06-MODEL-GOVERNANCE/01-auditors/audit-bias-fairness.sh`
+- Fairness and bias audit scripts are future hardening work for BERU; current evidence focuses on citation, evidence, and HITL guards
 - Break-scenario at `06-MODEL-GOVERNANCE/scenarios/break-GOVERN1-bias-regression.md`
 - Crosswalk at `frameworks/crosswalk/800-53-to-ai-rmf.md` maps "MEASURE 2.9 (fairness/bias) → BERU should classify risk consistently across system types"
 
@@ -180,7 +180,7 @@ MEASURE is the evaluation layer. GOVERN created the policies. MAP identified the
 ### MEASURE 3.3
 **Subcategory:** Feedback gathered from operators and users about negative AI impact
 **BERU Evidence Required:**
-- Feedback endpoint in `GP-INFRA/GP-API/routes/feedback.py` collects user-reported BERU errors
+- BERU error and inference tracking live in `BERU-AI/mlops/inference_tracker.py`; a user feedback endpoint is future work
 - Feedback loop in `1-FineTuning-Pipeline/feedback_loop.py` identifies categories where BERU underperforms
 - HITL approver disagreement rates tracked; sustained disagreement triggers a re-evaluation of the rank assignment logic
 

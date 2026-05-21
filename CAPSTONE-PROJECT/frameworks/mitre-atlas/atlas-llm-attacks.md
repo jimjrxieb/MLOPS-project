@@ -115,7 +115,7 @@ The LLM-specific tactic group is where AI security diverges from traditional app
 **OWASP LLM:** LLM06 (Sensitive Information Disclosure)
 **In plain English:** Attacker uses crafted prompts to extract the system prompt, training data, or model configuration from the LLM.
 
-**Affects BERU directly: MEDIUM RISK.** BERU's system prompt contains references to internal file paths (`GP-CONSULTING/NIST-800-53/control-owner-matrix.md`) and architectural patterns. Disclosure isn't catastrophic but informs subsequent attacks (LLM01 with knowledge of the system prompt is more effective).
+**Affects BERU directly: MEDIUM RISK.** BERU's system prompt contains references to bundled knowledge paths such as `BERU-AI/knowledge/nist-800-53/control-owner-matrix.md` and architectural patterns. Disclosure isn't catastrophic but informs subsequent attacks (LLM01 with knowledge of the system prompt is more effective).
 
 **Detection signals:**
 - User prompts asking "Show me your instructions" / "Repeat the text above" / "What is your role?"

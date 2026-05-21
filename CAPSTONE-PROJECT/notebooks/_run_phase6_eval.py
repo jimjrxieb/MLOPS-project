@@ -296,7 +296,7 @@ Base model `{config['model']['base_model']}` plus LoRA r={config['lora']['r']}/a
 ## Next steps
 
 {'1. **Promote** to champion at `6-model-cards/champion/beru-v1.md`.' if decision == 'PROMOTE' else '1. **Diagnose weak families** from the per-type / per-OWASP-LLM tables above; add targeted training data; re-run.'}
-2. Convert `merged_16bit/` to GGUF Q4_K_M and register with Ollama as `beru:v1.0` for production serving.
+2. Convert `merged_16bit/` to GGUF Q4_K_M and register with a versioned Ollama tag for eval.
 3. Cross-link this experiment in `CAPSTONE-PROJECT/templates/ai-inventory-register.md` (JSA-AI-003) under registered-versions.
 4. Once M4 (LangGraph agent) is built, run the agent eval suites to complete the 4-eval architecture.
 

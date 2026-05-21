@@ -684,7 +684,7 @@ This is the M3 capstone fine-tune run. Base model `{base_model_name}` plus LoRA 
 ## Next steps
 
 1. {'Update model card at `6-model-cards/champion/beru-v1.md` and archive the prior champion.' if decision == 'PROMOTE' else 'Identify weak categories from per-type / per-OWASP-LLM tables; add targeted training data; re-run.'}
-2. Convert merged 16-bit model to GGUF Q4_K_M and register with Ollama as `beru:v1.0` for deployment.
+2. Convert merged 16-bit model to GGUF Q4_K_M and register with a versioned Ollama tag for eval.
 3. Cross-link this experiment in `CAPSTONE-PROJECT/templates/ai-inventory-register.md` (JSA-AI-003) under the registered-versions table.
 4. Run agent suites once M4 (LangGraph) is built — completes the 4-eval architecture.
 

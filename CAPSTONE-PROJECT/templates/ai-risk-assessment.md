@@ -150,7 +150,7 @@ Likelihood: [1-5] × Impact: [1-5] = Score: [N] → Rank: [E/D/C/B/S]
 
 ---
 
-## Completed Example — BERU v1.0
+## Completed Example — BERU Current Prototype
 
 **Top risks:**
 

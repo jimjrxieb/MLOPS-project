@@ -1,7 +1,7 @@
 # M2 — RAG Architecture
 
 > **Goal:** Understand why RAG exists and build a retrieval pipeline that grounds BERU in real control text.
-> **Build:** Populate the `beru-nist-800-53` ChromaDB collection from `GP-CONSULTING/NIST-800-53/controls/`.
+> **Build:** Populate the `beru-nist-800-53` ChromaDB collection from `BERU-AI/knowledge/nist-800-53/controls/`.
 > **Gate:** Query "least privilege access" returns AC-6. Query "network boundary" returns SC-7.
 
 ---
@@ -128,7 +128,7 @@ client.get_or_create_collection(
 The existing RAG pipeline lives in `2-RagIngestion-Pipeline/`. The BERU ingestion will use it.
 
 Source documents for `beru-nist-800-53`:
-1. `GP-CONSULTING/NIST-800-53/controls/` — one `.md` file per control, with evidence questions
+1. `BERU-AI/knowledge/nist-800-53/controls/` — one `.md` file per control, with evidence questions
 2. `CAPSTONE-PROJECT/frameworks/nist-ai-600-1/` — AI RMF GOVERN/MAP/MANAGE subcategories
 3. `CAPSTONE-PROJECT/frameworks/crosswalk/800-53-to-ai-rmf.md` — the bidirectional mapping
 4. Gemini-generated synthetic SSPs (when you generate them) → parsed by `SSPParser`
@@ -172,7 +172,7 @@ ollama pull nomic-embed-text
 curl http://localhost:11434/api/tags  # should show nomic-embed-text
 
 # Step 2: Run ingestion pointing at NIST control files
-# (we'll write this script — it reads GP-CONSULTING/NIST-800-53/controls/)
+# The ingest path reads BERU-AI/knowledge/nist-800-53/controls/
 
 # Step 3: Verify retrieval works
 python3 -c "

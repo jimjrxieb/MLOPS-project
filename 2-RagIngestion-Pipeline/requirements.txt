@@ -1,0 +1,9 @@
+# Runtime dependencies for 2-RagIngestion-Pipeline.
+# Ollama must be running separately for embedding generation.
+chromadb
+networkx
+requests
+PyYAML
+
+# Optional: only needed when enabling Tier 3 Claude semantic labeling.
+anthropic

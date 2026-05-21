@@ -1,7 +1,7 @@
 # M1 — LLM Fundamentals
 
 > **Goal:** Understand how LLMs work well enough to use them reliably, not just hope they work.
-> **Build:** BERU system prompt — already exists in `BERU-AI/Modelfile_beru3b`. Understand every line.
+> **Build:** BERU system prompt — already exists in `BERU-AI/modelfiles/Modelfile_beru3b`. Understand every line.
 > **Gate:** System prompt produces correct 9-field output on 10 varied inputs via the Anthropic API.
 
 ---
@@ -42,7 +42,7 @@ For BERU: use `temperature=0` or very low (0.1). Compliance findings must be con
 
 The system prompt is what turns a generic LLM into BERU. It runs before every user message and sets the rules the model follows.
 
-Open `BERU-AI/Modelfile_beru3b`. The `SYSTEM """..."""` block is the system prompt. Read these parts:
+Open `BERU-AI/modelfiles/Modelfile_beru3b`. The `SYSTEM """..."""` block is the system prompt. Read these parts:
 
 ```
 YOUR ROLE:
@@ -110,7 +110,7 @@ text = response.content[0].text
 The pattern: `client → create → model + messages → parse response`. Same everywhere.
 
 ### The GP-API uses both
-`GP-INFRA/GP-API/routes/jade.py` — uses Claude Sonnet for B/S-rank decisions.
+Older JADE API routes used hosted-model calls for high-rank review decisions; BERU's current focus is local inference plus HITL routing.
 `BERU-AI/providers/ollama.py` — uses Ollama for local model serving.
 
 Both follow the same message array format.
@@ -158,8 +158,8 @@ The `TEMPLATE` block is critical and model-specific. LLaMA 3.1 and 3.2 share the
 
 **Registering a new model:**
 ```bash
-ollama create beru:v1.0 -f BERU-AI/Modelfile_beru3b
-ollama run beru:v1.0
+ollama create beru:local -f BERU-AI/modelfiles/Modelfile_beru3b
+ollama run beru:local
 # Test: "Assess this finding: Trivy found CVE-2024-1234 in base image"
 ```
 
@@ -175,7 +175,7 @@ ollama run beru:v1.0
 | `rate_limit_error` | Too many API calls | Add `time.sleep(1)` between calls; use batch endpoints where available |
 | `context_length_exceeded` | Too much input | Chunk or summarize the scanner output before sending |
 | Ollama returns empty string | Wrong stop tokens in Modelfile | Check the exact stop tokens for LLaMA 3.x: `<|eot_id|>`, `<|start_header_id|>` |
-| `ollama: model not found` | Model not registered | Run `ollama create beru:v1.0 -f Modelfile_beru3b` first |
+| `ollama: model not found` | Model not registered | Register the local Modelfile or use the Docker Compose `model-init` service |
 
 ---
 

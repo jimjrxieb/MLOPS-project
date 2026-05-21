@@ -1,8 +1,8 @@
 # M4 — Agentic Systems
 
 > **Goal:** Build a reasoning loop that takes a scanner file as input and produces a POA&M as output — without you in the middle.
-> **Build:** `BERU-AI/agent.py` — LangGraph agentic loop, end-to-end.
-> **Gate:** `python3 BERU-AI/agent.py --input sample-trivy.json` produces a POA&M and CISO summary.
+> **Build:** `BERU-AI/agent/graph.py` and `BERU-AI/agent/nodes.py` — LangGraph agentic loop, end-to-end.
+> **Gate:** BERU API or graph entry point produces findings, POA&M draft material, and CISO summary output.
 
 ---
 
@@ -56,7 +56,7 @@ def retrieve_context(state: BeruState) -> BeruState:
     ...
 
 def generate_findings(state: BeruState) -> BeruState:
-    # Calls LLM (Ollama/beru:v1.0) with control text in context
+    # Calls the BERU model through Ollama with control text in context
     ...
 
 def route_by_rank(state: BeruState) -> BeruState:
@@ -115,8 +115,8 @@ graph.add_conditional_edges(
 From `architecture-laws.md`:
 > Agents don't think — playbooks think. Agents execute.
 
-BERU's "thinking" is not in `agent.py`. It's in the playbooks:
-- `GP-CONSULTING/NIST-800-53/controls/` — what evidence to gather per control
+BERU's "thinking" is not in one prompt. It's in the playbooks:
+- `BERU-AI/knowledge/nist-800-53/controls/` — what evidence to gather per control
 - `CAPSTONE-PROJECT/frameworks/` — how to classify AI RMF findings
 - `BERU-AI/config/scanner_mappings.yaml` — which scanner maps to which controls
 
@@ -181,7 +181,7 @@ When the agent finishes, if `hitl_pending` is non-empty, the agent exits cleanly
 
 ```
 BERU: 2 findings queued for human review (B-rank)
-Review and approve with: python3 agent.py --approve <queue_id>
+Review through the HITL queue API or the queue files managed by `BERU-AI/tools/hitl_router.py`.
 ```
 
 The pipeline does not hang waiting for approval. It completes the E/D/C findings and stops. The human reviews the queue at their own schedule. This is the correct pattern — don't block production on human latency.
@@ -225,7 +225,7 @@ assert result["findings"][0]["scanner"] == "trivy"
 
 ## What You Build
 
-`BERU-AI/agent.py` — a LangGraph StateGraph with 6 nodes wired together:
+`BERU-AI/agent/graph.py` — a LangGraph StateGraph wired through `BERU-AI/agent/nodes.py`:
 
 ```
 parse_scanner → map_to_controls → retrieve_context → generate_findings → route_by_rank → produce_outputs
@@ -235,16 +235,11 @@ Each node uses the tools already built:
 - `ToolOutputParser` (core/) → node 1
 - `NISTMapper` (core/) → node 2
 - ChromaDB query (M2) → node 3
-- Ollama `beru:v1.0` call → node 4
+- BERU model call through Ollama/provider abstraction → node 4
 - `HITLRouter` (tools/) → node 5
 - `EvidencePackager` (tools/) → node 6
 
-**The demo test:**
-```bash
-python3 BERU-AI/agent.py \
-  --input GP-S3/6-seclab-reports/cybersec-evidence/sample-trivy.json \
-  --output /tmp/beru-output/
-```
+**The demo test:** use `CAPSTONE-PROJECT/DEMO.md` as the current reviewer path.
 
 Expected output:
 ```
@@ -256,7 +251,7 @@ Expected output:
 ```
 
 **3PAO question this answers:** "How does BERU decide what to do at each step?"
-Your answer: "BERU follows a defined LangGraph StateGraph — 6 nodes, fixed sequence, no improvisation. The nodes call tools that read playbooks. The routing logic for B/S-rank is architecturally enforced by HITLRouter before any output is written."
+Your answer: "BERU follows a defined LangGraph StateGraph with explicit guards and routing, not an open-ended autonomous loop. The nodes call tools that read playbooks. The routing logic for B/S-rank is architecturally enforced by HITLRouter before any high-risk output is trusted."
 
 ---
 

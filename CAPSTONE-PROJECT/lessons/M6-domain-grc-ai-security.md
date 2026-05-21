@@ -11,7 +11,7 @@
 
 Every AI engineer knows Python, RAG, and LLM APIs. Almost none of them understand NIST 800-53. That gap is where you separate from the field for the roles you're targeting.
 
-PwC, Deloitte, and the defense MLOps role all want AI engineers who can build the system AND explain its compliance posture. "I built a RAG pipeline over NIST controls" is table stakes. "I can tell you which controls BERU can assess autonomously, which require human judgment, and why — and I documented all of it" is what gets you in the room.
+Serious AI/GRC roles need engineers who can build the system and explain its compliance posture. "I built a RAG pipeline over NIST controls" is table stakes. "I can tell you which controls BERU can assess autonomously, which require human judgment, and why — and I documented all of it" is what gets you in the room.
 
 This module is the vocabulary. You don't need to memorize 800-53. You need to know the structure well enough to navigate it confidently.
 
@@ -109,7 +109,7 @@ POA&M = Plan of Action and Milestones. It's the remediation tracking document. E
 
 The SSP (System Security Plan) is the core authorization document. It describes how each control is implemented. Control implementation statements range from terrible to excellent.
 
-Look at `GP-CONSULTING/NIST-800-53/ssp-examples/` for the bad/good/great examples. The pattern:
+Look at `BERU-AI/knowledge/nist-800-53/ssp-examples/` for the bad/good/great examples. The pattern:
 
 | Quality | What it looks like |
 |---------|-------------------|
@@ -180,7 +180,7 @@ BERU's entire design is FedRAMP-aligned: local model (SC-28), synthetic training
 
 ## What You Build
 
-`GP-CONSULTING/NIST-800-53/BERU-COVERAGE.md` — one row per control family:
+`BERU-AI/BERU-COVERAGE.md` — one row per control family:
 
 ```markdown
 | Family | Controls BERU Can Assess | Evidence Tool | Cannot Assess Autonomously |

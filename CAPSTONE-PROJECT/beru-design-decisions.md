@@ -99,7 +99,7 @@ If you can't identify a control or justification, that's a signal to reconsider 
 - MANAGE 2.2 (human oversight): B/S route to HITL router — architecturally enforced, not just policy
 - MAP 4.2 (human interface): every B/S touch point is specified and tested
 
-**Evidence artifact:** `agent.py` — HITL router call on B/S rank. Unit test in `8-tests/` validates this path.
+**Evidence artifact:** `BERU-AI/agent/nodes.py` — HITL router call on B/S rank. Unit tests in `8-tests/` validate this path.
 
 ---
 
@@ -130,7 +130,7 @@ If you can't identify a control or justification, that's a signal to reconsider 
 **Decision:** Every BERU training run and eval run is logged to MLflow with params, metrics, and artifacts
 **Why:**
 1. Reproducibility — any run can be reconstructed from MLflow record
-2. Promotion decisions are evidence-backed — "we promoted v1.0 because eval score was 74%, beating v0.9's 61%"
+2. Promotion decisions are evidence-backed — blocked versions remain blocked when the eval gate is not met
 3. Compliance audit trail — auditor can review every model version decision
 
 **Control justification:**
@@ -182,7 +182,7 @@ If you can't identify a control or justification, that's a signal to reconsider 
 **Control justification (NIST 800-53 Rev 5):**
 - **CM-2 (Baseline Configuration):** `beru-nist-800-53` is a separate ChromaDB collection — distinct baseline from `jade-*` collections. Documenting the divergence here IS the baseline record.
 - **CM-3 (Configuration Change Control):** This decision document, along with the audit report at `GP-S3/3-mlops-reports/1-rag-staging/rag-ingestion-*-beru.md`, is the change record. Re-ingest is idempotent via stable IDs.
-- **SR-4 (Provenance):** Every chunk carries `source_file` and `source_path` metadata pointing to a version-controlled file under `GP-CONSULTING/NIST-800-53/controls/` or `CAPSTONE-PROJECT/frameworks/`.
+- **SR-4 (Provenance):** Every chunk carries `source_file` and `source_path` metadata pointing to a version-controlled file under `BERU-AI/knowledge/nist-800-53/controls/` or `BERU-AI/knowledge/frameworks/`.
 - **SI-7 (Information Integrity):** `STUB_PATTERNS` regex hard-aborts ingest if synthetic placeholder phrases appear in any chunk. Post-ingest verification re-scans stored documents for the same patterns.
 
 **Control justification (NIST AI RMF 1.0):**
@@ -231,7 +231,7 @@ If you can't identify a control or justification, that's a signal to reconsider 
 - Training corpus minimum unchanged: 500 examples per chunk (catastrophic-forgetting floor is independent of model size)
 
 **Control justification (NIST 800-53 Rev 5):**
-- **CM-2 (Baseline Configuration):** This document IS the rebaseline record. The new baseline is `llama3.2:3b` registered as `beru:base` (and `beru:v1.0` once fine-tuned).
+- **CM-2 (Baseline Configuration):** This document IS the rebaseline record. The base is `llama3.2:3b`; promoted BERU tags are created only after eval gates pass.
 - **CM-3 (Configuration Change Control):** D-001 stays in the record (not deleted, amended). The change is reviewable and traceable.
 - **SA-11 (Developer Testing and Evaluation):** Pre-fine-tune brain baseline runs against the rebaselined 3B before any training cycle starts — enforces "before/after with same eval suite" discipline.
 
@@ -255,7 +255,7 @@ If you can't identify a control or justification, that's a signal to reconsider 
 - The eval promotion gate (≥70% overall, ≥60% per family, zero hallucinated IDs)
 
 **Evidence artifacts:**
-- `BERU-AI/Modelfile_beru3b` (the new Modelfile)
+- `BERU-AI/modelfiles/Modelfile_beru3b` (the Modelfile)
 - `4-eval-clarify/3-results/beru/eval-llama3.2-3b-baseline-{ts}.json` (pre-fine-tune brain baseline — pending)
 - `5-experiments/exp-005-beru-3b-baseline/` (baseline run params + metrics — pending)
 - `templates/ai-inventory-register.md` (JSA-AI-003 updated)
@@ -457,7 +457,7 @@ We target 500 for the first SFT pass — the realistic-first-improvement band �
 
 `8-tests/test_beru_training_data.py:TestCorpusQuality` enforces:
 
-- `test_control_name_pairings_are_correct` — every `CONTROL: XX-N — name` line is checked against the canonical name table loaded from `GP-CONSULTING/NIST-800-53/controls/*.md` frontmatter. The very bug that broke the original 200 cannot pass.
+- `test_control_name_pairings_are_correct` — every `CONTROL: XX-N — name` line is checked against the canonical name table loaded from `BERU-AI/knowledge/nist-800-53/controls/*.md` frontmatter. The very bug that broke the original 200 cannot pass.
 - `test_remediation_strings_are_diverse` — no single remediation string occupies >5% of the corpus.
 - `test_risk_strings_are_diverse` — same threshold.
 - `test_evidence_gap_strings_are_diverse` — same threshold.

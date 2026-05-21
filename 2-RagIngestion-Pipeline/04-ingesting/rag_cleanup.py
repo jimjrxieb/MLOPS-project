@@ -22,8 +22,10 @@ from typing import List, Dict, Tuple
 import argparse
 
 # Paths
-SCRIPT_DIR = Path(__file__).parent
+SCRIPT_DIR = Path(__file__).resolve().parent
 RAG_ROOT = SCRIPT_DIR.parent  # GP-MODEL-OPS/2-RagIngestion-Pipeline/
+MODEL_OPS_ROOT = RAG_ROOT.parent
+GP_ROOT = MODEL_OPS_ROOT.parent
 CHROMA_PATH = RAG_ROOT / "05-ragged-data" / "chroma"
 
 # Basic definitions JADE v0.9 already knows from training
@@ -427,7 +429,7 @@ def ingest_concept_links(client, links: List[Dict], dry_run: bool = True) -> Dic
         coll.delete(ids=existing['ids'])
 
     # Use Ollama directly for embeddings (avoid RAG engine singleton conflict)
-    sys.path.insert(0, str(OPENSEARCH_ROOT.parent / "JADE-AI" / "core"))
+    sys.path.insert(0, str(GP_ROOT / "JADE-AI" / "core"))
     from ollama_embeddings import get_ollama_embeddings
     embed_model = get_ollama_embeddings()
 
