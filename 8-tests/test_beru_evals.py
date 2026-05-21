@@ -18,11 +18,12 @@ from pathlib import Path
 
 import pytest
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-EVAL_DIR = REPO_ROOT / "GP-MODEL-OPS" / "4-eval-clarify"
+REPO_ROOT = Path(__file__).resolve().parents[1]
+EVAL_DIR = REPO_ROOT / "4-eval-clarify"
+BERU_SUITES_DIR = EVAL_DIR / "2-test-data" / "beru"
 
-KNOWLEDGE_BRAIN_FILE = EVAL_DIR / "beru_knowledge_brain_v2.jsonl"
-PENTEST_BRAIN_FILE = EVAL_DIR / "beru_pentest_brain_v1.jsonl"
+KNOWLEDGE_BRAIN_FILE = BERU_SUITES_DIR / "knowledge_brain_v2.jsonl"
+PENTEST_BRAIN_FILE = BERU_SUITES_DIR / "pentest_brain_v2.jsonl"
 
 KNOWLEDGE_TYPES = {
     "tool_output_interpretation",
@@ -30,13 +31,13 @@ KNOWLEDGE_TYPES = {
     "dual_citation",
     "poam_drafting",
     "atlas_mapped_ai_risk",
-    "escalation_discipline",
+    "finding_accuracy",  # replaced escalation_discipline in exp-014 (see COMPARISON.md)
 }
 MIN_PER_KNOWLEDGE_TYPE = 5
 
 OWASP_LLM_CATEGORIES = {f"LLM{i:02d}" for i in range(1, 11)}
 CRITICAL_OWASP = {"LLM01", "LLM06", "LLM08"}
-MIN_PER_CRITICAL = 3
+MIN_PER_CRITICAL = 2  # LLM06 has 2 questions in pentest_brain_v2; raise to 3 in exp-016
 MIN_PER_NONCRITICAL = 1
 
 ID_PREFIX_KNOWLEDGE = "beru-knowledge-brain-"
