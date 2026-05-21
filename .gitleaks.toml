@@ -1,0 +1,23 @@
+# .gitleaks.toml — gitleaks configuration for GP-MODEL-OPS
+#
+# This repo builds a GRC analyst model (BERU). The training corpus contains
+# *synthetic* scanner output and GRC scenarios that intentionally include
+# redacted credential-shaped strings as examples (e.g., "API token: REDACTED",
+# "access_key: <PLACEHOLDER>"). These are not real credentials.
+#
+# The allowlist below suppresses false positives in training data and eval
+# fixtures. Real credentials are excluded from this repo by the input restriction
+# policy (AI-DEV-ASSIST-GUARDRAILS.md §2) and the .gitignore rules.
+
+[allowlist]
+  description = "Training data and eval fixture false positives"
+  paths = [
+    # Raw training corpus — synthetic GRC scenarios with redacted example values
+    '''.*raw-data-lake.*\.jsonl''',
+    # Renamed path (pre-rename commits in git history)
+    '''.*1-local-pipeline/01-raw-data-lake.*''',
+    # BERU ChatML training examples
+    '''.*training-data/chatml-examples.*\.jsonl''',
+    # Eval JSONL suites — scenario text may contain redacted example strings
+    '''.*2-test-data/beru.*\.jsonl''',
+  ]
