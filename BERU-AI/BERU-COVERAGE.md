@@ -3,10 +3,10 @@
 **Audience:** 3PAO assessors, MLOps mentors, GRC engineers evaluating whether BERU's
 output is fit-to-use for any specific control or system.
 **Status:** living document. Updated when corpus, prompt, or guards change.
-**Last updated:** 2026-05-13
-**Operating champion:** `beru:v1.5` (Llama-3.2-3B fine-tune) + the SSP-grading prompt
-introduced in `agent/nodes.py::_ssp_grading_prompt` ("promptfix").
-**Do-not-promote:** `beru:v1.6` (exp-012) — see [§5 Measured performance](#5-measured-performance).
+**Last updated:** 2026-05-20
+**Operating champion:** `beru:v1.6` (exp-012/014) — knowledge_brain 20.0%, pentest_brain 68.2%.
+**Active challenger:** `beru:v1.7` (exp-015) — knowledge_brain 34.1%, pentest_brain 63.0%. Not promoted (gate: 70%).
+**Next:** exp-016 — dual-citation generator + ATLAS scenario generator, target 5,000+ examples.
 
 > One-line summary: BERU reliably **screens** SSP claims against 42 bundled
 > NIST 800-53 Rev 5 controls in 12 families (11 with SSP exemplars + SR added

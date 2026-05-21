@@ -1,0 +1,17 @@
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# MLflow experiment runs (large, regenerable — view with `mlflow ui`)
+mlruns/
+
+# Unsloth / llama.cpp compiled artifacts (C++ build output, never commit)
+unsloth_compiled_cache/
+
+# Training corpus (regenerable with data lab scripts — see README)
+training-data/chatml-examples/
+training-data/_authoring/
+
+# API output temp files
+/tmp/beru-api/

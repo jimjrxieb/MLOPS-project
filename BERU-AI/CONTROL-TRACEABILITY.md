@@ -2,7 +2,7 @@
 
 **System:** BERU-AI — junior GRC analyst agent, LLaMA 3.2-3B fine-tuned + LangGraph orchestrator
 **Frameworks in scope:** NIST 800-53 Rev 5, NIST AI RMF 1.0, NIST AI 600-1 (Jul 2024)
-**Last updated:** 2026-05-11
+**Last updated:** 2026-05-20
 **Owner:** GP-Copilot platform team
 **Intended reader:** 3PAO auditor, internal compliance reviewer
 

@@ -1,4 +1,4 @@
-FROM /home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/3-model-registry/beru/v1.7/jade-v1.0-q4_k_m.gguf
+FROM /home/jimmie/linkops-industries/GP-copilot/GP-MODEL-OPS/3-model-registry/beru/v1.7/beru-v1.7-q4_k_m.gguf
 
 TEMPLATE """<|start_header_id|>system<|end_header_id|>
 
