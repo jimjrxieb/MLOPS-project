@@ -6,59 +6,60 @@ This is where models get interrogated before they're allowed to serve. Two eval 
 
 ---
 
-## Eval Suites
+## Active Eval Suites
 
 ### Knowledge Brain (`beru_knowledge_brain_v2.jsonl`)
 
 30 questions across 6 types that test BERU's GRC reasoning:
 
-| Type | What it tests | Count |
-|------|--------------|-------|
-| `finding_accuracy` | Given SSP claim + real evidence → PASS / PARTIAL / FAIL | 5 |
-| `evidence_gap_detection` | What's missing for a PASS? | 5 |
-| `poam_drafting` | Write a complete POA&M item from a finding | 5 |
-| `tool_output_interpretation` | Read scanner output → control ID + status | 5 |
-| `dual_citation` | 800-53 control + AI RMF subcategory simultaneously | 5 |
-| `atlas_mapped_ai_risk` | Map AI system risk to MITRE ATLAS technique | 5 |
+| Type | What it tests | v1.6 | v1.7 |
+|------|--------------|------|------|
+| `finding_accuracy` | SSP claim + real evidence → PASS / PARTIAL / FAIL | 40% | 48.8% |
+| `poam_drafting` | Write a complete POA&M item from a finding | 20% | 39.6% |
+| `tool_output_interpretation` | Read scanner output → control ID + status | 20% | 39.3% |
+| `evidence_gap_detection` | What's missing for a PASS? | 40% | 29.2% |
+| `dual_citation` | 800-53 control + AI RMF subcategory simultaneously | 0% | 24.2% |
+| `atlas_mapped_ai_risk` | Map AI system risk to MITRE ATLAS technique | 0% | 23.8% |
+| **Overall** | | **20.0%** | **34.1%** |
 
-Current gap: `dual_citation` 0%, `tool_output_interpretation` 20%. These are the targets for the next corpus generation.
+Gate: 70% overall / 60% per type. Neither version promoted yet.
 
-### Pentest Brain (`beru_pentest_brain_v1.jsonl`)
+### Pentest Brain (`beru_pentest_brain_v2.jsonl`)
 
-22 questions mapped to OWASP LLM Top 10. Tests whether BERU correctly handles adversarial prompts, data poisoning scenarios, and LLM-specific attack surfaces.
+22 questions mapped to OWASP LLM Top 10, framed as **evidence-in / finding-out** — matching BERU's production context where inputs arrive as scanner output and evidence reports, not direct user prompts.
 
-| Category | Weight | Current (exp-014) |
-|----------|--------|-------------------|
-| LLM01 Prompt Injection | — | 75% |
-| LLM04 Data/Model Poisoning | — | 100% |
-| LLM07 System Prompt Leakage | — | 100% |
-| LLM09 Misinformation | — | 100% |
-| LLM10 Unbounded Consumption | — | 100% |
-| LLM06 Excessive Agency | — | 67% |
-| LLM08 Vector/Embedding Weakness | — | 50% ← needs work |
-| LLM02 Sensitive Info Disclosure | — | 50% |
-| LLM03 Supply Chain | — | 50% |
-| LLM05 Improper Output Handling | — | 0% |
+| Category | v1.6 (PB v1) | v1.7 (PB v2†) |
+|----------|-------------|--------------|
+| LLM01 Prompt Injection | 75% | 35% |
+| LLM02–07, LLM08, LLM10 | varies | 70% each |
+| LLM09 Scope Discipline | 100% | 35% |
+| **Overall** | **68.2%** | **63.0%** |
+
+†PB v2 uses evidence-in/finding-out framing — scores are not directly comparable to PB v1.
 
 ### Workflow Brain (`beru_workflow_eval_v1.jsonl`)
 
 End-to-end scenario tests: given a full scanner output, produce a complete structured finding (all 9 fields). Tests the full BERU workflow, not individual capabilities.
+
+### SSP Grading (`eval_ssp_grading.py`)
+
+Grades SSP narrative quality against bad / good / great rubric. Results tracked per experiment in `3-results/beru/ssp_grading/`.
 
 ---
 
 ## Running Evals
 
 ```bash
-# Run knowledge brain eval (requires Ollama with beru:vX.X loaded)
-python3 beru_eval_runner.py --suite knowledge --model beru:v1.6
+# Run knowledge brain (requires Ollama with beru:vX.X loaded)
+python3 beru_eval_runner.py --suite knowledge --model beru:v1.7
 
 # Run pentest brain
-python3 beru_eval_runner.py --suite pentest --model beru:v1.6
+python3 beru_eval_runner.py --suite pentest --model beru:v1.7
 
-# Run both (full gate check)
-python3 beru_eval_runner.py --suite all --model beru:v1.6
+# Run both (full promotion gate check)
+python3 beru_eval_runner.py --suite all --model beru:v1.7
 
-# Results go to 3-results/beru/
+# Results written to 3-results/beru/
 ```
 
 ---
@@ -67,19 +68,24 @@ python3 beru_eval_runner.py --suite all --model beru:v1.6
 
 ```text
 4-eval-clarify/
-  beru_eval_runner.py          ← main eval runner
-  beru_knowledge_brain_v2.jsonl ← 30 KB questions (current)
-  beru_pentest_brain_v1.jsonl  ← 22 PB questions
-  beru_workflow_eval_v1.jsonl  ← end-to-end workflow scenarios
-  eval_ssp_grading.py          ← SSP quality grader (good/great tier)
-  workflow_scorer.py           ← workflow eval scorer
-  BENCHMARK_FRAMEWORK.md       ← original JADE eval design (historical)
-  1-model-registry/            ← model manifest per eval run
+  beru_eval_runner.py            ← main eval runner (knowledge + pentest + workflow)
+  beru_knowledge_brain_v2.jsonl  ← 30-question GRC reasoning suite (current)
+  beru_pentest_brain_v2.jsonl    ← 22-question OWASP LLM Top 10 suite (evidence-in framing)
+  beru_workflow_eval_v1.jsonl    ← end-to-end 9-field finding scenarios
+  eval_ssp_grading.py            ← SSP quality grader (bad/good/great tier)
+  build_workflow_eval.py         ← workflow eval builder
+  workflow_scorer.py             ← workflow eval scorer
+  BENCHMARK_FRAMEWORK.md        ← original JADE eval design (historical reference)
   2-test-data/
-    evaluation/                ← domain Q&A benchmarks (CKS, CKA, cloud, etc.)
-    beru/                      ← BERU-specific test fixtures
-    training-data/             ← faulty + fixed examples for eval testing
-  3-results/                   ← raw eval output per run (gitignored)
+    evaluation/                  ← domain Q&A benchmarks for JADE/Katie (CKS, CKA, cloud, etc.)
+    beru/                        ← BERU-specific test fixtures (TBD)
+    training-data/               ← faulty + fixed examples (JADE/Katie training artifacts)
+  3-results/
+    beru/
+      knowledge_brain/           ← per-run KB eval JSON (gitignored)
+      pentest_brain/             ← per-run PB eval JSON (gitignored)
+      ssp_grading/               ← SSP grading results exp-010 → exp-012 (tracked)
+  archive/                       ← superseded suites and old scripts
 ```
 
 ---
@@ -88,6 +94,8 @@ python3 beru_eval_runner.py --suite all --model beru:v1.6
 
 **Test behavior, not knowledge recall.** A model that can recite NIST control names but can't correctly grade a PASS/PARTIAL/FAIL from real evidence is useless for GRC work.
 
-**Question types must match the job.** Early eval suites included `escalation_discipline` questions (would BERU refuse to output a report until a human approved it). Wrong mental model — BERU produces documents. It doesn't gate on approvals. Replaced with `finding_accuracy` in exp-014.
+**Question types must match the job.** Early eval suites included `escalation_discipline` questions (would BERU refuse to output a report until a human approved it). Wrong mental model — BERU produces documents. Replaced with `finding_accuracy` in exp-014.
+
+**Suite framing must match production context.** The original pentest brain tested raw refusal behavior. BERU never receives direct user prompts in production — inputs arrive as CrewAI evidence reports. Pentest brain v2 reflects this with evidence-in / finding-out framing.
 
 **Separate the suites.** Knowledge brain tests subject matter expertise. Pentest brain tests adversarial robustness. They measure different things and a model can fail one while passing the other.
