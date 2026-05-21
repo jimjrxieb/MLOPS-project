@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Eval Question",
-  "description": "Benchmark question for model evaluation. Used in 4-eval-clarify/2-test-data/evaluation/*-benchmark/",
+  "description": "Benchmark question for JADE/Katie model evaluation. Used in 4-eval-clarify/2-test-data/evaluation/*-benchmark/. BERU eval questions (knowledge_brain, pentest_brain) live in 4-eval-clarify/2-test-data/beru/ and use a superset of this schema with type, validation_keywords, fail_indicators, and owasp_llm fields.",
   "type": "object",
   "required": ["id", "category", "question", "expected_keywords", "grading"],
   "properties": {

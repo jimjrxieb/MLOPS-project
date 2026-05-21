@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Evaluation Result",
-  "description": "Schema for model evaluation benchmark results. Written by eval_bridge.py.",
+  "description": "Schema for JADE/Katie evaluation benchmark results. Written by 1-FineTuning-Pipeline/eval_bridge.py. BERU eval results use a separate per-run JSON written by 4-eval-clarify/beru_eval_runner.py.",
   "type": "object",
   "required": ["model_path", "timestamp", "knowledge"],
   "properties": {
