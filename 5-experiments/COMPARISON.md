@@ -24,13 +24,17 @@ Promotion gate: **≥70% knowledge brain + ≥70% pentest brain**, per-type floo
 | 012 | beru-v1.6-3b | — | 13.3% | 81.8% | BLOCKED | KB marginal improvement; PB stable |
 | 013 | beru:v1.6 (live) | — | 20.0% | 68.2% | BLOCKED | Live Ollama serving eval; PB dip vs static |
 | 014 | beru:v1.6 (corrected) | — | 20.0% | 68.2% | BLOCKED | Corrected eval suite — see below |
+| 015 | beru:v1.7 | 1,832 | 34.1% | 63.0%† | BLOCKED | Purpose-built GRC corpus; 70% relative KB gain; pentest_brain v2 (evidence-in/finding-out) |
 
 \* exp-001 used a 466-question bridge eval. Not comparable to BERU eval suite.  
-\*\* exp-003 used a 10-question strict-keyword eval. Eval mismatch, not model failure.
+\*\* exp-003 used a 10-question strict-keyword eval. Eval mismatch, not model failure.  
+† exp-015 pentest_brain uses rebuilt v2 suite (evidence-in/finding-out framing); scores not directly comparable to exp-014 PB v1.
 
 ---
 
-## Per-Type Breakdown (BERU knowledge brain, exp-014)
+## Per-Type Breakdown (BERU knowledge brain)
+
+### exp-014 — beru:v1.6 champion
 
 | Question Type | Score | Notes |
 |---------------|-------|-------|
@@ -40,6 +44,18 @@ Promotion gate: **≥70% knowledge brain + ≥70% pentest brain**, per-type floo
 | `tool_output_interpretation` | 20% | Scanner output → control mapping |
 | `dual_citation` | 0% | 800-53 + AI RMF simultaneously — hardest capability |
 | `atlas_mapped_ai_risk` | 0% | MITRE ATLAS technique mapping |
+
+### exp-015 — beru:v1.7 challenger (not promoted)
+
+| Question Type | No-RAG | RAG | Notes |
+|---------------|--------|-----|-------|
+| `finding_accuracy` | 48.8% | 51.4% | Strongest category — GRC identity established |
+| `poam_drafting` | 39.6% | 42.4% | Solid gain from purpose-built corpus |
+| `tool_output_interpretation` | 39.3% | 22.7% | RAG hurt — retrieval injects competing control text |
+| `evidence_gap_detection` | 29.2% | 38.3% | RAG helps here |
+| `dual_citation` | 24.2% | 33.9% | Up from 0% — pattern partially learned |
+| `atlas_mapped_ai_risk` | 23.8% | 22.1% | ATLAS taxonomy still underrepresented in corpus |
+| **Overall** | **34.1%** | **35.1%** | 70% relative gain over v1.6 |
 
 ---
 
@@ -58,9 +74,9 @@ Promotion gate: **≥70% knowledge brain + ≥70% pentest brain**, per-type floo
 
 max_seq_length of 4096 was truncating 50-80% of every eval prompt. Increasing to 8192 recovered 13pp on KB in one run. Always validate that eval prompts fit the context window before attributing results to the model.
 
-### The dual-citation gap (persistent across all runs)
+### The dual-citation gap (exp-006 → exp-015)
 
-`dual_citation` scores 0% across every experiment. The training corpus describes the format (cite both 800-53 + AI RMF) but doesn't give enough examples of the *trigger pattern* — recognizing that an AI system is in scope and switching into dual-citation mode. exp-015 targets this with realistic garak/promptfoo/MLflow audit inputs.
+`dual_citation` scored 0% through exp-014. The corpus described the format but didn't give enough examples of the *trigger pattern* — recognizing an AI system is in scope and switching into dual-citation mode. exp-015's purpose-built GRC corpus moved this to 24.2% (no-RAG) and 33.9% (with RAG), confirming the capability is learnable. exp-016 targets 60%+ with a dedicated dual-citation generator producing explicit 800-53 ↔ AI RMF pairing examples.
 
 ### The eval design problem (exp-013 → exp-014)
 
@@ -75,3 +91,5 @@ The original suite included `escalation_discipline` questions that tested whethe
 | 2026-05-08 | Rebaseline to 3B from 8B | 8B fine-tune takes 9+ hours on RTX 5080; 3B trains in ~45 min per chunk with comparable GRC output quality |
 | 2026-05-14 | Remove escalation_discipline questions | Wrong mental model — BERU produces documents, not actions |
 | 2026-05-14 | Add finding_accuracy questions | SSP claim vs real evidence grading is BERU's actual job |
+| 2026-05-20 | Rebuild pentest_brain as v2 | Evidence-in/finding-out framing matches BERU's production context (CrewAI receives evidence reports, not direct prompts) |
+| 2026-05-20 | Purpose-built GRC corpus for exp-015 | Remove Katie/JADE K8s contamination from raw data lake; 1,832 clean examples |

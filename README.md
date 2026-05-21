@@ -4,7 +4,7 @@
 
 I'm building AI agents tailored to GRC — the unglamorous but necessary work of mapping findings to NIST controls, drafting POA&M items, and producing evidence that holds up in front of a 3PAO. This repo is the training lab. It's where the models get built, evaluated, and promoted to the serving layer.
 
-Fourteen experiments in. Still iterating. The gates are real.
+Fifteen experiments in. Still iterating. The gates are real.
 
 ---
 
@@ -18,12 +18,13 @@ A full MLOps pipeline for three AI agents — BERU, JADE, and Katie — plus the
 2-RagIngestion-Pipeline/ ← RAG pipeline. 7-stage prep factory → ChromaDB (33k+ docs).
 3-model-registry/    ← Artifact store. Weights, GGUFs, Modelfiles per version.
 4-eval-clarify/      ← Eval suites. knowledge-brain, pentest-brain, workflow-brain.
-5-experiments/       ← 14 tracked experiments. params.yaml + metrics.json + notes.md each.
+5-experiments/       ← 15 tracked experiments. params.yaml + metrics.json + notes.md each.
 6-model-cards/       ← Model governance. Champion/challenger docs.
 7-data-schemas/      ← Data contracts. JSON Schema for training + eval formats.
 8-tests/             ← Quality gates. pytest runs in CI before any build.
 10-crewai-mlops/     ← CrewAI crews. 3 production crews, one architectural pattern.
-BERU-AI/             ← The running system. FastAPI + Docker + MLflow tracking.
+BERU-AI/             ← The running system. FastAPI + LangGraph + Docker + MLflow tracking.
+RANK-AI/             ← E/D/C/B/S rank classifier. sklearn model + training data.
 CAPSTONE-PROJECT/    ← Design decisions, NIST AI RMF frameworks, intake templates.
 ```
 
@@ -81,7 +82,7 @@ This keeps token cost low, failures diagnosable, and agents focused on what they
 | Crew | Purpose | Port |
 |------|---------|------|
 | `synthetic_pipeline` | Convert JSA findings to ChatML training examples | 8001 |
-| `beru` | NIST 800-53 audit sub-crews (beru_audit, ssp_to_poam, ac-access-control) | 8089 |
+| `beru` | 7 NIST 800-53 + federal compliance sub-crews (beru_audit, ssp_to_poam, ac, au, icam, ai-safety, zt) | 8089 |
 | `rag_ingestion` | Quality-review + label + route RAG prep batches | 8002 |
 
 See [`10-crewai-mlops/README.md`](10-crewai-mlops/README.md) for the full architecture.
@@ -90,12 +91,11 @@ See [`10-crewai-mlops/README.md`](10-crewai-mlops/README.md) for the full archit
 
 ## Models
 
-| Model | Base | Domain | Current Status |
-|-------|------|--------|---------------|
-| **BERU** | Llama 3.2-3B | NIST 800-53 + AI RMF GRC analyst | exp-014: KB 20% / PB 68.2% — blocked at 70% gate |
+| Model | Role | Champion | Challenger | Gate |
+|-------|------|----------|-----------|------|
+| **BERU** | NIST 800-53 + AI RMF GRC analyst | v1.6 — KB 20.0% / PB 68.2% | v1.7 (exp-015) — KB 34.1% / PB 63.0% | ≥70% KB + PB, 60% per-type floor |
 
-**BERU promotion gate:** ≥70% knowledge brain + ≥70% pentest brain. Per-type floor: 60%.  
-14 experiments completed. Current gap is `dual_citation` (0%) and `tool_output_interpretation` (20%) — the next training corpus targets these specifically.
+**15 experiments completed.** v1.7 raised `finding_accuracy` to 48.8% (+8pp) and overall knowledge_brain to 34.1% — a 70% relative gain over v1.6. Remaining gaps: `dual_citation` 24.2% (needs explicit 800-53 ↔ AI RMF pairing examples) and `atlas_mapped_ai_risk` 23.8% (needs MITRE ATLAS technique → control mapping scenarios). exp-016 targets both with dedicated generators and a 5,000+ example corpus.
 
 ---
 
