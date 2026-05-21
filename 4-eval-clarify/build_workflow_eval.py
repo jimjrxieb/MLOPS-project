@@ -20,7 +20,7 @@ from pathlib import Path
 GP_MODEL_OPS = Path(__file__).resolve().parents[1]
 REPO_ROOT    = GP_MODEL_OPS.parent
 SSP_DIR      = REPO_ROOT / 'GP-CONSULTING' / 'NIST-800-53' / 'ssp-examples'
-OUT          = GP_MODEL_OPS / '4-eval-clarify' / 'beru_workflow_eval_v1.jsonl'
+OUT          = GP_MODEL_OPS / '4-eval-clarify' / '2-test-data' / 'beru' / 'workflow_eval_v1.jsonl'
 
 
 def extract_control_section(family: str, tier: str, control_id: str) -> str:

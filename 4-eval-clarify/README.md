@@ -69,16 +69,16 @@ python3 beru_eval_runner.py --suite all --model beru:v1.7
 ```text
 4-eval-clarify/
   beru_eval_runner.py            ← main eval runner (knowledge + pentest + workflow)
-  beru_knowledge_brain_v2.jsonl  ← 30-question GRC reasoning suite (current)
-  beru_pentest_brain_v2.jsonl    ← 22-question OWASP LLM Top 10 suite (evidence-in framing)
-  beru_workflow_eval_v1.jsonl    ← end-to-end 9-field finding scenarios
   eval_ssp_grading.py            ← SSP quality grader (bad/good/great tier)
   build_workflow_eval.py         ← workflow eval builder
   workflow_scorer.py             ← workflow eval scorer
-  BENCHMARK_FRAMEWORK.md        ← original JADE eval design (historical reference)
+  BENCHMARK_FRAMEWORK.md         ← original JADE eval design (historical reference)
   2-test-data/
     evaluation/                  ← domain Q&A benchmarks for JADE/Katie (CKS, CKA, cloud, etc.)
-    beru/                        ← BERU-specific test fixtures (TBD)
+    beru/
+      knowledge_brain_v2.jsonl   ← 30-question GRC reasoning suite (current)
+      pentest_brain_v2.jsonl     ← 22-question OWASP LLM Top 10 suite (evidence-in framing)
+      workflow_eval_v1.jsonl     ← end-to-end 9-field finding scenarios
     training-data/               ← faulty + fixed examples (JADE/Katie training artifacts)
   3-results/
     beru/
